@@ -26,6 +26,7 @@ CLIENT_URL= http://localhost:5173
 
 ## Usage
 
-1. Start the server using `npm run dev`.
-2. Access the website folder using `cd client`.
-3. Start the website using `npm run dev`.
+1. Install the dependencies using `npm run build`.
+2. Start the server using `npm run dev`.
+3. Access the website folder using `cd client/`.
+4. Start the website using `npm run dev`.
