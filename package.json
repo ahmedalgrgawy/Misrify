@@ -2,10 +2,10 @@
   "name": "graduation-project",
   "version": "1.0.0",
   "description": "\"# Graduation-Project\"",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "dev": "SET NODE_ENV=development & nodemon server/index.js",
-    "start": "SET NODE_ENV=production & nodemon server/index.js",
+    "dev": "SET NODE_ENV=development & nodemon server/server.js",
+    "start": "SET NODE_ENV=production & nodemon server/server.js",
     "build": "npm install && npm install --prefix client"
   },
   "keywords": [],
