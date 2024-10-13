@@ -17,11 +17,17 @@ To run this project, you need to set up the following environment variables:
 ### Required Environment Variables
 
 ```plaintext
-MONGO_URL=
+MONGO_URL=mongodb+srv://ahmedalgrgawy:6td0wkHouzGCi2mn@cluster0.8fnau.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
 PORT=5000
+
 JWT_SECRET=graduationTeam@dr_nora2025
+
 NODE_ENV=development
+
 CLIENT_URL= http://localhost:5173
+
+
 ```
 
 ## Usage
