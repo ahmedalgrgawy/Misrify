@@ -8,7 +8,7 @@ const orderSchema = new mongoose.Schema({
     },
     coupon: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Coupons",
+        ref: "Coupon",
     },
     orderItems: [
         {
