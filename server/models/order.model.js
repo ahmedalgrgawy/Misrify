@@ -6,7 +6,7 @@ const orderSchema = new mongoose.Schema({
         ref: "User",
         required: [true, "User is required"],
     },
-    Coupon: {
+    coupon: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Coupons",
     },
