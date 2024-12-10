@@ -10,7 +10,7 @@ const categorySchema = new mongoose.Schema({
         type: String,
         required: [true, "Description is required"],
     }
-})
+}, { timestamps: true })
 
 const Category = mongoose.model("Category", categorySchema);
 
