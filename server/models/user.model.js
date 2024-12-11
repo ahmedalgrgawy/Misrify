@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["male", "female"],
         default: "male",
+        required: [true, "Gender is Required"]
     },
     role: {
         type: String,
@@ -52,6 +53,10 @@ const userSchema = new mongoose.Schema({
             default: []
         }
     ],
+    isVerified: {
+        type: Boolean,
+        default: false
+    }
 }, { timestamps: true })
 
 userSchema.pre("save", async function (next) {
