@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken"
 import redis from "../lib/redis.js"
 
 export const generateToken = (userId) => {
-    const accessToken = jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
+    const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '15m' })
 
-    const refreshToken = jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: '7d' })
+    const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_TOKEN, { expiresIn: '7d' })
 
     return { accessToken, refreshToken }
 }

@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import cors from "cors";
 import { connectDb } from './lib/connectDb.js';
 import { wrapRoutes } from './routes/index.routes.js';
+import bodyParser from 'body-parser'
 
 dotenv.config()
 
@@ -13,6 +14,8 @@ const port = process.env.PORT || 5000;
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }))
 
 app.use(express.json())
+
+app.use(bodyParser.json());
 
 app.use(cookieParser())
 
