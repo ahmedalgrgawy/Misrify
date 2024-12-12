@@ -1,9 +1,10 @@
 import redis from "../lib/redis.js";
 import User from "../models/user.model.js";
-import { generateToken } from "../services/jwt.service.js";
+import { generateToken, storeTokenInCookies, storeTokenInRedis } from "../services/jwt.service.js";
 import { sendWelcomeEmail } from "../services/nodemailer.service.js";
 import { sendResetOtp, sendVerifyOtp } from "../services/otp.service.js";
 import { generateOtp, generateResetPasswordOtp } from "../utils/generators.js";
+import { validateCollegeEmail, validateEmail } from "../utils/validation.js";
 
 export const signup = async (req, res) => {
     try {
@@ -30,7 +31,7 @@ export const signup = async (req, res) => {
         user.otp = otp
         user.otpExpiry = otpExpiry
 
-        // TODO: send otp to email
+        // Check: send otp to email
         sendVerifyOtp(email, name, otp);
 
         const { accessToken, refreshToken } = generateToken(user._id);

@@ -1,5 +1,6 @@
 import { resetEmailTemplate } from "../views/resetEmailTemplate.js";
 import { verifyEmailTemplate } from "../views/verifyEmailTemplate.js"
+import { sendEmail } from "./nodemailer.service.js";
 
 export const sendVerifyOtp = async (email, name, otp) => {
     try {
