@@ -34,3 +34,27 @@ export const protectedRoute = async (req, res, next) => {
         return res.status(401).json({ success: false, message: "Unauthorized" })
     }
 }
+
+export const adminRoute = (req, res, next) => {
+    try {
+        if (req.user && req.user.role === 'admin') {
+            next()
+        } else {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+    } catch (error) {
+        return res.status(401).json({ success: false, message: "Unauthorized" })
+    }
+}
+
+export const merchantRoute = (req, res, next) => {
+    try {
+        if (req.user && req.user.role === 'merchant') {
+            next()
+        } else {
+            return res.status(401).json({ success: false, message: "Unauthorized" })
+        }
+    } catch (error) {
+        return res.status(401).json({ success: false, message: "Unauthorized" })
+    }
+}
