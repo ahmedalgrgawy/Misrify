@@ -1,10 +1,13 @@
 import crypto from "crypto"
 
 export const generateOtp = () => {
-    return {
-        otp: Math.floor(1000 + Math.random() * 9000),
-        otpExpiry: Date.now() + 10 * 60 * 1000 // 10 minutes
-    }
+
+    const otp = Math.floor(1000 + Math.random() * 9000)
+
+    const otpExpiry = Date.now() + 10 * 60 * 1000 // 10 minutes
+
+
+    return { otp, otpExpiry }
 }
 
 export const generateResetPasswordOtp = () => {
