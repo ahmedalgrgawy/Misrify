@@ -8,7 +8,7 @@ import { validateCollegeEmail, validateEmail } from "../utils/validation.js";
 
 export const signup = async (req, res) => {
     try {
-        const { name, email, password, phoneNumber, address, gender, points } = req.body;
+        const { name, email, password, phoneNumber, address, gender } = req.body;
 
         if (!validateEmail(email)) {
             res.status(401).json({ success: false, message: "Invalid Email" })
@@ -20,19 +20,19 @@ export const signup = async (req, res) => {
             res.status(401).json({ success: false, message: "User Already Exist" })
         }
 
-        if (validateCollegeEmail(email)) {
-            points = 100;
-        }
+        const user = new User({ name, email, password, phoneNumber, address, gender });
 
-        const user = new User({ name, email, password, phoneNumber, address, gender, points });
+        if (validateCollegeEmail(email)) {
+            user.points = 100;
+        }
 
         const { otp, otpExpiry } = generateOtp();
 
-        user.otp = otp
-        user.otpExpiry = otpExpiry
+        user.otp = otp;
+        user.otpExpiry = otpExpiry;
 
         // Check: send otp to email
-        sendVerifyOtp(email, name, otp);
+        sendVerifyOtp(user.email, user.name, user.otp);
 
         const { accessToken, refreshToken } = generateToken(user._id);
 
@@ -42,7 +42,7 @@ export const signup = async (req, res) => {
 
         await user.save();
 
-        res.status(200).json({ success: true, message: "User Created Successfully" })
+        res.status(200).json({ success: true, message: "User Created Successfully", user })
 
     } catch (error) {
         console.log(error);
