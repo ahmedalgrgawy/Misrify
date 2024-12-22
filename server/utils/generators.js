@@ -6,13 +6,14 @@ export const generateOtp = () => {
 
     const otpExpiry = Date.now() + 10 * 60 * 1000 // 10 minutes
 
-
     return { otp, otpExpiry }
 }
 
 export const generateResetPasswordOtp = () => {
-    return {
-        resetPasswordOtp: crypto.randomBytes(20).toString("hex"),
-        resetPasswordOtpExpiry: Date.now() + 10 * 60 * 1000 // 10 minutes
-    }
+
+    const resetPasswordOtp = crypto.randomBytes(20).toString("hex")
+
+    const resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000 // 10 minutes
+
+    return { resetPasswordOtp, resetPasswordOtpExpiry }
 }
