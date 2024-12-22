@@ -1,9 +1,9 @@
 import express from "express"
 import { checkAuth, forgotPassword, login, logout, reCreateAccessToken, resetPassword, signup, verifyEmail } from "../controllers/auth.controllers.js";
 import { protectedRoute } from "../middlewares/auth.middlewares.js";
-import catchAsync from "../utils/catchAsync.js";
 import { validate } from "../services/validate.service.js";
 import { forgotPasswordValidationSchema, loginValidationSchema, resetPasswordValidationSchema, signupValidationSchema, verifyEmailValidationSchema } from "../validators/userValidator.js";
+import catchAsync from "../errors/catchAsync.js";
 
 const router = express.Router()
 
