@@ -12,8 +12,8 @@ export const signupValidationSchema = Joi.object({
         "string.min": "Password must be at least 6 characters long",
         "string.empty": "Password is required",
     }),
-    phoneNumber: Joi.string().required().messages({
-        "string.empty": "Phone number is required",
+    phoneNumber: Joi.number().required().messages({
+        "number.empty": "Phone number is required",
     }),
     address: Joi.string().required().messages({
         "string.empty": "Address is required",
@@ -21,7 +21,7 @@ export const signupValidationSchema = Joi.object({
     gender: Joi.string().valid("male", "female").required().messages({
         "any.only": "Gender must be 'male' or 'female'",
         "string.empty": "Gender is required",
-    }),
+    })
 });
 
 export const verifyEmailValidationSchema = Joi.object({
@@ -29,8 +29,8 @@ export const verifyEmailValidationSchema = Joi.object({
         "string.email": "A valid email address is required",
         "string.empty": "Email is required",
     }),
-    otp: Joi.string().required().messages({
-        "string.empty": "OTP is required",
+    otp: Joi.number().required().messages({
+        "number.empty": "OTP is required",
     }),
 })
 
@@ -57,8 +57,8 @@ export const resetPasswordValidationSchema = Joi.object({
         "string.email": "A valid email address is required",
         "string.empty": "Email is required",
     }),
-    resetPasswordOtp: Joi.string().required().messages({
-        "string.empty": "OTP is required",
+    resetPasswordOtp: Joi.number().required().messages({
+        "number.empty": "OTP is required",
     }),
     newPassword: Joi.string().min(6).required().messages({
         "string.min": "Password must be at least 6 characters long",

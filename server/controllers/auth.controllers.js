@@ -5,7 +5,7 @@ import { generateToken, storeTokenInCookies, storeTokenInRedis } from "../servic
 import { sendWelcomeEmail } from "../services/nodemailer.service.js";
 import { sendResetOtp, sendVerifyOtp } from "../services/otp.service.js";
 import { generateOtp, generateResetPasswordOtp } from "../utils/generators.js";
-import { validateCollegeEmail } from "../utils/validation.js";
+import { validateCollegeEmail } from "../validators/validateCollegeEmail.js";
 
 export const signup = async (req, res, next) => {
     const { name, email, password, phoneNumber, address, gender } = req.body;
@@ -13,7 +13,7 @@ export const signup = async (req, res, next) => {
     const isUserExist = await User.findOne({ email });
 
     if (isUserExist) {
-        next(new AppError("User Already Exist", 401))
+        return next(new AppError("User Already Exist", 401))
     }
 
     const user = new User({ name, email, password, phoneNumber, address, gender });
@@ -39,40 +39,38 @@ export const signup = async (req, res, next) => {
     await user.save();
 
     user.password = undefined;
+    user.otp = undefined;
 
     res.status(200).json({ success: true, message: "User Created Successfully", user })
 }
 
-export const verifyEmail = async (req, res) => {
+export const verifyEmail = async (req, res, next) => {
     const { email, otp } = req.body;
 
-    if (!otp) {
-        next(new AppError("OTP is required", 401))
-    }
-
-    if (otpExpiry < Date.now()) {
-        next(new AppError("OTP Expired", 401))
-    }
-
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }).select('-password');
 
     if (!user) {
-        next(new AppError("User Does Not Exist", 401))
+        return next(new AppError("User Does Not Exist", 401))
+    }
+
+    if (user.otpExpiry < Date.now()) {
+        return next(new AppError("OTP Expired", 401))
     }
 
     if (user.otp !== otp) {
-        next(new AppError("Invalid OTP", 401))
+        return next(new AppError("Invalid OTP", 401))
     }
 
     user.otp = null;
     user.otpExpiry = null;
+
     user.isVerified = true;
 
     await user.save();
 
     await sendWelcomeEmail(user.email, user.name);
 
-    res.status(200).json({ success: true, message: "Email Verified Successfully" })
+    res.status(200).json({ success: true, message: "Email Verified Successfully", user })
 }
 
 export const login = async (req, res) => {
