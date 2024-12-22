@@ -123,25 +123,33 @@ export const forgotPassword = async (req, res, next) => {
     res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully" })
 }
 
-export const resetPassword = async (req, res) => {
-    const { resetPasswordOtp, newPassword } = req.body
+export const resetPassword = async (req, res,next) => {
+    const { email, resetPasswordOtp, newPassword } = req.body
 
-    const user = await User.findOne({
-        resetPasswordOtp: resetPasswordOtp,
-        resetPasswordOtpExpiry: { $gt: Date.now() }
-    })
+    const user = await User.findOne({ email });
 
     if (!user) {
-        res.status(401).json({ success: false, message: "Invalid OTP" })
+        return next(new AppError("User Does Not Exist", 401))
+    }
+
+    if (user.resetPasswordOtpExpiry < Date.now()) {
+        return next(new AppError("OTP Expired", 401))
+    }
+
+    if (user.resetPasswordOtp !== resetPasswordOtp) {
+        return next(new AppError("Invalid OTP", 401))
     }
 
     user.password = newPassword;
+
     user.resetPasswordOtp = null;
     user.resetPasswordOtpExpiry = null;
 
     await user.save();
 
-    res.status(200).json({ success: true, message: "Password Reset Successfully" })
+    user.password = undefined
+
+    res.status(200).json({ success: true, message: "Password Reset Successfully", user })
 }
 
 export const logout = async (req, res) => {
