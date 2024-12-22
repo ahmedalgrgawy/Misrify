@@ -1,38 +1,34 @@
 import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import User from '../models/user.model.js'
+import AppError from '../errors/AppError.js'
 dotenv.config()
 
 export const protectedRoute = async (req, res, next) => {
-    try {
+    const accessToken = req.cookies.accessToken
 
-        const accessToken = req.cookies.accessToken
+    if (accessToken) {
 
-        if (accessToken) {
+        try {
+            const decodedToken = jwt.verify(accessToken, process.env.JWT_SECRET)
 
-            try {
-                const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET)
+            const user = await User.findById(decodedToken.userId).select('-password')
 
-                const user = await User.findById(decodedToken.userId).select('-password')
+            if (!user) return next(new AppError("Unauthorized, User Not Found", 401))
 
-                if (!user) return res.status(401).json({ success: false, message: "Unauthorized, User Not Found" })
+            req.user = user;
 
-                req.user = user;
-
-                next()
-            } catch (error) {
-                if (error.name === 'TokenExpiredError') {
-                    return res.status(401).json({ success: false, message: "Unauthorized, Token Expired" })
-                }
-                throw error;
+            next()
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                return next(new AppError("Unauthorized, Token Expired", 401))
             }
-        } else {
-            return res.status(401).json({ success: false, message: "Unauthorized, No Token Provided" })
+            throw error;
         }
-
-    } catch (error) {
-        return res.status(401).json({ success: false, message: "Unauthorized" })
+    } else {
+        return next(new AppError("Unauthorized, No Token Provided", 401))
     }
+
 }
 
 export const adminRoute = (req, res, next) => {
