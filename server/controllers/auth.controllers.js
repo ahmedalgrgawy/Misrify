@@ -1,251 +1,198 @@
+import AppError from "../errors/AppError.js";
 import redis from "../lib/redis.js";
 import User from "../models/user.model.js";
 import { generateToken, storeTokenInCookies, storeTokenInRedis } from "../services/jwt.service.js";
 import { sendWelcomeEmail } from "../services/nodemailer.service.js";
 import { sendResetOtp, sendVerifyOtp } from "../services/otp.service.js";
 import { generateOtp, generateResetPasswordOtp } from "../utils/generators.js";
-import { validateCollegeEmail, validateEmail } from "../utils/validation.js";
+import { validateCollegeEmail } from "../utils/validation.js";
 
-export const signup = async (req, res) => {
-    try {
-        const { name, email, password, phoneNumber, address, gender } = req.body;
+export const signup = async (req, res, next) => {
+    const { name, email, password, phoneNumber, address, gender } = req.body;
 
-        const isUserExist = await User.findOne({ email });
+    const isUserExist = await User.findOne({ email });
 
-        if (isUserExist) {
-            res.status(401).json({ success: false, message: "User Already Exist" })
-        }
-
-        const user = new User({ name, email, password, phoneNumber, address, gender });
-
-        if (validateCollegeEmail(email)) {
-            user.points = 100;
-        }
-
-        const { otp, otpExpiry } = generateOtp();
-
-        user.otp = otp;
-        user.otpExpiry = otpExpiry;
-
-        // Check: send otp to email
-        sendVerifyOtp(user.email, user.name, user.otp);
-
-        const { accessToken, refreshToken } = generateToken(user._id);
-
-        await storeTokenInRedis(user._id, refreshToken);
-
-        storeTokenInCookies(res, accessToken, refreshToken);
-
-        await user.save();
-
-        user.password = undefined;
-
-        res.status(200).json({ success: true, message: "User Created Successfully", user })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    if (isUserExist) {
+        next(new AppError("User Already Exist", 401))
     }
+
+    const user = new User({ name, email, password, phoneNumber, address, gender });
+
+    if (validateCollegeEmail(email)) {
+        user.points = 100;
+    }
+
+    const { otp, otpExpiry } = generateOtp();
+
+    user.otp = otp;
+    user.otpExpiry = otpExpiry;
+
+    // Check: send otp to email
+    sendVerifyOtp(user.email, user.name, user.otp);
+
+    const { accessToken, refreshToken } = generateToken(user._id);
+
+    await storeTokenInRedis(user._id, refreshToken);
+
+    storeTokenInCookies(res, accessToken, refreshToken);
+
+    await user.save();
+
+    user.password = undefined;
+
+    res.status(200).json({ success: true, message: "User Created Successfully", user })
 }
 
 export const verifyEmail = async (req, res) => {
-    try {
-        const { email, otp } = req.body;
+    const { email, otp } = req.body;
 
-        if (!otp) {
-            res.status(401).json({ success: false, message: "OTP is required" })
-        }
-
-        if (otpExpiry < Date.now()) {
-            res.status(401).json({ success: false, message: "OTP Expired" })
-        }
-
-        const user = await User.findOne({ email })
-
-        if (!user) {
-            res.status(401).json({ success: false, message: "User Does Not Exist" })
-        }
-
-        if (user.otp !== otp) {
-            res.status(401).json({ success: false, message: "Invalid OTP" })
-        }
-
-        user.otp = null;
-        user.otpExpiry = null;
-        user.isVerified = true;
-
-        await user.save();
-
-        await sendWelcomeEmail(user.email, user.name);
-
-        res.status(200).json({ success: true, message: "Email Verified Successfully" })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    if (!otp) {
+        next(new AppError("OTP is required", 401))
     }
+
+    if (otpExpiry < Date.now()) {
+        next(new AppError("OTP Expired", 401))
+    }
+
+    const user = await User.findOne({ email })
+
+    if (!user) {
+        next(new AppError("User Does Not Exist", 401))
+    }
+
+    if (user.otp !== otp) {
+        next(new AppError("Invalid OTP", 401))
+    }
+
+    user.otp = null;
+    user.otpExpiry = null;
+    user.isVerified = true;
+
+    await user.save();
+
+    await sendWelcomeEmail(user.email, user.name);
+
+    res.status(200).json({ success: true, message: "Email Verified Successfully" })
 }
 
 export const login = async (req, res) => {
-    try {
-        const { email, password } = req.body
+    const { email, password } = req.body
 
-        if (!email || !password) {
-            res.status(401).json({ success: false, message: "Email and Password are required" })
-        }
+    const user = await User.findOne({ email }).select('-password');
 
-        const user = await User.findOne({ email }).select('-password');
-
-        if (!user) {
-            res.status(401).json({ success: false, message: "User Not Found" })
-        }
-
-        if (!user.isVerified) {
-            res.status(401).json({ success: false, message: "User Not Verified" })
-        }
-
-        const isPasswordMatch = await user.comparePassword(password);
-
-        if (!isPasswordMatch) {
-            res.status(401).json({ success: false, message: "Invalid Password" })
-        }
-
-        const { accessToken, refreshToken } = generateToken(user._id);
-
-        await storeTokenInRedis(user._id, refreshToken);
-
-        storeTokenInCookies(res, accessToken, refreshToken);
-
-        res.status(200).json({ success: true, message: "User Logged In Successfully", user })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    if (!user) {
+        next(new AppError("User Not Found", 401))
     }
+
+    if (!user.isVerified) {
+        next(new AppError("User Not Verified", 401))
+    }
+
+    const isPasswordMatch = await user.comparePassword(password);
+
+    if (!isPasswordMatch) {
+        next(new AppError("Invalid Password", 401))
+    }
+
+    const { accessToken, refreshToken } = generateToken(user._id);
+
+    await storeTokenInRedis(user._id, refreshToken);
+
+    storeTokenInCookies(res, accessToken, refreshToken);
+
+    res.status(200).json({ success: true, message: "User Logged In Successfully", user })
 }
 
 export const forgotPassword = async (req, res) => {
-    try {
-        const { email } = req.body
+    const { email } = req.body
 
-        const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-        if (!user) {
-            res.status(401).json({ success: false, message: "User Not Found" })
-        }
+    const { resetPasswordOtp, resetPasswordOtpExpiry } = generateResetPasswordOtp();
 
-        const { resetPasswordOtp, resetPasswordOtpExpiry } = generateResetPasswordOtp();
+    user.resetPasswordOtp = resetPasswordOtp;
+    user.resetPasswordOtpExpiry = resetPasswordOtpExpiry;
 
-        user.resetPasswordOtp = resetPasswordOtp;
-        user.resetPasswordOtpExpiry = resetPasswordOtpExpiry;
+    await user.save();
 
-        await user.save();
+    // TODO: send otp to email
+    sendResetOtp(email, user.name, resetPasswordOtp);
 
-        // TODO: send otp to email
-        sendResetOtp(email, user.name, resetPasswordOtp);
-
-        res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully" })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Server Error", error: error.message })
-    }
+    res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully" })
 }
 
 export const resetPassword = async (req, res) => {
-    try {
-        const { resetPasswordOtp, newPassword } = req.body
+    const { resetPasswordOtp, newPassword } = req.body
 
-        const user = await User.findOne({
-            resetPasswordOtp: resetPasswordOtp,
-            resetPasswordOtpExpiry: { $gt: Date.now() }
-        })
+    const user = await User.findOne({
+        resetPasswordOtp: resetPasswordOtp,
+        resetPasswordOtpExpiry: { $gt: Date.now() }
+    })
 
-        if (!user) {
-            res.status(401).json({ success: false, message: "Invalid OTP" })
-        }
-
-        user.password = newPassword;
-        user.resetPasswordOtp = null;
-        user.resetPasswordOtpExpiry = null;
-
-        await user.save();
-
-        res.status(200).json({ success: true, message: "Password Reset Successfully" })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    if (!user) {
+        res.status(401).json({ success: false, message: "Invalid OTP" })
     }
+
+    user.password = newPassword;
+    user.resetPasswordOtp = null;
+    user.resetPasswordOtpExpiry = null;
+
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Password Reset Successfully" })
 }
 
 export const logout = async (req, res) => {
-    try {
-        const refreshToken = req.cookies.refreshToken;
 
-        if (refreshToken) {
-            const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const refreshToken = req.cookies.refreshToken;
 
-            await redis.del(`refreshToken_${decodedToken.userId}`);
-        }
+    if (refreshToken) {
+        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
 
-        res.clearCookie("accessToken");
-
-        res.clearCookie("refreshToken");
-
-        return res.status(200).json({ success: true, message: "Logged out successfully" });
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Server Error", error: error.message })
+        await redis.del(`refreshToken_${decodedToken.userId}`);
     }
+
+    res.clearCookie("accessToken");
+
+    res.clearCookie("refreshToken");
+
+    return res.status(200).json({ success: true, message: "Logged out successfully" });
 }
 
 export const reCreateAccessToken = async (req, res) => {
-    try {
 
-        const refreshToken = req.cookies.refreshToken;
+    const refreshToken = req.cookies.refreshToken;
 
-        if (!refreshToken) {
-            return res.status(401).json({ success: false, message: "Unauthorized" });
-        }
-
-        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-
-        const storedToken = await redis.get(`refreshToken_${decodedToken.userId}`);
-
-        if (refreshToken !== storedToken) {
-            return res.status(401).json({ success: false, message: "Unauthorized, Invalid Refresh Token" });
-        }
-
-        const newAccessToken = jwt.sign({ userId: decodedToken.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
-
-        res.cookie('accessToken', newAccessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV !== 'development',
-            sameSite: 'strict',
-            maxAge: 60 * 60 * 24 * 7 * 1000
-        })
-
-        return res.status(200).json({ success: true, message: "Access Token Recreated" })
-
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: "Server Error", error: error.message })
+    if (!refreshToken) {
+        return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+
+    const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+    const storedToken = await redis.get(`refreshToken_${decodedToken.userId}`);
+
+    if (refreshToken !== storedToken) {
+        return res.status(401).json({ success: false, message: "Unauthorized, Invalid Refresh Token" });
+    }
+
+    const newAccessToken = jwt.sign({ userId: decodedToken.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
+
+    res.cookie('accessToken', newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV !== 'development',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 24 * 7 * 1000
+    })
+
+    return res.status(200).json({ success: true, message: "Access Token Recreated" })
 }
 
 export const checkAuth = async (req, res) => {
-    try {
+    const user = await User.findById(req.user._id).select('-password');
 
-        const user = await User.findById(req.user._id).select('-password');
-
-        if (!user) {
-            return res.status(401).json({ success: false, message: "Unauthorized", user })
-        }
-
-        res.status(200).json({ success: true, message: "Authenticated", })
-    } catch (error) {
-
+    if (!user) {
+        return res.status(401).json({ success: false, message: "Unauthorized", user })
     }
+
+    res.status(200).json({ success: true, message: "Authenticated", })
 }

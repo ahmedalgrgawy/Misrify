@@ -1,4 +1,4 @@
-import AppError from '../utils/AppError.js'
+import AppError from '../errors/AppError.js'
 import authRoutes from './auth.routes.js'
 import userRoutes from './user.routes.js'
 
