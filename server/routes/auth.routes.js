@@ -2,20 +2,22 @@ import express from "express"
 import { checkAuth, forgotPassword, login, logout, reCreateAccessToken, resetPassword, signup, verifyEmail } from "../controllers/auth.controllers.js";
 import { protectedRoute } from "../middlewares/auth.middlewares.js";
 import catchAsync from "../utils/catchAsync.js";
+import { validate } from "../services/validate.service.js";
+import { forgotPasswordValidationSchema, loginValidationSchema, resetPasswordValidationSchema, signupValidationSchema, verifyEmailValidationSchema } from "../validators/userValidator.js";
 
 const router = express.Router()
 
 router.get("/check-auth", protectedRoute, catchAsync(checkAuth))
 
-router.post("/signup", catchAsync(signup))
+router.post("/signup", validate(signupValidationSchema), catchAsync(signup))
 
-router.post("/verify-email", catchAsync(verifyEmail))
+router.post("/verify-email", validate(verifyEmailValidationSchema), catchAsync(verifyEmail))
 
-router.post("/login", catchAsync(login))
+router.post("/login", validate(loginValidationSchema), catchAsync(login))
 
-router.post("/forgot-password", catchAsync(forgotPassword))
+router.post("/forgot-password", validate(forgotPasswordValidationSchema), catchAsync(forgotPassword))
 
-router.post("/reset-password", catchAsync(resetPassword))
+router.post("/reset-password", validate(resetPasswordValidationSchema), catchAsync(resetPassword))
 
 router.post("/logout", catchAsync(logout))
 
