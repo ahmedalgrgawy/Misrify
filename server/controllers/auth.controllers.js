@@ -10,10 +10,6 @@ export const signup = async (req, res) => {
     try {
         const { name, email, password, phoneNumber, address, gender } = req.body;
 
-        if (!validateEmail(email)) {
-            res.status(401).json({ success: false, message: "Invalid Email" })
-        }
-
         const isUserExist = await User.findOne({ email });
 
         if (isUserExist) {
@@ -42,6 +38,8 @@ export const signup = async (req, res) => {
 
         await user.save();
 
+        user.password = undefined;
+
         res.status(200).json({ success: true, message: "User Created Successfully", user })
 
     } catch (error) {
@@ -52,18 +50,23 @@ export const signup = async (req, res) => {
 
 export const verifyEmail = async (req, res) => {
     try {
-        const { otp } = req.body;
+        const { email, otp } = req.body;
 
         if (!otp) {
             res.status(401).json({ success: false, message: "OTP is required" })
         }
 
-        const user = await User.findOne({
-            otp: otp,
-            otpExpiry: { $gt: Date.now() }
-        })
+        if (otpExpiry < Date.now()) {
+            res.status(401).json({ success: false, message: "OTP Expired" })
+        }
+
+        const user = await User.findOne({ email })
 
         if (!user) {
+            res.status(401).json({ success: false, message: "User Does Not Exist" })
+        }
+
+        if (user.otp !== otp) {
             res.status(401).json({ success: false, message: "Invalid OTP" })
         }
 
