@@ -73,23 +73,23 @@ export const verifyEmail = async (req, res, next) => {
     res.status(200).json({ success: true, message: "Email Verified Successfully", user })
 }
 
-export const login = async (req, res) => {
+export const login = async (req, res,next) => {
     const { email, password } = req.body
 
-    const user = await User.findOne({ email }).select('-password');
+    const user = await User.findOne({ email })
 
     if (!user) {
-        next(new AppError("User Not Found", 401))
+        return next(new AppError("User Not Found", 401))
     }
 
     if (!user.isVerified) {
-        next(new AppError("User Not Verified", 401))
+        return next(new AppError("User Not Verified", 401))
     }
 
     const isPasswordMatch = await user.comparePassword(password);
 
     if (!isPasswordMatch) {
-        next(new AppError("Invalid Password", 401))
+        return next(new AppError("Wrong Password", 401))
     }
 
     const { accessToken, refreshToken } = generateToken(user._id);
@@ -97,6 +97,8 @@ export const login = async (req, res) => {
     await storeTokenInRedis(user._id, refreshToken);
 
     storeTokenInCookies(res, accessToken, refreshToken);
+
+    user.password = undefined
 
     res.status(200).json({ success: true, message: "User Logged In Successfully", user })
 }
