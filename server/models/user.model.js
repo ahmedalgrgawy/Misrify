@@ -59,12 +59,12 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    // otp: {
-    //     type: Number,
-    // },
-    // otpExpiry: {
-    //     type: Date,
-    // }
+    otp: {
+        type: Number,
+    },
+    otpExpiry: {
+        type: Date,
+    }
 }, { timestamps: true })
 
 userSchema.pre("save", async function (next) {
