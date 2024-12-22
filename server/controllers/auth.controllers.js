@@ -27,7 +27,6 @@ export const signup = async (req, res, next) => {
     user.otp = otp;
     user.otpExpiry = otpExpiry;
 
-    // Check: send otp to email
     sendVerifyOtp(user.email, user.name, user.otp);
 
     const { accessToken, refreshToken } = generateToken(user._id);
@@ -73,7 +72,7 @@ export const verifyEmail = async (req, res, next) => {
     res.status(200).json({ success: true, message: "Email Verified Successfully", user })
 }
 
-export const login = async (req, res,next) => {
+export const login = async (req, res, next) => {
     const { email, password } = req.body
 
     const user = await User.findOne({ email })
@@ -103,10 +102,14 @@ export const login = async (req, res,next) => {
     res.status(200).json({ success: true, message: "User Logged In Successfully", user })
 }
 
-export const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res, next) => {
     const { email } = req.body
 
     const user = await User.findOne({ email });
+
+    if (!user) {
+        return next(new AppError("User Not Found", 401))
+    }
 
     const { resetPasswordOtp, resetPasswordOtpExpiry } = generateResetPasswordOtp();
 
@@ -115,7 +118,6 @@ export const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    // TODO: send otp to email
     sendResetOtp(email, user.name, resetPasswordOtp);
 
     res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully" })
