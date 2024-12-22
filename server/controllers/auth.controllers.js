@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import AppError from "../errors/AppError.js";
 import redis from "../lib/redis.js";
 import User from "../models/user.model.js";
@@ -6,6 +7,8 @@ import { sendWelcomeEmail } from "../services/nodemailer.service.js";
 import { sendResetOtp, sendVerifyOtp } from "../services/otp.service.js";
 import { generateOtp, generateResetPasswordOtp } from "../utils/generators.js";
 import { validateCollegeEmail } from "../validators/validateCollegeEmail.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 export const signup = async (req, res, next) => {
     const { name, email, password, phoneNumber, address, gender } = req.body;
@@ -123,7 +126,7 @@ export const forgotPassword = async (req, res, next) => {
     res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully" })
 }
 
-export const resetPassword = async (req, res,next) => {
+export const resetPassword = async (req, res, next) => {
     const { email, resetPasswordOtp, newPassword } = req.body
 
     const user = await User.findOne({ email });
@@ -157,7 +160,7 @@ export const logout = async (req, res) => {
     const refreshToken = req.cookies.refreshToken;
 
     if (refreshToken) {
-        const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const decodedToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN);
 
         await redis.del(`refreshToken_${decodedToken.userId}`);
     }
@@ -169,23 +172,23 @@ export const logout = async (req, res) => {
     return res.status(200).json({ success: true, message: "Logged out successfully" });
 }
 
-export const reCreateAccessToken = async (req, res) => {
+export const reCreateAccessToken = async (req, res, next) => {
 
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-        return res.status(401).json({ success: false, message: "Unauthorized" });
+        return next(new AppError("Unauthorized", 401))
     }
 
-    const decodedToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+    const decodedToken = jwt.verify(refreshToken, process.env.JWT_REFRESH_TOKEN);
 
     const storedToken = await redis.get(`refreshToken_${decodedToken.userId}`);
 
     if (refreshToken !== storedToken) {
-        return res.status(401).json({ success: false, message: "Unauthorized, Invalid Refresh Token" });
+        return next(new AppError("Unauthorized, Invalid Refresh Token", 401))
     }
 
-    const newAccessToken = jwt.sign({ userId: decodedToken.userId }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '15m' })
+    const newAccessToken = jwt.sign({ userId: decodedToken.userId }, process.env.JWT_SECRET, { expiresIn: '15m' })
 
     res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
@@ -198,11 +201,5 @@ export const reCreateAccessToken = async (req, res) => {
 }
 
 export const checkAuth = async (req, res) => {
-    const user = await User.findById(req.user._id).select('-password');
-
-    if (!user) {
-        return res.status(401).json({ success: false, message: "Unauthorized", user })
-    }
-
-    res.status(200).json({ success: true, message: "Authenticated", })
+    res.status(200).json({ success: true, message: "Authenticated", user: req.user })
 }

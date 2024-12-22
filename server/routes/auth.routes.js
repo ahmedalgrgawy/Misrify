@@ -7,7 +7,7 @@ import catchAsync from "../errors/catchAsync.js";
 
 const router = express.Router()
 
-router.get("/check-auth", protectedRoute, catchAsync(checkAuth))
+router.get("/check-auth", catchAsync(protectedRoute), catchAsync(checkAuth))
 
 router.post("/signup", validate(signupValidationSchema), catchAsync(signup))
 
