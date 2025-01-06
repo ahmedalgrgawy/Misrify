@@ -122,3 +122,18 @@ export const createUserSchema = Joi.object({
         "string.empty": "Gender is required",
     }),
 })
+
+export const editUserSchema = Joi.object({
+    name: Joi.string().optional().messages({
+        "string.empty": "Name is required",
+    }),
+    phoneNumber: Joi.number().optional().messages({
+        "number.empty": "Phone number is required",
+    }),
+    address: Joi.string().optional().messages({
+        "string.empty": "Address is required",
+    }),
+    role: Joi.string().optional().messages({
+        "string.empty": "Role is required",
+    }),
+})
