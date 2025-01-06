@@ -31,25 +31,18 @@ export const protectedRoute = async (req, res, next) => {
 }
 
 export const adminRoute = (req, res, next) => {
-    try {
-        if (req.user && req.user.role === 'admin') {
-            next()
-        } else {
-            return res.status(401).json({ success: false, message: "Unauthorized" })
-        }
-    } catch (error) {
-        return res.status(401).json({ success: false, message: "Unauthorized" })
+    if (req.user && req.user.role === 'admin') {
+        next()
+    } else {
+        return next(new AppError("Unauthorized, You Are Not Admin", 401))
     }
 }
 
 export const merchantRoute = (req, res, next) => {
-    try {
-        if (req.user && req.user.role === 'merchant') {
-            next()
-        } else {
-            return res.status(401).json({ success: false, message: "Unauthorized" })
-        }
-    } catch (error) {
-        return res.status(401).json({ success: false, message: "Unauthorized" })
+
+    if (req.user && req.user.role === 'merchant') {
+        next()
+    } else {
+        return next(new AppError("Unauthorized, You Are Not Merchant", 401))
     }
 }
