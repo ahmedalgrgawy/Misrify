@@ -70,11 +70,19 @@ export const updateUserSchema = Joi.object({
     name: Joi.string().optional().messages({
         "string.empty": "Name is required",
     }),
+    email: Joi.string().email().lowercase().trim().optional().messages({
+        "string.email": "A valid email address is required",
+        "string.empty": "Email is required",
+    }),
     phoneNumber: Joi.number().optional().messages({
         "number.empty": "Phone number is required",
     }),
     address: Joi.string().optional().messages({
         "string.empty": "Address is required",
+    }),
+    gender: Joi.string().valid("male", "female").optional().messages({
+        "any.only": "Gender must be 'male' or 'female'",
+        "string.empty": "Gender is required",
     }),
     currentPassword: Joi.string().min(6).optional().messages({
         "string.min": "Password must be at least 6 characters long",
@@ -101,10 +109,10 @@ export const createUserSchema = Joi.object({
         "string.min": "Password must be at least 6 characters long",
         "string.empty": "Password is required",
     }),
-    phoneNumber: Joi.number().required().messages({
+    phoneNumber: Joi.number().optional().messages({
         "number.empty": "Phone number is required",
     }),
-    address: Joi.string().required().messages({
+    address: Joi.string().optional().messages({
         "string.empty": "Address is required",
     }),
     role: Joi.string().required().messages({
