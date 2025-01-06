@@ -9,7 +9,7 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res, next) => {
     const userId = req.user.id;
-    const { name, phoneNumber, address, currentPassword, newPassword } = req.body;
+    const { name, email, phoneNumber, address, currentPassword, newPassword, gender } = req.body;
     let { imgUrl } = req.body;
 
     let user = await User.findById(userId);
@@ -42,9 +42,11 @@ export const updateProfile = async (req, res, next) => {
     }
 
     user.name = name || user.name;
-    user.phoneNumber = phoneNumber || user.phoneNumber;;
-    user.address = address || user.address;;
-    user.imgUrl = imgUrl || user.imgUrl;;
+    user.email = email || user.email;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.address = address || user.address;
+    user.gender = gender || user.gender;
+    user.imgUrl = imgUrl || user.imgUrl;
 
     user = await user.save();
 
@@ -90,14 +92,32 @@ export const createUser = async (req, res, next) => {
 
     res.status(201).json({ success: true, message: "User Created Successfully" })
 }
-export const editUser = async (req, res, next) => { }
+
+export const editUser = async (req, res, next) => {
+
+    const userId = req.params.id
+    const { name, phoneNumber, address, role } = req.body
+
+    if (!userId) {
+        next(AppError("User Id Must Be Provided", 404))
+    }
+
+    const user = await User.findById(userId)
+
+    if (!user) {
+        return next(new AppError("User Is Not Found", 404))
+    }
+
+
+
+}
 
 export const deleteUser = async (req, res, next) => {
 
     const userId = req.params.id
 
     if (!userId) {
-        next(AppError(404, "User Id Must Be Provided"))
+        next(AppError("User Id Must Be Provided", 404))
     }
 
     const user = await User.findById(userId)
