@@ -107,4 +107,10 @@ export const createUserSchema = Joi.object({
     address: Joi.string().required().messages({
         "string.empty": "Address is required",
     }),
+    role: Joi.string().required().messages({
+        "string.empty": "Role is required",
+    }),
+    gender: Joi.string().optional().messages({
+        "string.empty": "Gender is required",
+    }),
 })
