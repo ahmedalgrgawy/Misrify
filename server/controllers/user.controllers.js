@@ -108,7 +108,18 @@ export const editUser = async (req, res, next) => {
         return next(new AppError("User Is Not Found", 404))
     }
 
+    user.name = name || user.name;
+    user.phoneNumber = phoneNumber || user.phoneNumber;
+    user.address = address || user.address;
+    user.role = role || user.role;
 
+    await user.save();
+
+    res.status(200).json({
+        success: true,
+        message: "User updated successfully",
+        user
+    });
 
 }
 
@@ -129,7 +140,7 @@ export const deleteUser = async (req, res, next) => {
     await user.delete();
 
     res.status(200).json({
-        status: "success",
+        success: true,
         message: "User deleted successfully",
     });
 }
