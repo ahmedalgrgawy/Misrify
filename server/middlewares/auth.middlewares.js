@@ -28,7 +28,6 @@ export const protectedRoute = async (req, res, next) => {
     } else {
         return next(new AppError("Unauthorized, No Token Provided", 401))
     }
-
 }
 
 export const adminRoute = (req, res, next) => {

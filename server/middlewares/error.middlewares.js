@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const errorHandler = (err, req, res, next) => {
     let { statusCode, message } = err;
 
