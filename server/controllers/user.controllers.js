@@ -91,4 +91,25 @@ export const createUser = async (req, res, next) => {
     res.status(201).json({ success: true, message: "User Created Successfully" })
 }
 export const editUser = async (req, res, next) => { }
-export const deleteUser = async (req, res, next) => { }
+
+export const deleteUser = async (req, res, next) => {
+
+    const userId = req.params.id
+
+    if (!userId) {
+        next(AppError(404, "User Id Must Be Provided"))
+    }
+
+    const user = await User.findById(userId)
+
+    if (!user) {
+        return next(new AppError("User Is Not Found", 404))
+    }
+
+    await user.delete();
+
+    res.status(200).json({
+        status: "success",
+        message: "User deleted successfully",
+    });
+}
