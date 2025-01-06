@@ -9,6 +9,6 @@ const router = express.Router()
 
 router.get("/profile", catchAsync(protectedRoute), catchAsync(getProfile))
 
-router.put("/update", catchAsync(protectedRoute), catchAsync(validate(updateUserSchema)), catchAsync(updateProfile))
+router.put("/update", catchAsync(protectedRoute), validate(updateUserSchema), catchAsync(updateProfile))
 
 export default router;
