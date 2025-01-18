@@ -7,14 +7,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-        child: Scaffold(
-          appBar(
-            AppBar(
-              title("ahmed")
-            )
-          )
-
-    ));
+    return SafeArea(child: Scaffold(appBar: AppBar(title: Text("ahmed"))));
   }
 }
