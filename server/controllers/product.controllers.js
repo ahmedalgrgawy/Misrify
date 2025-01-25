@@ -5,17 +5,16 @@ import Product from "../models/product.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res, next) => {
-    const RequestedProducts = await Product.find({ isApproved: false })
+    const requestedProducts = await Product.find({ isApproved: false })
         .populate("category")
         .populate("brand")
-        .populate("merchant")
         .exec();
 
-    if (!RequestedProducts || RequestedProducts.length === 0) {
+    if (!requestedProducts || requestedProducts.length === 0) {
         return next(new AppError("No Requested Products Found", 404))
     }
 
-    res.status(200).json({ success: true, RequestedProducts })
+    res.status(200).json({ success: true, requestedProducts })
 }
 
 export const getProducts = async (req, res, next) => {
@@ -49,8 +48,12 @@ export const approveOrRejectProduct = async (req, res, next) => {
         return next(new AppError("Product Not Found", 404))
     }
 
-    if (isApproved === false) {
-        await ProductToApprove.remove();
+    if (ProductToApprove.isApproved) {
+        return next(new AppError("Product Already Approved", 400))
+    }
+
+    if (isApproved.toLowerCase() === "no") {
+        await ProductToApprove.deleteOne();
         return next(new AppError("Product Rejected", 200))
     }
 
@@ -62,16 +65,18 @@ export const approveOrRejectProduct = async (req, res, next) => {
 }
 
 export const createProduct = async (req, res, next) => {
-    const { name, categoryId, brandId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
-    let { imgUrl } = req.body;
+    const { name, categoryId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
+    let { imgUrl, brandId } = req.body;
 
     const user = req.user;
 
-    const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
-        folder: "Products"
-    });
+    if (imgUrl) {
+        const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
+            folder: "Products"
+        });
 
-    imgUrl = uploadedResponse.secure_url;
+        imgUrl = uploadedResponse.secure_url;
+    }
 
     if (user.role === 'merchant') {
         const merchantBrand = await Brand.findOne({ owner: user._id });
@@ -96,7 +101,7 @@ export const createProduct = async (req, res, next) => {
         isDiscounted,
         discountAmount,
         isApproved: user.role === 'merchant' ? false : true
-    }).populate("category").populate("brand");
+    })
 
     await product.save();
 
@@ -105,8 +110,8 @@ export const createProduct = async (req, res, next) => {
 
 export const editProduct = async (req, res, next) => {
     const { id } = req.params;
-    const { name, categoryId, brandId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
-    let { imgUrl } = req.body;
+    const { name, categoryId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
+    let { imgUrl, brandId } = req.body;
 
     const user = req.user
 
