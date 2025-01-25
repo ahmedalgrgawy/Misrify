@@ -1,15 +1,17 @@
+import AppError from "../errors/AppError";
+
 // This Function is for Admin Only
-export const deleteComment = async (req, res) => {
+export const deleteComment = async (req, res, next) => {
     const { id } = req.params;
 
     if (!id) {
-        return res.status(400).json({ success: false, message: "Comment Id is Required" })
+        return next(new AppError("Comment Id is required", 400))
     }
 
     const CommentToDelete = await Comment.findById(id);
 
     if (!CommentToDelete) {
-        return res.status(404).json({ success: false, message: "Comment Not Found" })
+        return next(new AppError("Comment Not Found", 404))
     }
 
     await CommentToDelete.remove();
