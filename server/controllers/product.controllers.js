@@ -1,3 +1,4 @@
+import cloudinary from "../lib/cloudinary";
 import Product from "../models/product.model";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -57,6 +58,40 @@ export const approveOrRejectProduct = async (req, res) => {
     await ProductToApprove.save();
 
     res.status(200).json({ success: true, message: "Product Approved" })
+}
+
+export const createProduct = async (req, res) => {
+    const { name, categoryId, brandId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
+    let { imgUrl } = req.body;
+
+    const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
+        folder: "Products"
+    });
+
+    imgUrl = uploadedResponse.secure_url;
+
+    const product = new Product({
+        name,
+        category: categoryId,
+        brand: brandId,
+        description,
+        quantityInStock,
+        price,
+        colors,
+        sizes,
+        imgUrl,
+        isDiscounted,
+        discountAmount,
+        isApproved: true
+    })
+
+    await product.save();
+
+    res.status(201).json({ success: true, message: "Product Created Successfully", product })
+}
+
+export const editProduct = async (req, res) => {
+
 }
 
 // <<<<<<<<<<<<<<<<< Merchant Functions >>>>>>>>>>>>>>>>>>>>>>>>>>

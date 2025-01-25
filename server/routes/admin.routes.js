@@ -4,11 +4,13 @@ import { adminRoute, protectedRoute } from '../middlewares/auth.middlewares.js'
 import { createUser, deleteUser, editUser, getAllMerchants, getAllUsers } from '../controllers/user.controllers.js'
 import { validate } from '../services/validate.service.js'
 import { createUserSchema, editUserSchema } from '../validators/userValidator.js'
-import { approveOrRejectProduct, getProducts, getRequestedProducts } from '../controllers/product.controllers.js'
+import { approveOrRejectProduct, createProduct, getProducts, getRequestedProducts } from '../controllers/product.controllers.js'
 import { createBrand, editBrand, getBrands } from '../controllers/brand.controllers.js'
 import { createCategory, deleteCategory, getAllCategories } from '../controllers/categories.controllers.js'
 import { editBrandSchema, createBrandSchema } from '../validators/brandValidator.js'
 import { createCategorySchema } from '../validators/categoryValidator.js'
+import { valid } from 'joi'
+import { createProductSchema } from '../validators/productValidator.js'
 
 const router = express.Router()
 
@@ -45,6 +47,8 @@ router.delete("/delete-brand/:id", catchAsync(protectedRoute), catchAsync(adminR
 router.get("/requested-products", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getRequestedProducts))
 
 router.get("/products", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getProducts))
+
+router.post("/create-product", catchAsync(protectedRoute), catchAsync(adminRoute), validate(createProductSchema), catchAsync(createProduct))
 
 router.put("/toggle-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(approveOrRejectProduct))
 
