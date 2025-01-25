@@ -16,3 +16,6 @@ export const deleteComment = async (req, res) => {
 
     res.status(200).json({ success: true, message: "Comment Deleted" })
 }
+
+// This Function is for Merchant Only
+// TODO: Implement Create Comment for Merchant
