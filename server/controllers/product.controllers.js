@@ -1,4 +1,5 @@
 import cloudinary from "../lib/cloudinary.js";
+import Brand from "../models/brand.model.js";
 import Product from "../models/product.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -145,6 +146,26 @@ export const deleteProduct = async (req, res) => {
 }
 
 // <<<<<<<<<<<<<<<<< Merchant Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
+export const getMerchantProducts = async (req, res) => {
+    const merchantId = req.user._id;
+    const merchantBrand = await Brand.findOne({ owner: merchantId });
+
+    if (!merchantBrand) {
+        return res.status(404).json({ success: false, message: "Merchant Does Not Have A Brand " })
+    }
+
+    const products = await Product.find({ brand: merchantBrand._id }).populate("category")
+        .populate("brand")
+        .exec();
+
+    if (!products || products.length === 0) {
+        return res.status(404).json({ success: false, message: "No Products Found" })
+    }
+
+    res.status(200).json({ success: true, merchantProducts: products })
+
+}
+
 
 // <<<<<<<<<<<<<<<<< User Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 
