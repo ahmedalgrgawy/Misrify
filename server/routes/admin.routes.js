@@ -50,10 +50,13 @@ router.get("/products", catchAsync(protectedRoute), catchAsync(adminRoute), catc
 
 router.post("/create-product", catchAsync(protectedRoute), catchAsync(adminRoute), validate(createProductSchema), catchAsync(createProduct))
 
-router.put("/edit-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute),validate(editProductSchema), catchAsync(editProduct))
+router.put("/edit-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute), validate(editProductSchema), catchAsync(editProduct))
 
 router.put("/toggle-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(approveOrRejectProduct))
 
 router.delete("/delete-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteProduct))
+
+// Delete Comment
+router.delete("/delete-comment/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteComment))
 
 export default router;
