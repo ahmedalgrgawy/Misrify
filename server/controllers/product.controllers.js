@@ -1,3 +1,5 @@
+import Product from "../models/product.model";
+
 export const getRequestedProducts = async (req, res) => {
     const RequestedProducts = await Product.find({ isApproved: false })
         .populate("category")
