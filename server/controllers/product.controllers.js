@@ -21,7 +21,6 @@ export const getProducts = async (req, res) => {
     const Products = await Product.find({ isApproved: true })
         .populate("category")
         .populate("brand")
-        .populate("merchant")
         .exec();
 
     if (!Products || Products.length === 0) {
@@ -64,7 +63,7 @@ export const approveOrRejectProduct = async (req, res) => {
 export const createProduct = async (req, res) => {
     const { name, categoryId, brandId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
     let { imgUrl } = req.body;
-    let isApproved = false;
+
     const user = req.user;
 
     const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
@@ -81,8 +80,6 @@ export const createProduct = async (req, res) => {
         }
 
         brandId = merchantBrand._id;
-    } else {
-        isApproved = true;
     }
 
     const product = new Product({
@@ -97,7 +94,7 @@ export const createProduct = async (req, res) => {
         imgUrl,
         isDiscounted,
         discountAmount,
-        isApproved
+        isApproved: user.role === 'merchant' ? false : true
     }).populate("category").populate("brand");
 
     await product.save();
@@ -135,8 +132,8 @@ export const editProduct = async (req, res) => {
     }
 
     product.name = name || product.name;
-    product.category = categoryId || product.category;
-    product.brand = brandId || product.brand;
+    product.category = categoryId || product.category.id;
+    product.brand = brandId || product.brand._id;
     product.description = description || product.description;
     product.quantityInStock = quantityInStock || product.quantityInStock;
     product.price = price || product.price;
