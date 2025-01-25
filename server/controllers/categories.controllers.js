@@ -2,13 +2,13 @@ import AppError from "../errors/AppError.js";
 import Category from "../models/category.model.js";
 
 export const getAllCategories = async (req, res, next) => {
-    const Categories = await Category.find().exec();
+    const categories = await Category.find().exec();
 
-    if (!Categories || Categories.length === 0) {
+    if (!categories || categories.length === 0) {
         return next(new AppError("No Categories Found", 404))
     }
 
-    res.status(200).json({ success: true, Categories })
+    res.status(200).json({ success: true, categories })
 }
 
 export const createCategory = async (req, res, next) => {

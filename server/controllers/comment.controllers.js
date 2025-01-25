@@ -1,4 +1,4 @@
-import AppError from "../errors/AppError";
+import AppError from "../errors/AppError.js";
 
 // This Function is for Admin Only
 export const deleteComment = async (req, res, next) => {

@@ -5,12 +5,12 @@ import { createUser, deleteUser, editUser, getAllMerchants, getAllUsers } from '
 import { validate } from '../services/validate.service.js'
 import { createUserSchema, editUserSchema } from '../validators/userValidator.js'
 import { approveOrRejectProduct, createProduct, deleteProduct, editProduct, getProducts, getRequestedProducts } from '../controllers/product.controllers.js'
-import { createBrand, editBrand, getBrands } from '../controllers/brand.controllers.js'
-import { createCategory, deleteCategory, getAllCategories } from '../controllers/categories.controllers.js'
+import { createBrand, deleteBrand, editBrand, getBrands } from '../controllers/brand.controllers.js'
+import { createCategory, deleteCategory, editCategory, getAllCategories } from '../controllers/categories.controllers.js'
 import { editBrandSchema, createBrandSchema } from '../validators/brandValidator.js'
 import { createCategorySchema } from '../validators/categoryValidator.js'
-import { valid } from 'joi'
 import { createProductSchema, editProductSchema } from '../validators/productValidator.js'
+import { deleteComment } from '../controllers/comment.controllers.js'
 
 const router = express.Router()
 
