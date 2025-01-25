@@ -93,3 +93,38 @@ export const createProductSchema = Joi.object({
             'boolean.base': 'isApproved must be a boolean',
         }),
 });
+
+export const editProductSchema = Joi.object({
+    name: Joi.string().optional().messages({
+        "string.empty": "Name is required",
+    }),
+    categoryId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).optional().messages({
+        "string.empty": "Category is required",
+    }),
+    brandId: Joi.string().pattern(/^[0-9a-fA-F]{24}$/).optional().messages({
+        "string.empty": "Brand is required",
+    }),
+    description: Joi.string().optional().messages({
+        "string.empty": "Description is required",
+    }),
+    quantityInStock: Joi.number().integer().min(0).optional().messages({
+        "number.base": "Quantity must be a number",
+        "number.min": "Quantity must be at least 0",
+    }),
+    price: Joi.number().positive().optional().messages({
+        "number.base": "Price must be a number",
+        "number.positive": "Price must be greater than 0",
+    }),
+    colors: Joi.array().items(Joi.string()).optional(),
+    sizes: Joi.array().items(Joi.string()).optional(),
+    imgUrl: Joi.string().uri().optional().messages({
+        "string.uri": "Image must be a valid URL",
+    }),
+    isDiscounted: Joi.boolean().optional().messages({
+        "boolean.base": "isDiscounted must be a boolean",
+    }),
+    discountAmount: Joi.number().min(0).optional().messages({
+        "number.base": "Discount amount must be a number",
+        "number.min": "Discount amount cannot be negative",
+    }),
+})

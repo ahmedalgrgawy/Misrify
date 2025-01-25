@@ -1,5 +1,5 @@
-import cloudinary from "../lib/cloudinary";
-import Product from "../models/product.model";
+import cloudinary from "../lib/cloudinary.js";
+import Product from "../models/product.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res) => {
@@ -91,7 +91,39 @@ export const createProduct = async (req, res) => {
 }
 
 export const editProduct = async (req, res) => {
+    const { id } = req.params;
+    const { name, categoryId, brandId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
+    let { imgUrl } = req.body;
 
+    const product = await Product.findById(id);
+
+    if (!product) {
+        return res.status(404).json({ success: false, message: "Product Not Found" })
+    }
+
+    if (imgUrl) {
+        await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
+        const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
+            folder: "Products"
+        });
+        imgUrl = uploadedResponse.secure_url;
+    }
+
+    product.name = name || product.name;
+    product.category = categoryId || product.category;
+    product.brand = brandId || product.brand;
+    product.description = description || product.description;
+    product.quantityInStock = quantityInStock || product.quantityInStock;
+    product.price = price || product.price;
+    product.colors = colors || product.colors;
+    product.sizes = sizes || product.sizes;
+    product.imgUrl = imgUrl || product.imgUrl;
+    product.isDiscounted = isDiscounted || product.isDiscounted;
+    product.discountAmount = discountAmount || product.discountAmount;
+
+    await product.save();
+
+    res.status(200).json({ success: true, message: "Product Updated Successfully", product })
 }
 
 // <<<<<<<<<<<<<<<<< Merchant Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
