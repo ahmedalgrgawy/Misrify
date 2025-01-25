@@ -2,7 +2,9 @@ import AppError from "../errors/AppError.js";
 import Brand from "../models/brand.model.js";
 
 export const getBrands = async (req, res, next) => {
-    const Brands = await Brand.find().populate("owner").exec();
+    const Brands = await Brand.find()
+        .populate("owner", ["name", "email", "phoneNumber", "address"])
+        .exec();
 
     if (!Brands || Brands.length === 0) {
         return next(new AppError("No Brands Found", 404))
