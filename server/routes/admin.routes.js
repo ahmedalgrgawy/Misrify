@@ -4,6 +4,7 @@ import { adminRoute, protectedRoute } from '../middlewares/auth.middlewares.js'
 import { createUser, deleteUser, editUser, getAllMerchants, getAllUsers } from '../controllers/user.controllers.js'
 import { validate } from '../services/validate.service.js'
 import { createUserSchema, editUserSchema } from '../validators/userValidator.js'
+import { getRequestedProducts } from '../controllers/product.controllers.js'
 
 const router = express.Router()
 
@@ -19,6 +20,9 @@ router.put("/edit-user/:id", catchAsync(protectedRoute), catchAsync(adminRoute),
 router.delete("/delete-user/:id", catchAsync(protectedRoute), catchAsync(adminRoute), validate(editUserSchema), catchAsync(deleteUser))
 
 // Handling Categories & Brands
+
 // Handling Products
+router.get("/requested-products", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getRequestedProducts))
+
 
 export default router;
