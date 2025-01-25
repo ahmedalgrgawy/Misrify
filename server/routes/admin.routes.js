@@ -6,8 +6,9 @@ import { validate } from '../services/validate.service.js'
 import { createUserSchema, editUserSchema } from '../validators/userValidator.js'
 import { getProducts, getRequestedProducts } from '../controllers/product.controllers.js'
 import { createBrand, editBrand, getBrands } from '../controllers/brand.controllers.js'
-import { getAllCategories } from '../controllers/categories.controllers.js'
+import { createCategory, deleteCategory, getAllCategories } from '../controllers/categories.controllers.js'
 import { editBrandSchema, createBrandSchema } from '../validators/brandValidator.js'
+import { createCategorySchema } from '../validators/categoryValidator.js'
 
 const router = express.Router()
 
@@ -24,6 +25,12 @@ router.delete("/delete-user/:id", catchAsync(protectedRoute), catchAsync(adminRo
 
 // Handling Categories
 router.get("/categories", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllCategories))
+
+router.post("/create-category", catchAsync(protectedRoute), catchAsync(adminRoute), validate(createCategorySchema), catchAsync(createCategory))
+
+router.put("/edit-category/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(editCategory))
+
+router.delete("/delete-category/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteCategory))
 
 // Handling Brands
 router.get("/brands", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getBrands))
