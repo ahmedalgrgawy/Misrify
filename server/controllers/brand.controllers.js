@@ -12,8 +12,7 @@ export const getBrands = async (req, res) => {
 
 export const createBrand = async (req, res) => {
 
-    const adminOrMerchantId = req.user._id;
-    const { name, description } = req.body;
+    const { ownerId, name, description } = req.body;
     name.toLowerCase();
 
     const isBrandExist = await Brand.findOne({ name });
@@ -22,7 +21,7 @@ export const createBrand = async (req, res) => {
         return res.status(400).json({ success: false, message: "Brand already exists" })
     }
 
-    const brand = new Brand({ name, description, owner: adminOrMerchantId });
+    const brand = new Brand({ name, description, owner: ownerId });
 
     await brand.save();
 

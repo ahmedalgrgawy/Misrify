@@ -7,6 +7,9 @@ export const createBrandSchema = Joi.object({
     description: Joi.string().required().messages({
         "string.empty": "Description is required",
     }),
+    ownerId: Joi.string().required().messages({
+        "string.empty": "Owner is required",
+    }),
 })
 
 export const editBrandSchema = Joi.object({
