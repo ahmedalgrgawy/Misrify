@@ -64,12 +64,26 @@ export const approveOrRejectProduct = async (req, res) => {
 export const createProduct = async (req, res) => {
     const { name, categoryId, brandId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
     let { imgUrl } = req.body;
+    let isApproved = false;
+    const user = req.user;
 
     const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
         folder: "Products"
     });
 
     imgUrl = uploadedResponse.secure_url;
+
+    if (user.role === 'merchant') {
+        const merchantBrand = await Brand.findOne({ owner: user._id });
+
+        if (!merchantBrand) {
+            return res.status(404).json({ success: false, message: "Merchant Does Not Have A Brand " })
+        }
+
+        brandId = merchantBrand._id;
+    } else {
+        isApproved = true;
+    }
 
     const product = new Product({
         name,
@@ -83,8 +97,8 @@ export const createProduct = async (req, res) => {
         imgUrl,
         isDiscounted,
         discountAmount,
-        isApproved: true
-    })
+        isApproved
+    }).populate("category").populate("brand");
 
     await product.save();
 
