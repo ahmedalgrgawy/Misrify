@@ -110,10 +110,20 @@ export const editProduct = async (req, res) => {
     const { name, categoryId, brandId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
     let { imgUrl } = req.body;
 
-    const product = await Product.findById(id);
+    const user = req.user
+
+    const product = await Product.findById(id).populate("category").populate("brand");
 
     if (!product) {
         return res.status(404).json({ success: false, message: "Product Not Found" })
+    }
+
+    if (user.role === 'merchant') {
+        if (product.brand.owner.toString() !== user._id.toString()) {
+            return res.status(401).json({ success: false, message: "You Are Not Authorized To Edit This Product" })
+        } else {
+            brandId = product.brand._id;
+        }
     }
 
     if (imgUrl) {
@@ -143,15 +153,22 @@ export const editProduct = async (req, res) => {
 
 export const deleteProduct = async (req, res) => {
     const { id } = req.params;
+    const user = req.user;
 
     if (!id) {
         return res.status(400).json({ success: false, message: "Product Id is Required" })
     }
 
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate("category").populate("brand");
 
     if (!product) {
         return res.status(404).json({ success: false, message: "Product Not Found" })
+    }
+
+    if (user.role === 'merchant') {
+        if (product.brand.owner.toString() !== user._id.toString()) {
+            return res.status(401).json({ success: false, message: "You Are Not Authorized To Delete This Product" })
+        }
     }
 
     await product.deleteOne();
