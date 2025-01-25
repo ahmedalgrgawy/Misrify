@@ -5,6 +5,8 @@ import { createUser, deleteUser, editUser, getAllMerchants, getAllUsers } from '
 import { validate } from '../services/validate.service.js'
 import { createUserSchema, editUserSchema } from '../validators/userValidator.js'
 import { getProducts, getRequestedProducts } from '../controllers/product.controllers.js'
+import { getBrands } from '../controllers/brand.controllers.js'
+import { getAllCategories } from '../controllers/categories.controllers.js'
 
 const router = express.Router()
 
@@ -20,6 +22,9 @@ router.put("/edit-user/:id", catchAsync(protectedRoute), catchAsync(adminRoute),
 router.delete("/delete-user/:id", catchAsync(protectedRoute), catchAsync(adminRoute), validate(editUserSchema), catchAsync(deleteUser))
 
 // Handling Categories & Brands
+router.get("/categories", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllCategories))
+
+router.get("/brands", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getBrands))
 
 // Handling Products
 router.get("/requested-products", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getRequestedProducts))
