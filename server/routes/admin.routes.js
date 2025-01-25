@@ -4,7 +4,7 @@ import { adminRoute, protectedRoute } from '../middlewares/auth.middlewares.js'
 import { createUser, deleteUser, editUser, getAllMerchants, getAllUsers } from '../controllers/user.controllers.js'
 import { validate } from '../services/validate.service.js'
 import { createUserSchema, editUserSchema } from '../validators/userValidator.js'
-import { approveOrRejectProduct, createProduct, editProduct, getProducts, getRequestedProducts } from '../controllers/product.controllers.js'
+import { approveOrRejectProduct, createProduct, deleteProduct, editProduct, getProducts, getRequestedProducts } from '../controllers/product.controllers.js'
 import { createBrand, editBrand, getBrands } from '../controllers/brand.controllers.js'
 import { createCategory, deleteCategory, getAllCategories } from '../controllers/categories.controllers.js'
 import { editBrandSchema, createBrandSchema } from '../validators/brandValidator.js'
@@ -53,5 +53,7 @@ router.post("/create-product", catchAsync(protectedRoute), catchAsync(adminRoute
 router.put("/edit-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute),validate(editProductSchema), catchAsync(editProduct))
 
 router.put("/toggle-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(approveOrRejectProduct))
+
+router.delete("/delete-product/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteProduct))
 
 export default router;

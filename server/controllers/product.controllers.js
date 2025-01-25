@@ -126,6 +126,24 @@ export const editProduct = async (req, res) => {
     res.status(200).json({ success: true, message: "Product Updated Successfully", product })
 }
 
+export const deleteProduct = async (req, res) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return res.status(400).json({ success: false, message: "Product Id is Required" })
+    }
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+        return res.status(404).json({ success: false, message: "Product Not Found" })
+    }
+
+    await product.deleteOne();
+
+    res.status(200).json({ success: true, message: "Product Deleted Successfully" })
+}
+
 // <<<<<<<<<<<<<<<<< Merchant Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 
 // <<<<<<<<<<<<<<<<< User Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
