@@ -4,9 +4,11 @@ import catchAsync from '../errors/catchAsync.js';
 import { createProduct, deleteProduct, editProduct, getMerchantProducts } from '../controllers/product.controllers.js';
 import { validate } from '../services/validate.service.js';
 import { createProductSchema, editProductSchema } from '../validators/productValidator.js';
+import { createComment } from '../controllers/comment.controllers.js';
 
 const router = express.Router()
 
+// Handling Products
 router.get("/products", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getMerchantProducts))
 
 router.post("/create-product", catchAsync(protectedRoute), catchAsync(merchantRoute), validate(createProductSchema), catchAsync(createProduct))
@@ -14,5 +16,8 @@ router.post("/create-product", catchAsync(protectedRoute), catchAsync(merchantRo
 router.put("/edit-product/:id", catchAsync(protectedRoute), catchAsync(merchantRoute), validate(editProductSchema), catchAsync(editProduct))
 
 router.delete("/delete-product/:id", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(deleteProduct))
+
+// Handling Comments & Reviews
+router.post("/create-comment", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(createComment))
 
 export default router;
