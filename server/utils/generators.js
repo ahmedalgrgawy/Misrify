@@ -11,7 +11,7 @@ export const generateOtp = () => {
 
 export const generateResetPasswordOtp = () => {
 
-    const resetPasswordOtp = Math.floor(1000 + Math.random() * 9000)
+    const resetPasswordOtp = crypto.randomBytes(20).toString("hex")
 
     const resetPasswordOtpExpiry = Date.now() + 10 * 60 * 1000 // 10 minutes
 
