@@ -30,6 +30,14 @@ export const protectedRoute = async (req, res, next) => {
     }
 }
 
+export const customerRoute = (req, res, next) => {
+    if (req.user && req.user.role === 'user') {
+        next()
+    } else {
+        return next(new AppError("Unauthorized, You Are Not Customer", 401))
+    }
+}
+
 export const adminRoute = (req, res, next) => {
     if (req.user && req.user.role === 'admin') {
         next()
