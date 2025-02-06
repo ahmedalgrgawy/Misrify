@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "572795362174",
+    "project_id": "graduation-project-c9b8a",
+    "storage_bucket": "graduation-project-c9b8a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572795362174:android:f851903a66d52f8b7bf12f",
+        "android_client_info": {
+          "package_name": "com.example.graduation_project1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB874MECPVIu9gAWSHSuJBTJYc3pE8X2CE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
