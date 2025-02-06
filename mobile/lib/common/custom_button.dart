@@ -13,12 +13,17 @@ class CustomButton extends StatelessWidget {
       this.btnHeight,
       this.btnColor,
       this.radius,
-      required this.text});
+      required this.text,
+      this.textcolor,
+      this.borderColor});
 
   final void Function()? onTap;
   final double? btnWidth;
   final double? btnHeight;
   final Color? btnColor;
+  final Color? textcolor;
+  final Color? borderColor;
+
   final double? radius;
   final String text;
 
@@ -30,12 +35,16 @@ class CustomButton extends StatelessWidget {
         width: btnWidth ?? width,
         height: btnHeight ?? 28.h,
         decoration: BoxDecoration(
+          border: Border.all(color: borderColor ?? kLightBlue),
           color: btnColor ?? kBlue,
-          borderRadius: BorderRadius.circular(radius ?? 12.r),
+          borderRadius: BorderRadius.circular(
+            radius ?? 12.r,
+          ),
         ),
         child: Center(
           child: ReusableText(
-              text: text, style: appStyle(12, kLightWhite, FontWeight.w500)),
+              text: text,
+              style: appStyle(16, textcolor ?? kLightBlue, FontWeight.w500)),
         ),
       ),
     );

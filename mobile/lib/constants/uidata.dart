@@ -383,3 +383,26 @@ const choicesList = [
     "value": "recommended",
   },
 ];
+
+class OnBoardingText {
+  static const String onBoardingTitle1 = "Shopping app";
+  static const String onBoardingTitle2 = "Successful purchase";
+  static const String onBoardingTitle3 = "Payment Online";
+
+  static const String onBoardingSubTitle1 =
+      "Welcome to our application dedicated to e-shopping, specialized in displaying Egyptian brands.";
+  static const String onBoardingSubTitle2 =
+      "Our first goal is for the user to be able to carry out successful purchase operations.";
+  static const String onBoardingSubTitle3 =
+      "We will provide you with more than one way to pay online";
+}
+
+class LogoImages {
+  static const String ios = "assets/icons/apple_signIn.png";
+  static const String google = "assets/icons/google.png";
+  static const String facebook = "assets/icons/facebook.png";
+
+  static const String firstPage = "assets/onboarding/1.svg";
+  static const String secondPage = "assets/onboarding/2.svg";
+  static const String thirdPage = "assets/onboarding/3.svg";
+}

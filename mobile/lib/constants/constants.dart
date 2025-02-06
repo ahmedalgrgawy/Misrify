@@ -11,8 +11,11 @@ const kBlue = Color(0xff15253F);
 const kDarkest = Color(0xff081120);
 const kDarkBlue = Color(0xFF0B172A);
 const kNavy = Color(0xff0E1D35);
+const Kbackground = Color(0xffEBEBEF);
+const kRed = Color(0xffe81e4d);
 
 double height = 825.h;
 double width = 375.w;
 
-const String appBaseUrl = "";
+const String appBaseUrl = "http://10.0.2.2:5000/api/auth";
+// local ip  IPv4 Address. . . . . . . . . . . : 172.24.128.1
