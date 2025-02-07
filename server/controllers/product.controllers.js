@@ -2,6 +2,7 @@ import AppError from "../errors/AppError.js";
 import cloudinary from "../lib/cloudinary.js";
 import Brand from "../models/brand.model.js";
 import Product from "../models/product.model.js";
+import Category from "../models/category.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res, next) => {
@@ -207,4 +208,117 @@ export const getMerchantProducts = async (req, res, next) => {
 
 // <<<<<<<<<<<<<<<<< User Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 
+export const getAllApprovedProducts = async (req, res, next) => {
+    const products = await Product.find({ isApproved: true })
+        .populate("category")
+        .populate("brand")
+        .exec();
+
+    if (!products || products.length === 0) {
+        return next(new AppError("No Approved Products Found", 404));
+    }
+
+    res.status(200).json({ success: true, products });
+};
+
+export const searchProducts = async (req, res, next) => {
+    const { query, filterBy } = req.query;
+
+    if (!query) {
+        return next(new AppError("Search Query is Required", 400));
+    }
+
+    let filter = { isApproved: true };
+    let brand = null;
+    let category = null;
+
+    if (!filterBy || filterBy === "brand" || filterBy === "category") {
+        [brand, category] = await Promise.all([
+            filterBy !== "category" ? Brand.findOne({ name: { $regex: query, $options: "i" } }) : null,
+            filterBy !== "brand" ? Category.findOne({ name: { $regex: query, $options: "i" } }) : null,
+        ]);
+    }
+
+    if (filterBy === "name") {
+        filter.name = { $regex: query, $options: "i" };
+    } else if (filterBy === "brand") {
+        if (!brand) return next(new AppError("No Brand Found Matching Your Search", 404));
+        filter.brand = brand._id;
+    } else if (filterBy === "category") {
+        if (!category) return next(new AppError("No Category Found Matching Your Search", 404));
+        filter.category = category._id;
+    } else {
+        filter.$or = [
+            { name: { $regex: query, $options: "i" } },
+            brand ? { brand: brand._id } : null,
+            category ? { category: category._id } : null,
+        ].filter(Boolean); 
+    }
+
+    const products = await Product.find(filter)
+        .populate("category")
+        .populate("brand")
+        .exec();
+
+    if (!products || products.length === 0) {
+        return next(new AppError("No Products Found Matching Your Search", 404));
+    }
+
+    res.status(200).json({ success: true, products });
+};
+
+export const filterProducts = async (req, res, next) => {
+    const { size, brand, category, minPrice, maxPrice } = req.query;
+    let filter = { isApproved: true };
+
+    if (size) {
+        if (!["S", "M", "L", "XL", "XXL"].includes(size.toUpperCase())) { 
+            return res.status(400).json({ success: false, message: "Invalid size value" });
+        }
+        filter.size = size.toUpperCase();
+    }
+
+    if (brand || category) {
+        const [brandData, categoryData] = await Promise.all([
+            brand ? Brand.findOne({ name: { $regex: brand, $options: "i" } }) : null,
+            category ? Category.findOne({ name: { $regex: category, $options: "i" } }) : null,
+        ]);
+
+        if (brand && !brandData) return res.status(404).json({ success: false, message: "Brand not found" });
+        if (category && !categoryData) return res.status(404).json({ success: false, message: "Category not found" });
+
+        if (brandData) filter.brand = brandData._id;
+        if (categoryData) filter.category = categoryData._id;
+    }
+
+    const min = parseFloat(minPrice);
+    const max = parseFloat(maxPrice);
+
+    if (minPrice && (isNaN(min) || min < 0)) {
+        return res.status(400).json({ success: false, message: "Invalid minPrice value" });
+    }
+    if (maxPrice && (isNaN(max) || max < 0)) {
+        return res.status(400).json({ success: false, message: "Invalid maxPrice value" });
+    }
+    if (minPrice && maxPrice && min > max) {
+        return res.status(400).json({ success: false, message: "minPrice cannot be greater than maxPrice" });
+    }
+
+    if (minPrice || maxPrice) {
+        filter.price = {};
+        if (minPrice) filter.price.$gte = min;
+        if (maxPrice) filter.price.$lte = max;
+    }
+
+    const products = await Product.find(filter)
+        .populate("category")
+        .populate("brand")
+        .exec();
+
+    if (!products.length) {
+        return res.status(404).json({ success: false, message: "No products found matching your filters" });
+    }
+
+    res.status(200).json({ success: true, products });
+};
 
