@@ -12,13 +12,14 @@ const commentSchema = new mongoose.Schema({
         ref: "User",
         required: [true, "User ID is required"],
     },
-    review: {
+    review: { // Add a reference to the review it belongs to
         type: mongoose.Schema.Types.ObjectId,
         ref: "Review",
-        required: [true, "Review ID is required"],
+        required: true,
     }
 
 }, { timestamps: true })
+
 
 const Comment = mongoose.model("Comment", commentSchema);
 
