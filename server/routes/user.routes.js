@@ -1,13 +1,15 @@
 import express from 'express'
-import { customerRoute, protectedRoute } from '../middlewares/auth.middlewares.js';
+import { customerRoute, protectedRoute, userAndMerchantRoute } from '../middlewares/auth.middlewares.js';
 import { getProfile, updateProfile } from '../controllers/user.controllers.js';
 import catchAsync from '../errors/catchAsync.js';
 import { validate } from '../services/validate.service.js';
 import { updateUserSchema } from '../validators/userValidator.js';
 import { getWishlist, toggleWishlist } from '../controllers/wishlist.controllers.js';
-import { getAllApprovedProducts, searchProducts, filterProducts} from '../controllers/product.controllers.js';
+import { getAllApprovedProducts, searchProducts, filterProducts } from '../controllers/product.controllers.js';
 import { createReview, updateReview, deleteReview } from "../controllers/review.controllers.js";
 import { createComment, updateComment, deleteCommentUser } from "../controllers/comment.controllers.js";
+import { createReviewSchema, updateReviewSchema } from '../validators/reviewValidator.js';
+import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
 
 
 const router = express.Router()
@@ -23,20 +25,20 @@ router.get("/wishlist", catchAsync(protectedRoute), catchAsync(customerRoute), c
 router.post("/toggle-wishlist", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(toggleWishlist))
 
 // Get all products for user
-router.get('/approved-products', catchAsync(getAllApprovedProducts));
+router.get('/products', catchAsync(getAllApprovedProducts));
 
 // Handling Search and filter processes 
 router.get('/search', catchAsync(searchProducts));
-router.get('/filter', catchAsync(filterProducts));  
+router.get('/filter', catchAsync(filterProducts));
 
 // Handling Reviews (Create, Update, Delete)
-router.post("/create-review", catchAsync(protectedRoute), catchAsync(createReview));
-router.put("/:reviewId", catchAsync(protectedRoute), catchAsync(updateReview));
-router.delete("/:reviewId", catchAsync(protectedRoute), catchAsync(deleteReview));
+router.post("/reviews/create", catchAsync(protectedRoute), catchAsync(customerRoute), validate(createReviewSchema), catchAsync(createReview));
+router.put("/reviews/:reviewId", catchAsync(protectedRoute), catchAsync(customerRoute), validate(updateReviewSchema), catchAsync(updateReview));
+router.delete("/reviews/:reviewId", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(deleteReview));
 
 // Handling Comments (Create, Update, Delete)
-router.post("/review/:reviewId/comment", catchAsync(protectedRoute), catchAsync(createComment)); 
-router.put("/comment/:commentId", catchAsync(protectedRoute), catchAsync(updateComment)); 
-router.delete("/comment/:commentId", catchAsync(protectedRoute), catchAsync(deleteCommentUser)); 
+router.post("/comments/create", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), validate(createCommentSchema), catchAsync(createComment));
+router.put("/comment/:commentId", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), validate(updateCommentSchema), catchAsync(updateComment));
+router.delete("/comment/:commentId", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), catchAsync(deleteCommentUser));
 
 export default router;
