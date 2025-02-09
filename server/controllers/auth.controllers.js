@@ -123,7 +123,7 @@ export const forgotPassword = async (req, res, next) => {
 
     sendResetOtp(email, user.name, resetPasswordOtp);
 
-    res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully" })
+    res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully", otp:resetPasswordOtp })
 }
 
 export const resetPassword = async (req, res, next) => {
