@@ -81,7 +81,7 @@ export const login = async (req, res, next) => {
     const user = await User.findOne({ email })
 
     if (!user) {
-        return next(new AppError("User Not Found", 401))
+        return next(new AppError("Credentials are not correct, try again!", 401))
     }
 
     if (!user.isVerified) {
@@ -91,7 +91,7 @@ export const login = async (req, res, next) => {
     const isPasswordMatch = await user.comparePassword(password);
 
     if (!isPasswordMatch) {
-        return next(new AppError("Wrong Password", 401))
+        return next(new AppError("Credentials are not correct, try again!", 401))
     }
 
     const { accessToken, refreshToken } = generateToken(user._id);
