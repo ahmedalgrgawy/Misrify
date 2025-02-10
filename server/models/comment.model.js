@@ -3,12 +3,19 @@ import mongoose from "mongoose";
 const commentSchema = new mongoose.Schema({
     text: {
         type: String,
-        required: true,
+        required: [true, "Comment text is required"],
+        trim: true,
+        minlength: [3, "Comment must be at least 3 characters long"]
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: [true, "User ID is required"],
+    },
+    review: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Review",
+        required: [true, "Review ID is required"],
     }
 
 }, { timestamps: true })
