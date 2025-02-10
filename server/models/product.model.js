@@ -35,6 +35,7 @@ const productSchema = new mongoose.Schema({
     },
     imgUrl: {
         type: String,
+        required: [true, "Image is required"],
     },
     isDiscounted: {
         type: Boolean,
@@ -48,12 +49,6 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
-    reviews: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Review"
-        }
-    ]
 }, { timestamps: true });
 
 const Product = mongoose.model("Product", productSchema);
