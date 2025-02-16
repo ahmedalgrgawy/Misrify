@@ -12,7 +12,7 @@ export const getCart = async (req, res, next) => {
         cart = await Cart.create({ user: userId, cartItems: [], totalPrice: 0 });
     }
     if (cart.cartItems.length === 0) 
-        return next(new AppError("Cart Is Empty", 404))
+        return next(new AppError("Cart Is Empty", 200))
 
     cart.totalPrice = await CartItem.aggregate([
         { $match: { _id: { $in: cart.cartItems } } },
@@ -35,7 +35,7 @@ export const addToCart = async (req, res, next) => {
     if (product.stock < quantity) {
         return res.status(400).json({ success: false, message: "Not enough stock available" });
     }
-    
+
     const price = product.price; 
 
     let cart = await Cart.findOne({ user: userId });
