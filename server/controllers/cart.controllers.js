@@ -28,20 +28,21 @@ export const addToCart = async (req, res, next) => {
     const userId = req.user._id;
     const { productId, quantity, color, size } = req.body;
 
-    // Fetch product from DB to get the actual price
     const product = await Product.findById(productId);
     if (!product) {
         return res.status(404).json({ success: false, message: "Product not found" });
     }
-    const price = product.price; // Get actual price from DB
+    if (product.stock < quantity) {
+        return res.status(400).json({ success: false, message: "Not enough stock available" });
+    }
+    
+    const price = product.price; 
 
-    // Find or create the user's cart
     let cart = await Cart.findOne({ user: userId });
     if (!cart) {
         cart = await Cart.create({ user: userId, cartItems: [], totalPrice: 0 });
     }
 
-    // Check if item already exists in the cart
     let cartItem = await CartItem.findOne({
         _id: { $in: cart.cartItems },
         product: productId,
@@ -51,7 +52,7 @@ export const addToCart = async (req, res, next) => {
 
     if (cartItem) {
         cartItem.quantity += quantity;
-        cartItem.total = cartItem.quantity * price; // Use actual price
+        cartItem.total = cartItem.quantity * price; 
         await cartItem.save();
     } else {
         cartItem = await CartItem.create({
@@ -65,7 +66,6 @@ export const addToCart = async (req, res, next) => {
         cart.cartItems.push(cartItem._id);
     }
 
-    // Recalculate cart total price
     cart.totalPrice = await CartItem.aggregate([
         { $match: { _id: { $in: cart.cartItems } } }, 
         { $group: { _id: null, total: { $sum: "$total" } } }, 
