@@ -10,7 +10,8 @@ import { createReview, updateReview, deleteReview } from "../controllers/review.
 import { createComment, updateComment, deleteCommentUser } from "../controllers/comment.controllers.js";
 import { createReviewSchema, updateReviewSchema } from '../validators/reviewValidator.js';
 import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
-
+import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart } from "../controllers/cart.controllers.js";
+import { addToCartSchema, updateCartItemQuantitySchema, removeFromCartSchema, clearCartSchema } from "../validators/cartValidator.js";
 
 const router = express.Router()
 
@@ -40,5 +41,12 @@ router.delete("/reviews/:reviewId", catchAsync(protectedRoute), catchAsync(custo
 router.post("/comments/create", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), validate(createCommentSchema), catchAsync(createComment));
 router.put("/comment/:commentId", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), validate(updateCommentSchema), catchAsync(updateComment));
 router.delete("/comment/:commentId", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), catchAsync(deleteCommentUser));
+
+// Handling Cart (getCart, addTo, remove, update, clear)
+router.get("/cart", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getCart));
+router.post("/addToCart", catchAsync(protectedRoute), catchAsync(customerRoute), validate(addToCartSchema), catchAsync(addToCart));
+router.put("/update-quantity", catchAsync(protectedRoute), catchAsync(customerRoute), validate(updateCartItemQuantitySchema), catchAsync(updateCartItemQuantity));
+router.delete("/remove-item", catchAsync(protectedRoute), catchAsync(customerRoute), validate(removeFromCartSchema), catchAsync(removeFromCart));
+router.delete("/clear", catchAsync(protectedRoute), catchAsync(customerRoute), validate(clearCartSchema), catchAsync(clearCart));
 
 export default router;
