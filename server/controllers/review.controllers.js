@@ -2,7 +2,6 @@ import AppError from "../errors/AppError.js";
 import Review from "../models/review.model.js";
 import Product from "../models/product.model.js";
 import Comment from "../models/comment.model.js";
-import mongoose from "mongoose";
 
 export const createReview = async (req, res, next) => {
     const { productId, rating, reviewText } = req.body;
