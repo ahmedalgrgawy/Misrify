@@ -54,3 +54,12 @@ export const merchantRoute = (req, res, next) => {
         return next(new AppError("Unauthorized, You Are Not Merchant", 401))
     }
 }
+
+export const userAndMerchantRoute = (req, res, next) => {
+
+    if (req.user && (req.user.role === 'user' || req.user.role === 'merchant')) {
+        next()
+    } else {
+        return next(new AppError("Unauthorized, You Are Not Allowed", 401))
+    }
+}
