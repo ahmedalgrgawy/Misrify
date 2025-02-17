@@ -212,6 +212,7 @@ export const getAllApprovedProducts = async (req, res, next) => {
     const products = await Product.find({ isApproved: true })
         .populate("category")
         .populate("brand")
+        .populate("reviews")
         .exec();
 
     if (!products || products.length === 0) {
@@ -252,7 +253,7 @@ export const searchProducts = async (req, res, next) => {
             { name: { $regex: query, $options: "i" } },
             brand ? { brand: brand._id } : null,
             category ? { category: category._id } : null,
-        ].filter(Boolean); 
+        ].filter(Boolean);
     }
 
     const products = await Product.find(filter)
@@ -272,7 +273,7 @@ export const filterProducts = async (req, res, next) => {
     let filter = { isApproved: true };
 
     if (size) {
-        if (!["S", "M", "L", "XL", "XXL"].includes(size.toUpperCase())) { 
+        if (!["S", "M", "L", "XL", "XXL"].includes(size.toUpperCase())) {
             return res.status(400).json({ success: false, message: "Invalid size value" });
         }
         filter.size = size.toUpperCase();

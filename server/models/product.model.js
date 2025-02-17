@@ -22,10 +22,12 @@ const productSchema = new mongoose.Schema({
     quantityInStock: {
         type: Number,
         required: [true, "Quantity is required"],
+        min: [0, "Quantity cannot be negative"],
     },
     price: {
         type: Number,
         required: [true, "Price is required"],
+        min: [0, "Price cannot be negative"],
     },
     colors: {
         type: [String],
@@ -43,6 +45,7 @@ const productSchema = new mongoose.Schema({
     discountAmount: {
         type: Number,
         default: 0,
+        min: [0, "Discount cannot be negative"],
     },
     isApproved: {
         type: Boolean,
@@ -55,6 +58,7 @@ const productSchema = new mongoose.Schema({
         }
     ]
 }, { timestamps: true });
+
 
 const Product = mongoose.model("Product", productSchema);
 
