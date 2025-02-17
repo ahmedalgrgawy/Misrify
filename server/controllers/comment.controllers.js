@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import AppError from "../errors/AppError.js";
 import Comment from "../models/comment.model.js";
 import Review from "../models/review.model.js";

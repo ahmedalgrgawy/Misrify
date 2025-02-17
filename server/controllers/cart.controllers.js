@@ -1,7 +1,7 @@
 import AppError from "../errors/AppError.js";
 import Cart from "../models/Cart.model.js";
 import CartItem from "../models/CartItem.model.js";
-import Product from "../models/product.model.js"; 
+import Product from "../models/product.model.js";
 
 export const getCart = async (req, res, next) => {
     const userId = req.user._id;
@@ -11,8 +11,10 @@ export const getCart = async (req, res, next) => {
     if (!cart) {
         cart = await Cart.create({ user: userId, cartItems: [], totalPrice: 0 });
     }
-    if (cart.cartItems.length === 0) 
+
+    if (cart.cartItems.length === 0) {
         return next(new AppError("Cart Is Empty", 200))
+    }
 
     cart.totalPrice = await CartItem.aggregate([
         { $match: { _id: { $in: cart.cartItems } } },
@@ -29,16 +31,23 @@ export const addToCart = async (req, res, next) => {
     const { productId, quantity, color, size } = req.body;
 
     const product = await Product.findById(productId);
+
     if (!product) {
-        return res.status(404).json({ success: false, message: "Product not found" });
-    }
-    if (product.stock < quantity) {
-        return res.status(400).json({ success: false, message: "Not enough stock available" });
+        return next(new AppError("Product not found", 404))
     }
 
-    const price = product.price; 
+    if (product.quantityInStock < quantity) {
+        return next(new AppError("Not enough stock available", 400))
+    }
+
+    if (product.quantityInStock === 0) {
+        return next(new AppError("Product is out Of Stock", 400))
+    }
+
+    const price = product.price;
 
     let cart = await Cart.findOne({ user: userId });
+
     if (!cart) {
         cart = await Cart.create({ user: userId, cartItems: [], totalPrice: 0 });
     }
@@ -52,7 +61,7 @@ export const addToCart = async (req, res, next) => {
 
     if (cartItem) {
         cartItem.quantity += quantity;
-        cartItem.total = cartItem.quantity * price; 
+        cartItem.total = cartItem.quantity * price;
         await cartItem.save();
     } else {
         cartItem = await CartItem.create({
@@ -67,8 +76,8 @@ export const addToCart = async (req, res, next) => {
     }
 
     cart.totalPrice = await CartItem.aggregate([
-        { $match: { _id: { $in: cart.cartItems } } }, 
-        { $group: { _id: null, total: { $sum: "$total" } } }, 
+        { $match: { _id: { $in: cart.cartItems } } },
+        { $group: { _id: null, total: { $sum: "$total" } } },
     ]).then(result => (result.length > 0 ? result[0].total : 0));
 
     await cart.save();
@@ -82,17 +91,21 @@ export const removeFromCart = async (req, res, next) => {
     const { cartItemId } = req.body;
 
     const cart = await Cart.findOne({ user: userId });
+
     if (!cart) {
         return next(new AppError("Cart not found", 404));
     }
 
     const cartItem = await CartItem.findById(cartItemId);
+
     if (!cartItem) {
         return next(new AppError("Cart item not found", 404));
     }
 
     cart.cartItems = cart.cartItems.filter(item => item.toString() !== cartItemId.toString());
-    cart.totalPrice -= cartItem.total; 
+
+    cart.totalPrice -= cartItem.total;
+
     await cart.save();
 
     await CartItem.findByIdAndDelete(cartItemId);
@@ -105,29 +118,33 @@ export const updateCartItemQuantity = async (req, res, next) => {
     const { cartItemId, operation } = req.body;
 
     const cart = await Cart.findOne({ user: userId });
+
     if (!cart) {
         return next(new AppError("Cart not found", 404));
     }
 
     const cartItem = await CartItem.findById(cartItemId);
+
     if (!cartItem) {
         return next(new AppError("Cart item not found", 404));
     }
 
     let change = (operation === "add") ? 1 : -1;
-  
+
     const oldTotal = cartItem.total;
+
     cartItem.quantity += change;
 
     if (cartItem.quantity <= 0) {
         await CartItem.findByIdAndDelete(cartItemId);
-        cart.cartItems = cart.cartItems.filter(item => item.toString() !== cartItemId); 
+        cart.cartItems = cart.cartItems.filter(item => item.toString() !== cartItemId);
     } else {
         cartItem.total = cartItem.price * cartItem.quantity;
         await cartItem.save();
     }
 
     cart.totalPrice += cartItem.total - oldTotal;
+
     await cart.save();
 
     res.status(200).json({ success: true, message: "Cart item quantity updated", cart });
