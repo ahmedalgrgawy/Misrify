@@ -105,7 +105,6 @@ class _ForgetpasswordScreenState extends State<ForgetpasswordScreen> {
                                         forgetPasswordModelToJson(model);
                                     controller.ForgetpasswordFunction(data);
                                   }
-                                  ;
                                 },
                                 child: Center(
                                   child: ReusableText(
@@ -129,7 +128,6 @@ class _ForgetpasswordScreenState extends State<ForgetpasswordScreen> {
                                         forgetPasswordModelToJson(model);
                                     controller.ForgetpasswordFunction(data);
                                   }
-                                  ;
                                 },
                                 text: 'Send',
                                 textcolor: Kbackground,

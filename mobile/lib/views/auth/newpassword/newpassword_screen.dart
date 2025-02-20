@@ -7,7 +7,6 @@ import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/controllers.auth/resetpassword_controller.dart';
-import 'package:graduation_project1/views/auth/success_screen.dart';
 import 'package:graduation_project1/views/auth/widgets/password_textfield.dart';
 
 class NewpasswordScreen extends StatefulWidget {

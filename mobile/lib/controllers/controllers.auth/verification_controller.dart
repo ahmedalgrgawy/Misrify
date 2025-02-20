@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
@@ -85,47 +84,15 @@ class VerificationController extends GetxController {
       Get.snackbar('Error', 'Please enter the OTP correctly',
           colorText: Colors.white, backgroundColor: Colors.red);
       return;
+    } else if (code != box.read('forgetPassword_otp')) {
+      Get.snackbar('Error', 'Wrong OTP',
+          colorText: Colors.white, backgroundColor: Colors.red);
+      return;
     }
 
-    setLoading = true;
+    Get.snackbar('OTP Entered correctly', 'Please, Enter your new password',
+        colorText: Colors.white, backgroundColor: Colors.green);
 
-    Uri url = Uri.parse('$appBaseUrl/verify-email');
-    var requestBody = jsonEncode({
-      "email": box.read('saved_email'),
-      "otp": code,
-    });
-    box.write('passwordotp', code);
-
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-    };
-
-    try {
-      var response = await http.post(url, headers: headers, body: requestBody);
-      if (response.statusCode == 200) {
-        LoginResponse data = loginResponseFromJson(response.body);
-
-        String userId = data.user.id;
-        String userData = jsonEncode(data);
-
-        box.write(userId, userData);
-        box.write('userId', data.user.id);
-        box.write('verification', data.user.isVerified);
-
-        setLoading = false;
-
-        Get.offAll(() => NewpasswordScreen());
-      } else {
-        var error = apiErrorFromJson(response.body);
-        Get.snackbar('Failed to verify', error.message,
-            colorText: kLightWhite,
-            backgroundColor: kRed,
-            icon: const Icon(Icons.error_outline));
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      setLoading = false;
-    }
+    Get.offAll(() => NewpasswordScreen());
   }
 }
