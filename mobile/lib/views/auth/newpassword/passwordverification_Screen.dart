@@ -11,7 +11,6 @@ import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:graduation_project1/controllers/controllers.auth/forgetpassword_controller.dart';
 import 'package:graduation_project1/controllers/controllers.auth/verification_controller.dart';
 import 'package:graduation_project1/models/forget_password_model.dart';
-import 'package:graduation_project1/views/auth/newpassword/newpassword_screen.dart';
 
 class PasswordverificationScreen extends StatelessWidget {
   const PasswordverificationScreen({super.key});

@@ -9,7 +9,6 @@ import 'package:graduation_project1/models/login_response.dart';
 import 'package:graduation_project1/models/resetpassword_model.dart';
 import 'package:graduation_project1/views/auth/login_Screen.dart';
 import 'package:graduation_project1/views/auth/verification_screen.dart';
-import 'package:graduation_project1/views/home/Home_Screen.dart';
 import 'package:http/http.dart' as http;
 
 class LoginController extends GetxController {

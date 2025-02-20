@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
-import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/tap_index_controller.dart';
 import 'package:graduation_project1/views/cart/widgets/cart_screen.dart';

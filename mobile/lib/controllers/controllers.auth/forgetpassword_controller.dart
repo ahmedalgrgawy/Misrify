@@ -3,8 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/models/api_error_model.dart';
-import 'package:graduation_project1/models/resetpassword_model.dart';
-import 'package:graduation_project1/models/success_model.dart';
+import 'package:graduation_project1/models/forget_password_response.dart';
 import 'package:graduation_project1/views/auth/newpassword/passwordverification_Screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -29,12 +28,13 @@ class ForgetpasswordController extends GetxController {
       var response = await http.post(url, headers: headers, body: data);
 
       if (response.statusCode == 200) {
-        var success = successModelFromJson(response.body);
+        var success = forgetPasswordResponseFromJson(response.body);
 
         var jsonData = forgetPasswordModelFromJson(data);
         box.write('saved_email', jsonData.email);
-
+        box.write('forgetPassword_otp', success.otp);
         setLoading = false;
+        print(response.body);
         Get.to(() => const PasswordverificationScreen(),
             transition: Transition.fadeIn,
             duration: const Duration(milliseconds: 1200));
