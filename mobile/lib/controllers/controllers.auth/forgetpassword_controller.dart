@@ -29,12 +29,11 @@ class ForgetpasswordController extends GetxController {
 
       if (response.statusCode == 200) {
         var success = forgetPasswordResponseFromJson(response.body);
-
         var jsonData = forgetPasswordModelFromJson(data);
         box.write('saved_email', jsonData.email);
         box.write('forgetPassword_otp', success.otp);
         setLoading = false;
-        print(response.body);
+
         Get.to(() => const PasswordverificationScreen(),
             transition: Transition.fadeIn,
             duration: const Duration(milliseconds: 1200));
