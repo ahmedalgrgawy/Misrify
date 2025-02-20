@@ -40,7 +40,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
             radius: 15.r,
           ),
           ReusableText(
-              text: title, style: appStyle(20, kDarkBlue, FontWeight.w700)),
+              text: title, style: appStyle(20, kDarkBlue, FontWeight.w600)),
           Row(
             children: [
               InkWell(

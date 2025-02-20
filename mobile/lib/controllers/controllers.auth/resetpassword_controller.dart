@@ -1,17 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/models/api_error_model.dart';
-import 'package:graduation_project1/models/login_response.dart';
 import 'package:graduation_project1/models/resetpassword_model.dart';
-import 'package:graduation_project1/views/auth/login_Screen.dart';
-import 'package:graduation_project1/views/auth/newpassword/newpassword_screen.dart';
 import 'package:graduation_project1/views/auth/success_screen.dart';
-import 'package:graduation_project1/views/home/Home_Screen.dart';
 import 'package:http/http.dart' as http;
 
 class ResetpasswordController extends GetxController {

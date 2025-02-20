@@ -1,73 +1,104 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/models/login_response.dart';
+import 'package:graduation_project1/models/validation_error_response.dart';
 import 'package:graduation_project1/views/auth/login_Screen.dart';
 import 'package:graduation_project1/views/auth/verification_screen.dart';
 import 'package:http/http.dart' as http;
 
 class RegistrationController extends GetxController {
-  RxBool _isLoading = false.obs;
+  final RxBool _isLoading = false.obs;
   final agreement = false.obs;
-
+  final RxString generalError = ''.obs;
+  final RxMap<String, String> fieldErrors = <String, String>{}.obs;
   final box = GetStorage();
+
   bool get isLoading => _isLoading.value;
   set setLoading(bool newState) {
     _isLoading.value = newState;
   }
 
-  void registerationFunction(String data) async {
+  //Register function with improved validation & error handling
+  void registerUser(String data) async {
     setLoading = true;
     Uri url = Uri.parse('$appBaseUrl/signup');
     Map<String, String> headers = {'Content-Type': 'application/json'};
-    if (agreement.isTrue) {
-      try {
-        var response = await http.post(url, headers: headers, body: data);
 
-        if (response.statusCode == 200) {
-          LoginResponse data = loginResponseFromJson(response.body);
-          String userEmail = data.user.email;
+    try {
+      var response = await http.post(url, headers: headers, body: data);
 
-          box.write("email", userEmail);
+      if (response.statusCode == 200 && agreement.isTrue) {
+        generalError.value = '';
+        fieldErrors.clear();
 
-          setLoading = false;
+        LoginResponse responseData = loginResponseFromJson(response.body);
+        box.write("email", responseData.user.email);
 
-          Get.to(() => const VerificationScreen(),
-              transition: Transition.fade,
-              duration: const Duration(milliseconds: 900));
+        setLoading = false;
 
-          Get.snackbar('Registration Successful', 'Please verify your email',
+        Get.to(() => const VerificationScreen(),
+            transition: Transition.fade,
+            duration: const Duration(milliseconds: 900));
+
+        Get.snackbar('Registration Successful', 'Please verify your email',
+            colorText: kLightWhite,
+            backgroundColor: kLightBlue,
+            icon: const Icon(Ionicons.checkmark_circle_outline));
+      } else {
+        if (agreement.isFalse) {
+          Get.snackbar('Failed to register',
+              'You must agree to the terms and conditions',
               colorText: kLightWhite,
-              backgroundColor: kLightBlue,
-              icon: const Icon(Ionicons.checkmark_circle_outline));
+              backgroundColor: kRed,
+              icon: const Icon(Icons.error_outline));
+          setLoading = false;
+          return;
+        }
+        var error = validationErrorResponseFromJson(response.body);
+
+        if (error.message == 'Validation errors') {
+          generalError.value = error.message;
+          Map<String, String> errorMap = {};
+          for (var error in error.errors ?? []) {
+            if (error.toLowerCase().contains("email")) {
+              errorMap["email"] = error;
+            } else if (error.toLowerCase().contains("password")) {
+              errorMap["password"] = error;
+            } else if (error.toLowerCase().contains("name")) {
+              errorMap["name"] = error;
+            } else if (error.toLowerCase().contains("phone")) {
+              errorMap["phoneNumber"] = error;
+            } else if (error.toLowerCase().contains("address")) {
+              errorMap["address"] = error;
+            } else if (error.toLowerCase().contains("gender")) {
+              errorMap["gender"] = error;
+            } else {
+              errorMap["general"] = error;
+            }
+          }
+
+          fieldErrors.assignAll(errorMap);
         } else {
-          var error = apiErrorFromJson(response.body);
           Get.snackbar('Failed to register', error.message,
               colorText: kLightWhite,
               backgroundColor: kRed,
               icon: const Icon(Icons.error_outline));
         }
-      } catch (e) {
-        debugPrint(e.toString());
-        Get.snackbar("Error", "Something went wrong. Please try again.");
-      } finally {
-        setLoading = false;
       }
-    }
-    if (agreement.isFalse) {
-      Get.snackbar(
-          'Failed to register', 'Make sure you agree the tirms and conditions',
-          colorText: kLightWhite,
-          backgroundColor: kRed,
-          icon: const Icon(Icons.error_outline));
+    } catch (e) {
+      generalError.value = 'Something went wrong. Please try again.';
+      fieldErrors.clear();
+      Get.snackbar("Error", "Something went wrong. Please try again.",
+          backgroundColor: kRed, colorText: kLightWhite);
+    } finally {
+      setLoading = false;
     }
   }
 
-  /// **2️⃣ Logout Function**
+  // Logout function
   void logout() {
     box.erase();
     Get.offAll(() => const LoginScreen(),
@@ -75,6 +106,7 @@ class RegistrationController extends GetxController {
         duration: const Duration(milliseconds: 900));
   }
 
+  //Get saved email for pre-filling fields
   String getSavedEmail() {
     return box.read('email') ?? "";
   }

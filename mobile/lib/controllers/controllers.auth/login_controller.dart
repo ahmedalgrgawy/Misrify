@@ -4,17 +4,18 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/data/repositories/authentication_repository.dart';
-import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/models/login_response.dart';
 import 'package:graduation_project1/models/resetpassword_model.dart';
 import 'package:graduation_project1/views/auth/login_Screen.dart';
 import 'package:graduation_project1/views/auth/verification_screen.dart';
-import 'package:graduation_project1/views/home/Home_Screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:graduation_project1/models/validation_error_response.dart';
 
 class LoginController extends GetxController {
   final RxBool _isLoading = false.obs;
   final box = GetStorage();
+  final RxString generalError = ''.obs; // Store general error message
+  final RxList<String> errors = <String>[].obs; // Store errors as a list
 
   bool get isLoading => _isLoading.value;
   set setLoading(bool newState) {
@@ -25,6 +26,7 @@ class LoginController extends GetxController {
     setLoading = true;
     Uri url = Uri.parse('$appBaseUrl/login');
     Map<String, String> headers = {'Content-Type': 'application/json'};
+
     try {
       var response = await http.post(url, headers: headers, body: data);
       if (response.statusCode == 200) {
@@ -37,14 +39,14 @@ class LoginController extends GetxController {
         box.write('verification', data.user.isVerified);
 
         setLoading = false;
-
+        generalError.value = ''; // ✅ Clear errors on success
+        errors.clear();
         Get.snackbar(
-          'You are successfully logged in',
-          'Enjoy your awesome experience',
-          colorText: kLightWhite,
-          backgroundColor: kLightBlue,
+          'Login Successful',
+          'Welcome!',
+          colorText: Colors.white,
+          backgroundColor: Colors.green,
         );
-
         if (data.user.isVerified == false) {
           Get.to(() => const VerificationScreen(),
               transition: Transition.fade,
@@ -54,15 +56,21 @@ class LoginController extends GetxController {
           AuthenticationRepository.instance.screenRedirect();
         }
       } else {
-        var error = apiErrorFromJson(response.body);
+        var error = validationErrorResponseFromJson(response.body);
 
-        Get.snackbar('Failed to login', error.message,
-            colorText: kLightWhite,
-            backgroundColor: kRed,
-            icon: const Icon(Icons.error_outline));
+        if (error.message == 'Validation errors') {
+          generalError.value = error.message;
+          errors.assignAll(error.errors ?? []);
+        } else {
+          Get.snackbar('Login Failed', error.message,
+              colorText: Colors.white,
+              backgroundColor: kRed,
+              icon: const Icon(Icons.error_outline));
+        }
       }
     } catch (e) {
-      debugPrint(e.toString());
+      generalError.value = 'Something went wrong';
+      errors.clear();
     }
   }
 

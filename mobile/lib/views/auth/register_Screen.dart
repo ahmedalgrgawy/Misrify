@@ -24,14 +24,17 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final RegistrationController controller = Get.put(RegistrationController());
+
   late final TextEditingController _emailController = TextEditingController();
   late final TextEditingController _passwordController =
       TextEditingController();
   late final TextEditingController _userController = TextEditingController();
   late final TextEditingController _phonenumberController =
       TextEditingController();
-  late final TextEditingController _addressControler = TextEditingController();
+  late final TextEditingController _addressController = TextEditingController();
   late final TextEditingController _genderController = TextEditingController();
+
   final FocusNode _passwordFocusNode = FocusNode();
 
   @override
@@ -41,15 +44,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _userController.dispose();
     _phonenumberController.dispose();
-    _addressControler.dispose();
+    _addressController.dispose();
     _genderController.dispose();
     super.dispose();
   }
 
+  void _registerUser() {
+    if (_userController.text.isEmpty) {
+      controller.fieldErrors["name"] = "Name is required";
+    }
+    if (_emailController.text.isEmpty) {
+      controller.fieldErrors["email"] = "Email is required";
+    }
+    if (_passwordController.text.isEmpty) {
+      controller.fieldErrors["password"] = "Password is required";
+    }
+
+    if (_phonenumberController.text.isEmpty) {
+      controller.fieldErrors["phoneNumber"] = "Phone number is required";
+    }
+    if (_addressController.text.isEmpty) {
+      controller.fieldErrors["address"] = "Address is required";
+    }
+    if (_genderController.text.isEmpty) {
+      controller.fieldErrors["gender"] = "Gender is required";
+    }
+
+    if (controller.fieldErrors.isNotEmpty) return;
+    RegistrationModel model = RegistrationModel(
+      name: _userController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text.trim(),
+      phoneNumber: _phonenumberController.text.trim(),
+      address: _addressController.text.trim(),
+      gender: _genderController.text.trim(),
+    );
+
+    // ✅ Convert model to JSON and send to API
+    String data = registrationModelToJson(model);
+    controller.registerUser(data);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(RegistrationController());
-
+    final RegistrationController registrationController =
+        Get.find<RegistrationController>();
     return Scaffold(
       backgroundColor: Kbackground,
       body: Padding(
@@ -73,96 +112,136 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: appStyle(32, kDarkest, FontWeight.w700),
                       ),
                       SizedBox(height: 30.h),
-                      EmailTextfield(
+                      CustomTextContainer(
                         title: 'Your Name',
                         controller: _userController,
+                        fieldName: 'name',
                       ),
                       SizedBox(height: 10.h),
+
                       EmailTextfield(
+                        islogin: false,
                         title: 'Email Address',
                         controller: _emailController,
                       ),
                       SizedBox(height: 10.h),
+
                       PasswordTextfield(
+                        islogin: false,
                         controller: _passwordController,
                       ),
                       SizedBox(height: 10.h),
-                      EmailTextfield(
+
+                      CustomTextContainer(
                         title: 'Phone Number',
                         controller: _phonenumberController,
+                        fieldName: 'phoneNumber',
+                        keyboardType: TextInputType.phone,
                       ),
-                      EmailTextfield(
+
+                      CustomTextContainer(
                         title: 'Address',
-                        controller: _addressControler,
+                        controller: _addressController,
+                        fieldName: 'address',
                       ),
                       SizedBox(height: 10.h),
-                      CustomTextContainer(
-                        title: 'Gender',
-                        suffixIcon: DropdownButtonFormField<String>(
-                          style: appStyle(15, kDarkBlue, FontWeight.normal),
-                          decoration: InputDecoration(
-                              filled: true,
-                              fillColor: Kbackground,
-                              hintText: "Select Gender",
-                              hintStyle:
-                                  appStyle(14, kLightGray, FontWeight.normal),
-                              contentPadding: EdgeInsets.symmetric(
-                                  vertical: 10.h, horizontal: 12.w),
-                              errorBorder: OutlineInputBorder(
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ReusableText(
+                              text: "Gender",
+                              style: appStyle(14, kBlue, FontWeight.w400)),
+                          SizedBox(height: 5.h),
+                          Obx(() {
+                            String? errorMessage =
+                                registrationController.fieldErrors['gender'];
+
+                            return DropdownButtonFormField<String>(
+                              style: appStyle(15, kDarkBlue, FontWeight.normal),
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Kbackground,
+                                hintText: "Select Gender",
+                                isDense: true,
+                                hintStyle:
+                                    appStyle(14, kLightGray, FontWeight.normal),
+                                contentPadding: EdgeInsets.symmetric(
+                                    vertical: 10.h, horizontal: 12.w),
+                                errorText: errorMessage,
+                                border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: errorMessage != null
+                                          ? kRed
+                                          : Kbackground,
+                                      width: 1.0),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.r)),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: errorMessage != null
+                                          ? kRed
+                                          : Kbackground,
+                                      width: 1.0),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.r)),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: errorMessage != null
+                                          ? kRed
+                                          : kLightGray,
+                                      width: 1.0),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15.r)),
+                                ),
+                                errorBorder: OutlineInputBorder(
                                   borderSide:
-                                      const BorderSide(color: kRed, width: .5),
+                                      const BorderSide(color: kRed, width: 1.0),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(15.r))),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      color: kLightGray, width: .5),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15.r))),
-                              focusedErrorBorder: OutlineInputBorder(
+                                      BorderRadius.all(Radius.circular(15.r)),
+                                ),
+                                focusedErrorBorder: OutlineInputBorder(
                                   borderSide:
-                                      const BorderSide(color: kRed, width: .5),
+                                      const BorderSide(color: kRed, width: 1.0),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(15.r))),
-                              disabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      color: Kbackground, width: .5),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15.r))),
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: const BorderSide(
-                                      color: Kbackground, width: .5),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15.r))),
-                              border: OutlineInputBorder(borderSide: const BorderSide(color: Kbackground, width: .5), borderRadius: BorderRadius.all(Radius.circular(15.r)))),
-                          icon: const Icon(
-                            CupertinoIcons.chevron_down,
-                            size: 16,
-                            color: kBlue,
-                          ),
-                          items: const [
-                            DropdownMenuItem(
-                              value: 'male',
-                              child: Text('male'),
-                            ),
-                            DropdownMenuItem(
-                              value: 'female',
-                              child: Text('female'),
-                            ),
-                          ],
-                          onChanged: (String? value) {
-                            if (value != null) {
-                              setState(() {
-                                _genderController.text = value;
-                              });
-                            }
-                          },
-                        ),
-                        controller: _genderController,
+                                      BorderRadius.all(Radius.circular(15.r)),
+                                ),
+                              ),
+                              icon: const Icon(
+                                CupertinoIcons.chevron_down,
+                                size: 16,
+                                color: kBlue,
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'male',
+                                  child: Text('male'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'female',
+                                  child: Text('female'),
+                                ),
+                              ],
+                              onChanged: (String? value) {
+                                registrationController.fieldErrors
+                                    .remove('gender');
+                                if (value != null) {
+                                  setState(() {
+                                    _genderController.text = value;
+                                  });
+                                }
+                              },
+                            );
+                          }),
+                        ],
                       ),
                       SizedBox(height: 120.h),
+
+                      /// ✅ Checkbox for Agreement
                       Row(
-                        crossAxisAlignment: CrossAxisAlignment
-                            .start, // Aligns checkbox and text at the top
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Obx(
                             () => Checkbox(
@@ -188,31 +267,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ],
                       ),
                       SizedBox(height: 16.h),
-                      CustomButton(
-                        onTap: () {
-                          if (_emailController.text.isNotEmpty &&
-                              _userController.text.isNotEmpty &&
-                              _addressControler.text.isNotEmpty &&
-                              _phonenumberController.text.isNotEmpty &&
-                              _genderController.text.isNotEmpty &&
-                              _passwordController.text.length >= 8) {
-                            RegistrationModel model = RegistrationModel(
-                              name: _userController.text,
-                              email: _emailController.text,
-                              password: _passwordController.text,
-                              address: _addressControler.text,
-                              phoneNumber: _phonenumberController.text,
-                              gender: _genderController.text,
-                            );
 
-                            String data = registrationModelToJson(model);
-                            controller.registerationFunction(data);
-                          } else {
-                            Get.snackbar('Error', 'All fields are required',
-                                colorText: Colors.white,
-                                backgroundColor: Colors.red);
-                          }
-                        },
+                      /// ✅ Sign Up Button
+                      CustomButton(
+                        onTap: _registerUser,
                         text: 'Sign Up',
                         btnColor: kLightBlue,
                         btnHeight: 48.h,
@@ -220,10 +278,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         btnWidth: width,
                       ),
                       SizedBox(height: 30.h),
+
                       ReusableText(
                           text: 'Or',
                           style: appStyle(12, kBlue, FontWeight.w700)),
                       SizedBox(height: 30.h),
+
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 40.0),
                         child: Row(
@@ -236,12 +296,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       SizedBox(height: 30.h),
+
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ReusableText(
                               text: 'Already have an account?',
                               style: appStyle(12, kDarkBlue, FontWeight.w500)),
+                          SizedBox(width: 5.w),
                           GestureDetector(
                             onTap: () {
                               Get.to(() => const LoginScreen(),

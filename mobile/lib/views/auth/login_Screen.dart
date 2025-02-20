@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(LoginController());
+
     return Scaffold(
       backgroundColor: Kbackground,
       body: Padding(
@@ -63,9 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         text: 'Sign In',
                         style: appStyle(32, kDarkest, FontWeight.w700),
                       ),
-                      SizedBox(
-                        height: 30.h,
-                      ),
+                      SizedBox(height: 30.h),
                       EmailTextfield(
                         title: 'Email Address',
                         suffixIcon: const Icon(
@@ -75,12 +74,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         controller: _emailController,
                       ),
-                      SizedBox(
-                        height: 25.h,
-                      ),
-                      PasswordTextfield(
-                        controller: _passwordController,
-                      ),
+                      SizedBox(height: 25.h),
+                      PasswordTextfield(controller: _passwordController),
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Row(
@@ -101,20 +96,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 30.h,
-                      ),
+                      SizedBox(height: 30.h),
                       CustomButton(
                         onTap: () {
-                          if (_emailController.text.isNotEmpty &&
-                              _passwordController.text.length >= 8) {
-                            LoginModel model = LoginModel(
-                                email: _emailController.text,
-                                password: _passwordController.text);
-
-                            String data = loginModelToJson(model);
-                            controller.loginFunction(data);
+                          if (_emailController.text.isEmpty) {
+                            controller.errors.add("Email is required");
+                            return;
                           }
+
+                          if (_passwordController.text.isEmpty) {
+                            controller.errors.add("Password is required");
+                            return;
+                          }
+
+                          LoginModel model = LoginModel(
+                            email: _emailController.text,
+                            password: _passwordController.text,
+                          );
+
+                          String data = loginModelToJson(model);
+                          controller.loginFunction(data);
                         },
                         text: 'Sign In',
                         btnColor: kLightBlue,
@@ -122,9 +123,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         textcolor: Kbackground,
                         btnWidth: width,
                       ),
-                      SizedBox(
-                        height: 20.h,
-                      ),
+                      SizedBox(height: 20.h),
                       CustomButton(
                         onTap: () {
                           Get.to(() => const HomeScreen(),
@@ -136,37 +135,30 @@ class _LoginScreenState extends State<LoginScreen> {
                         btnHeight: 48.h,
                         btnWidth: width,
                       ),
-                      SizedBox(
-                        height: 30.h,
-                      ),
+                      SizedBox(height: 30.h),
                       ReusableText(
                           text: 'Or',
                           style: appStyle(12, kBlue, FontWeight.w700)),
-                      SizedBox(
-                        height: 30.h,
-                      ),
+                      SizedBox(height: 30.h),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 40.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            LoginIconbutton(
-                              image: LogoImages.google,
-                            ),
+                            LoginIconbutton(image: LogoImages.google),
                             LoginIconbutton(image: LogoImages.ios),
                             LoginIconbutton(image: LogoImages.facebook),
                           ],
                         ),
                       ),
-                      SizedBox(
-                        height: 30.h,
-                      ),
+                      SizedBox(height: 30.h),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ReusableText(
-                              text: 'Don\'t have an acount?',
+                              text: 'Don\'t have an account?',
                               style: appStyle(12, kDarkBlue, FontWeight.w500)),
+                          SizedBox(width: 5.h),
                           GestureDetector(
                             onTap: () {
                               Get.to(() => const RegisterScreen(),

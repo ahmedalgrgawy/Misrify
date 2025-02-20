@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
@@ -12,7 +11,7 @@ import 'package:graduation_project1/views/home/Home_Screen.dart';
 import 'package:http/http.dart' as http;
 
 class VerificationController extends GetxController {
-  RxBool _isLoading = false.obs;
+  final RxBool _isLoading = false.obs;
   final box = GetStorage();
 
   dynamic _code;
@@ -65,7 +64,7 @@ class VerificationController extends GetxController {
 
         setLoading = false;
 
-        Get.offAll(() => HomeScreen());
+        Get.offAll(() => const HomeScreen());
       } else {
         var error = apiErrorFromJson(response.body);
         Get.snackbar('Failed to verify', error.message,
@@ -114,7 +113,7 @@ class VerificationController extends GetxController {
 
         setLoading = false;
 
-        Get.offAll(() => NewpasswordScreen());
+        Get.offAll(() => const NewpasswordScreen());
       } else {
         var error = apiErrorFromJson(response.body);
         Get.snackbar('Failed to verify', error.message,

@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/models/api_error_model.dart';
-import 'package:graduation_project1/models/resetpassword_model.dart';
 import 'package:graduation_project1/models/success_model.dart';
 import 'package:graduation_project1/views/auth/newpassword/passwordverification_Screen.dart';
 import 'package:http/http.dart' as http;
@@ -12,7 +11,7 @@ import '../../models/forget_password_model.dart';
 
 class ForgetpasswordController extends GetxController {
   final RxBool _isLoading = false.obs;
-  final box = GetStorage(); // Storage instance
+  final box = GetStorage();
 
   bool get isLoading => _isLoading.value;
   set setLoading(bool newState) {
