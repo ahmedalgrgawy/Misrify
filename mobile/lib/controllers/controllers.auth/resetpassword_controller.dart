@@ -37,7 +37,7 @@ class ResetpasswordController extends GetxController {
     Uri url = Uri.parse('$appBaseUrl/reset-password');
     var requestBody = jsonEncode({
       "email": box.read('saved_email'),
-      "resetPasswordOtp": box.read('forgetPassword_otp'),
+      "resetPasswordOtp": box.read('forgetPassword_otp').toString(),
       "newPassword": password
     });
 
@@ -47,6 +47,7 @@ class ResetpasswordController extends GetxController {
 
     try {
       var response = await http.post(url, headers: headers, body: requestBody);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         ResetPasswordModel data = resetPasswordModelFromJson(response.body);
 
