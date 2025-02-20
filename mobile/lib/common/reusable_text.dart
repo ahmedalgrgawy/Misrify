@@ -9,12 +9,22 @@ class ReusableText extends StatelessWidget {
     super.key,
     required this.text,
     required this.style,
+    this.maxlines,
+    this.align,
+    this.SoftWrap,
   });
   final String text;
   final TextStyle style;
+  final int? maxlines;
+  final TextAlign? align;
+  final bool? SoftWrap;
+
   @override
   Widget build(BuildContext context) {
     return Text(text,
-        maxLines: 1, softWrap: false, textAlign: TextAlign.left, style: style);
+        maxLines: maxlines ?? 1,
+        textAlign: align ?? TextAlign.left,
+        softWrap: SoftWrap ?? false,
+        style: style);
   }
 }
