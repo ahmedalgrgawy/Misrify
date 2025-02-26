@@ -7,6 +7,7 @@ import 'package:graduation_project1/data/repositories/authentication_repository.
 import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/models/login_response.dart';
 import 'package:graduation_project1/models/resetpassword_model.dart';
+import 'package:graduation_project1/models/validation_error_model.dart';
 import 'package:graduation_project1/views/auth/login_Screen.dart';
 import 'package:graduation_project1/views/auth/verification_screen.dart';
 import 'package:http/http.dart' as http;
@@ -14,6 +15,8 @@ import 'package:http/http.dart' as http;
 class LoginController extends GetxController {
   final RxBool _isLoading = false.obs;
   final box = GetStorage();
+  final RxString generalError = ''.obs; // Store general error message
+  final RxList<String> errors = <String>[].obs; // Store errors as a list
 
   bool get isLoading => _isLoading.value;
   set setLoading(bool newState) {
@@ -27,6 +30,8 @@ class LoginController extends GetxController {
     try {
       var response = await http.post(url, headers: headers, body: data);
       if (response.statusCode == 200) {
+        generalError.value = '';
+        errors.clear();
         LoginResponse data = loginResponseFromJson(response.body);
         String userId = data.user.id;
         String userData = jsonEncode(data);
@@ -53,15 +58,19 @@ class LoginController extends GetxController {
           AuthenticationRepository.instance.screenRedirect();
         }
       } else {
-        var error = apiErrorFromJson(response.body);
-
-        Get.snackbar('Failed to login', error.message,
-            colorText: kLightWhite,
-            backgroundColor: kRed,
-            icon: const Icon(Icons.error_outline));
+        var error = validationErrorResponseFromJson(response.body);
+        generalError.value = error.message;
+        errors.assignAll(error.errors ?? []);
+        if (error.message != "Validation errors") {
+          Get.snackbar('Failed to login', error.message,
+              colorText: kLightWhite,
+              backgroundColor: kRed,
+              icon: const Icon(Icons.error_outline));
+        }
       }
     } catch (e) {
-      debugPrint(e.toString());
+      generalError.value = 'Something went wrong';
+      errors.clear();
     }
   }
 
