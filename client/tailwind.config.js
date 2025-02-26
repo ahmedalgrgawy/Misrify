@@ -1,3 +1,4 @@
+import daisyui from "daisyui"
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -8,13 +9,13 @@ export default {
     extend: {
       colors: {
         'white': '#FFFFFF',
-        'bg-main':'#EBEBEF',
-        'light-grey': '#DDDEE5', 
+        'bg-main': '#EBEBEF',
+        'light-grey': '#DDDEE5',
         'second-grey': '#C3C3C3',
         'dark-grey': '#6E7786',
-        'main-blue': '#2B3D5B', 
+        'main-blue': '#2B3D5B',
         'title-blue': '#15253F',
-        'dark-blue': '#081120', 
+        'dark-blue': '#081120',
       },
       screens: {
         sm: { max: "767px" },
@@ -22,9 +23,9 @@ export default {
     },
   },
   plugins: [
-    require('daisyui'),
+    daisyui,
   ],
   daisyui: {
-    themes: [], 
+    themes: [],
   },
 }
