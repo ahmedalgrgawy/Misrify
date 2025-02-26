@@ -5,7 +5,7 @@ import axiosInstance from '../utils/axiosInstance';
 export const signup = createAsyncThunk("auth/signup", async (userData, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.post('/auth/signup', userData);
-    return response.data; 
+    return response.data;
   } catch (error) {
     return rejectWithValue(error.response?.data);
   }
@@ -15,7 +15,7 @@ export const signup = createAsyncThunk("auth/signup", async (userData, { rejectW
 export const loginUser = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
     const response = await axiosInstance.post('/auth/login', credentials);
-    return response.data; 
+    return response.data;
   } catch (error) {
     if (error.response && error.response.status === 401) {
       return rejectWithValue("Your account is not verified. Please verify your account before logging in.");
@@ -27,8 +27,10 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
 // Verify Account
 export const verifyAccount = createAsyncThunk('auth/verify-email', async ({ email, otp }, { rejectWithValue }) => {
   try {
+    console.log(email, otp);
+
     const response = await axiosInstance.post('/auth/verify-email', { email, otp });
-    return response.data; 
+    return response.data;
   } catch (error) {
     return rejectWithValue(error.response?.data);
   }
@@ -37,20 +39,20 @@ export const verifyAccount = createAsyncThunk('auth/verify-email', async ({ emai
 // Step 1: Send password reset email
 export const sendResetEmail = createAsyncThunk("auth/sendResetEmail", async (email, { rejectWithValue }) => {
   try {
-      const response = await axios.post("/auth/forgot-password", { email });
-      return response.data.message;
+    const response = await axiosInstance.post("/auth/forgot-password", { email });
+    return response.data.message;
   } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Error sending reset email.");
+    return rejectWithValue(error.response?.data?.message || "Error sending reset email.");
   }
 });
 
 // Step 2: Reset password with token
 export const resetPassword = createAsyncThunk("auth/resetPassword", async ({ token, password }, { rejectWithValue }) => {
   try {
-      const response = await axios.post(`/auth/reset-password/${token}`, { password });
-      return response.data.message;
+    const response = await axiosInstance.post(`/auth/reset-password/${token}`, { password });
+    return response.data.message;
   } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Error resetting password.");
+    return rejectWithValue(error.response?.data?.message || "Error resetting password.");
   }
 });
 
@@ -105,7 +107,7 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyAccount.fulfilled, (state, action) => {
+      .addCase(verifyAccount.fulfilled, (state) => {
         state.loading = false;
         state.verified = true;
       })
@@ -118,29 +120,29 @@ const authSlice = createSlice({
       .addCase(sendResetEmail.pending, (state) => {
         state.loading = true;
         state.error = null;
-    })
-    .addCase(sendResetEmail.fulfilled, (state, action) => {
+      })
+      .addCase(sendResetEmail.fulfilled, (state, action) => {
         state.loading = false;
         state.message = action.payload;
-    })
-    .addCase(sendResetEmail.rejected, (state, action) => {
+      })
+      .addCase(sendResetEmail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-    })
+      })
 
-    // Reset Password
-    .addCase(resetPassword.pending, (state) => {
+      // Reset Password
+      .addCase(resetPassword.pending, (state) => {
         state.loading = true;
         state.error = null;
-    })
-    .addCase(resetPassword.fulfilled, (state, action) => {
+      })
+      .addCase(resetPassword.fulfilled, (state, action) => {
         state.loading = false;
         state.message = action.payload;
-    })
-    .addCase(resetPassword.rejected, (state, action) => {
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-    })
+      })
   },
 });
 
