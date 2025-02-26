@@ -27,7 +27,7 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
 // Verify Account
 export const verifyAccount = createAsyncThunk('auth/verify-email', async ({ email, otp }, { rejectWithValue }) => {
   try {
-    console.log(email, otp);
+    // console.log(email, otp); debug
 
     const response = await axiosInstance.post('/auth/verify-email', { email, otp });
     return response.data;
