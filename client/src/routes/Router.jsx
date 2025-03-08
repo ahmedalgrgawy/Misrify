@@ -6,6 +6,8 @@ import Signup from '../Pages/Signup/Signup';
 import Verification from '../Pages/Verification/Verification';
 import ForgotPassword from '../Pages/ForgetPassword/ForgetPassword';
 import ResetPassword from '../Pages/ResetPassword/ResetPassword';
+import CheckGmail from '../Pages/CheckGmail/CheckGmail';
+import PasswordSuccess from '../Pages/PasswordSuccess/PasswordSuccess';
 
 const router = createBrowserRouter(
     [
@@ -31,8 +33,16 @@ const router = createBrowserRouter(
             element: <ForgotPassword />,
         },
         {
+            path: '/check-gmail',
+            element: <CheckGmail />,
+        },
+        {
             path: '/reset-password',
-            element: <ResetPassword />
+            element: <ResetPassword/>
+        },
+        {
+            path: '/password-success',
+            element: <PasswordSuccess />
         },
         {
             path: '*',

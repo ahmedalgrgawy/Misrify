@@ -1,11 +1,9 @@
-
 import { useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import loginImg from "../../assets/Sign imgs/login.png";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../../features/authSlice";
-
+import { loginUser, checkAuth } from "../../features/authSlice"; 
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -18,8 +16,11 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const result = await dispatch(loginUser({ email, password }));
+
     if (result.meta.requestStatus === "fulfilled") {
+      await dispatch(checkAuth());
       navigate("/");
     }
   };
@@ -85,6 +86,12 @@ const Login = () => {
               {loading ? "Logging in..." : "Log In"}
             </button>
           </form>
+          <p className="mt-4 text-start text-sm text-dark-blue">
+            Don't have an account?{" "}
+            <Link to="/signup" className="text-title-blue hover:text-dark-blue font-medium">
+              Signup
+            </Link>
+          </p>
         </div>
       </div>
     </div>

@@ -1,62 +1,104 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
+import { LuKeyRound } from "react-icons/lu";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 const ResetPassword = () => {
-    const [otp, setOtp] = useState("");
-    const [password, setPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
-    const email = new URLSearchParams(location.search).get("email");
+
+    const email = new URLSearchParams(location.search).get("email") || "";
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
 
-        try {
-            await axiosInstance.post("/auth/reset-password", {
-                email,
-                resetPasswordOtp: otp,
-                newPassword: password,
-            });
+        if (newPassword.length < 8) {
+            setError("Password must be at least 8 characters.");
+            return;
+        }
+        if (newPassword !== confirmPassword) {
+            setError("Passwords do not match.");
+            return;
+        }
 
-            navigate("/login");
-        } catch (error) {
-            setError(error.response?.data?.message || "Invalid OTP or something went wrong!");
+        try {
+            const response = await axiosInstance.post("/auth/reset-password", {
+                email,
+                newPassword,
+            });
+            if (response.data.success) {
+                navigate("/password-success");
+            } else {
+                setError("Failed to reset password.");
+            }
+        } catch (err) {
+            setError(err.response?.data?.message || "Server error, please try again.");
         }
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-bg-main">
-            <div className="bg-white p-8 rounded-lg shadow-md w-[400px] text-center">
-                <h2 className="text-2xl font-semibold text-title-blue">Reset Your Password</h2>
-                <p className="text-dark-grey text-sm mt-2">
-                    Enter the verification code sent to <span className="font-medium">{email}</span> along with your new password.
+        <div className="flex flex-col items-center justify-center h-screen bg-bg-main p-6">
+            <div className="bg-white p-8 rounded-2xl shadow-md w-[400px] text-center">
+                <div className="flex justify-center items-center mb-4">
+                    <div className="bg-[#E8EFFF] p-3 rounded-full">
+                        <LuKeyRound className="text-[#3E63DD] text-2xl" />
+                    </div>
+                </div>
+                <h2 className="text-title-blue text-2xl font-bold">Set New Password</h2>
+                <p className="text-dark-grey text-sm text-center">
+                    Your new password must be different from the previously used password.
                 </p>
 
-                <form onSubmit={handleSubmit} className="mt-6">
-                    <input
-                        type="text"
-                        className="w-full px-3 py-2 border border-light-grey rounded-lg mt-1 bg-bg-main focus:outline-none focus:ring-1 focus:ring-main-blue text-center tracking-widest text-xl"
-                        maxLength="6"
-                        placeholder="Enter OTP"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        required
-                    />
-                    <input
-                        type="password"
-                        className="w-full px-3 py-2 border border-light-grey rounded-lg mt-3 bg-bg-main focus:outline-none focus:ring-1 focus:ring-main-blue"
-                        placeholder="New Password"
-                        autoComplete="new-password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <button type="submit" className="w-full bg-main-blue text-white py-2 rounded-lg hover:bg-title-blue transition-all mt-4">
+                <form onSubmit={handleSubmit} className="space-y-4 mt-6">
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            placeholder="New Password"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="w-full px-3 py-2 border border-second-grey rounded-lg bg-bg-main focus:outline-none focus:ring-1 focus:ring-main-blue pr-10"
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-3 top-2/3 transform -translate-y-1/2 text-title-blue"
+                            onClick={() => setShowPassword(!showPassword)}
+                        >
+                            {showPassword ? <FiEyeOff /> : <FiEye />}
+                        </button>
+                        <p className="text-second-grey text-xs mt-1">Must be at least 8 characters.</p>
+                    </div>
+
+                    <div className="relative">
+                        <input
+                            type={showConfirmPassword ? "text" : "password"}
+                            placeholder="Confirm Password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className="w-full px-3 py-2 border border-second-grey rounded-lg bg-bg-main focus:outline-none focus:ring-1 focus:ring-main-blue pr-10"
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="absolute right-3 top-2/3 transform -translate-y-1/2 text-title-blue"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                            {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                        </button>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full bg-main-blue text-white px-4 py-2 rounded-lg hover:bg-dark-blue transition-all mt-4"
+                    >
                         Reset Password
                     </button>
                 </form>
@@ -64,11 +106,11 @@ const ResetPassword = () => {
                 {error && <p className="text-red-600 text-sm mt-3">{error}</p>}
 
                 <button
-                    onClick={() => navigate("/forgot-password")}
-                    className="mt-4 text-sm text-main-blue  flex items-center justify-center gap-1 hover:text-dark-blue"
+                    onClick={() => navigate("/login")}
+                    className="mt-4 text-sm text-main-blue flex items-center justify-center gap-1 hover:text-dark-blue"
                 >
                     <AiOutlineArrowLeft size={16} />
-                    Back to Forgot Password
+                    Back to Log In
                 </button>
             </div>
         </div>
