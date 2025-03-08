@@ -28,8 +28,6 @@ const Signup = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const result = await dispatch(signup(formData));
-        console.log(formData)
-
 
         if (result.meta.requestStatus === "fulfilled") {
             navigate("/verification");

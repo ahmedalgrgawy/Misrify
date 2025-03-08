@@ -63,7 +63,6 @@ export const resetPassword = createAsyncThunk(
   }
 );
 
-
 // Check Authentication 
 export const checkAuth = createAsyncThunk("auth/check-auth", async (_, { rejectWithValue }) => {
   try {
@@ -86,8 +85,6 @@ export const logoutUser = createAsyncThunk(
     }
   }
 );
-
-
 
 const authSlice = createSlice({
   name: 'auth',
@@ -124,7 +121,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       // Login
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
@@ -140,7 +136,6 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.isAuthenticated = false;
       })
-
       // Verify Account
       .addCase(verifyAccount.pending, (state) => {
         state.loading = true;
@@ -154,7 +149,6 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       // Send Reset Email
       .addCase(sendResetEmail.pending, (state) => {
         state.loading = true;

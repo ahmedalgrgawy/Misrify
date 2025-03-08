@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyAccount } from "../../features/authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ const Verification = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { loading, error } = useSelector((state) => state.auth);
+    const { user, loading, error } = useSelector((state) => state.auth);
     const email = location.state?.email || "";
 
     const [otpDigits, setOtpDigits] = useState({
@@ -42,7 +42,7 @@ const Verification = () => {
         e.preventDefault();
         const otp = Object.values(otpDigits).join("");
         const numericOtp = Number(otp);
-        const result = await dispatch(verifyAccount({ email, otp: numericOtp }));
+        const result = await dispatch(verifyAccount({ email: user.email, otp: numericOtp }));
         if (result.meta.requestStatus === "fulfilled") {
             navigate("/login");
         }
