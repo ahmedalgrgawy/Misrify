@@ -5,9 +5,11 @@ import { LuMail } from "react-icons/lu";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 const CheckGmail = () => {
     const [otp, setOtp] = useState("");
+    const trueOtp = useSelector((state) => state.auth.otp);
     const [error, setError] = useState("");
     const navigate = useNavigate();
     const location = useLocation();
@@ -18,14 +20,8 @@ const CheckGmail = () => {
         setError("");
 
         try {
-            const response = await axiosInstance.post("/auth/verify-email", {
-                email,
-                otp: String(otp),
-            });
-
-            if (response.data.success) {
-                toast.success("OTP Verified Successfully!");
-                navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+            if (String(trueOtp) === String(otp)) {
+                navigate(`/reset-password?email=${encodeURIComponent(email)}&otp=${encodeURIComponent(otp)}`);
             } else {
                 setError("Invalid OTP");
             }

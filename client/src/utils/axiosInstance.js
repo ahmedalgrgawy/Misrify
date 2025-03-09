@@ -1,11 +1,11 @@
 import axios from 'axios';
-import { logout, setAccessToken } from '../features/authSlice'; 
+import { logout, setAccessToken } from '../features/authSlice';
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:5001/api/',
+  baseURL: 'http://localhost:5000/api/',
   headers: { 'Content-Type': 'application/json' },
   timeout: 10000,
-  withCredentials: true, 
+  withCredentials: true,
 });
 
 // Request Interceptor
@@ -33,14 +33,14 @@ axiosInstance.interceptors.response.use(
         const newAccessToken = refreshResponse.data.accessToken;
 
         const { store } = await import('../app/store');
-        store.dispatch(setAccessToken(newAccessToken)); 
+        store.dispatch(setAccessToken(newAccessToken));
 
         axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         const { store } = await import('../app/store');
-        store.dispatch(logout()); 
+        store.dispatch(logout());
         return Promise.reject(refreshError);
       }
     }

@@ -33,6 +33,7 @@ const ResetPassword = () => {
             const response = await axiosInstance.post("/auth/reset-password", {
                 email,
                 newPassword,
+                resetPasswordOtp: new URLSearchParams(location.search).get("otp"),
             });
             if (response.data.success) {
                 navigate("/password-success");

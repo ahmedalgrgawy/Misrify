@@ -3,18 +3,22 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import { LuKeyRound } from "react-icons/lu";
+import { useDispatch } from "react-redux";
+import { setOtp } from "../../features/authSlice";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const dispatch = useDispatch()
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
 
         try {
-            await axiosInstance.post("/auth/forgot-password", { email });
+            const res = await axiosInstance.post("/auth/forgot-password", { email });
+            dispatch(setOtp(res.data.otp));
             navigate(`/check-gmail?email=${encodeURIComponent(email)}`);
         } catch (error) {
             setError(error.response?.data?.message || "Something went wrong!");
