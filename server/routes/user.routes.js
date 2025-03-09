@@ -12,6 +12,7 @@ import { createReviewSchema, updateReviewSchema } from '../validators/reviewVali
 import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
 import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart } from "../controllers/cart.controllers.js";
 import { addToCartSchema, updateCartItemQuantitySchema, removeFromCartSchema, clearCartSchema } from "../validators/cartValidator.js";
+import { exchangePointsForCoupon, getCoupons } from '../controllers/checkout.controllers.js';
 
 const router = express.Router()
 
@@ -48,5 +49,9 @@ router.post("/addToCart", catchAsync(protectedRoute), catchAsync(customerRoute),
 router.put("/update-quantity", catchAsync(protectedRoute), catchAsync(customerRoute), validate(updateCartItemQuantitySchema), catchAsync(updateCartItemQuantity));
 router.delete("/remove-item", catchAsync(protectedRoute), catchAsync(customerRoute), validate(removeFromCartSchema), catchAsync(removeFromCart));
 router.delete("/clear", catchAsync(protectedRoute), catchAsync(customerRoute), validate(clearCartSchema), catchAsync(clearCart));
+
+// Handling Coupons - Checkout - Payments
+router.get("/coupon", catchAsync(protectedRoute), catchAsync(getCoupons))
+router.post("/coupon/create", catchAsync(protectedRoute), catchAsync(exchangePointsForCoupon))
 
 export default router;
