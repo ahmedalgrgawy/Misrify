@@ -74,27 +74,19 @@ export const placeOrder = async (req, res, next) => {
         coupon,
     } = req.body;
 
-    if (!orderItems || orderItems.length === 0) {
-        return next(new AppError("No order items provided", 400))
-    }
-
-    if (!shippingAddress) {
-        return next(new AppError("Shipping address is required", 400))
-    }
-
     const orderItemsIds = [];
     let totalPrice = 0;
 
     for (const item of orderItems) {
-        // Verify product exists and has enough inventory
         const product = await Product.findById(item.product);
+
         if (!product) {
-            throw new Error(`Product ${item.product} not found`);
+            return next(new AppError("Product is not found", 404))
         }
 
         // Add inventory check if needed
         if (product.quantityInStock < item.quantity) {
-            throw new AppError(`Insufficient stock for ${product.name}`, 400);
+            return next(new AppError(`Insufficient stock for ${product.name}`, 400))
         }
 
         // Create order item
@@ -154,4 +146,8 @@ export const placeOrder = async (req, res, next) => {
         success: true,
         order: populatedOrder
     });
+}
+
+export const editOrder = async (req, res, next) => {
+
 }
