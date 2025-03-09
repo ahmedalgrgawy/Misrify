@@ -12,7 +12,8 @@ import { createReviewSchema, updateReviewSchema } from '../validators/reviewVali
 import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
 import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart } from "../controllers/cart.controllers.js";
 import { addToCartSchema, updateCartItemQuantitySchema, removeFromCartSchema, clearCartSchema } from "../validators/cartValidator.js";
-import { exchangePointsForCoupon, getCoupons } from '../controllers/checkout.controllers.js';
+import { exchangePointsForCoupon, getCoupons, getOrders, placeOrder } from '../controllers/checkout.controllers.js';
+import { createOrderSchema } from '../validators/checkoutValidator.js';
 
 const router = express.Router()
 
@@ -50,8 +51,12 @@ router.put("/update-quantity", catchAsync(protectedRoute), catchAsync(customerRo
 router.delete("/remove-item", catchAsync(protectedRoute), catchAsync(customerRoute), validate(removeFromCartSchema), catchAsync(removeFromCart));
 router.delete("/clear", catchAsync(protectedRoute), catchAsync(customerRoute), validate(clearCartSchema), catchAsync(clearCart));
 
-// Handling Coupons - Checkout - Payments
-router.get("/coupon", catchAsync(protectedRoute), catchAsync(getCoupons))
-router.post("/coupon/create", catchAsync(protectedRoute), catchAsync(exchangePointsForCoupon))
+// Handling Coupons
+router.get("/coupon", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getCoupons))
+router.post("/coupon/create", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(exchangePointsForCoupon))
+
+// Handling Checkout - Payments
+router.get("/orders", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getOrders))
+router.post("/order", catchAsync(protectedRoute), catchAsync(customerRoute), validate(createOrderSchema), catchAsync(placeOrder))
 
 export default router;

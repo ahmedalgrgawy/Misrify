@@ -21,11 +21,11 @@ const orderItemsSchema = new mongoose.Schema({
     price: {
         type: Number,
         required: [true, "Price is required"],
-    },
-    total: {
-        type: Number,
-        required: [true, "Total is required"],
     }
+    // total: {
+    //     type: Number,
+    //     required: [true, "Total is required"],
+    // }
 })
 
 const OrderItem = mongoose.model("OrderItem", orderItemsSchema);
