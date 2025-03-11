@@ -95,7 +95,8 @@ const authSlice = createSlice({
     verified: false,
     isAuthenticated: false,
     accessToken: null,
-    otp: null
+    otp: null,
+    hasCheckedAuth: false
   },
   reducers: {
     logout: (state) => {
@@ -183,16 +184,19 @@ const authSlice = createSlice({
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.user = action.payload.user;
         state.isAuthenticated = true;
+        state.hasCheckedAuth = true;
       })
       .addCase(checkAuth.rejected, (state) => {
         state.user = null;
         state.isAuthenticated = false;
+        state.hasCheckedAuth = true;
       })
       //Logout 
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.isAuthenticated = false;
         state.accessToken = null;
+        state.hasCheckedAuth = true;
       });
   },
 });
