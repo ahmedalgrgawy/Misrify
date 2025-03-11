@@ -65,17 +65,16 @@ const ResetPassword = () => {
                             placeholder="New Password"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
-                            className="w-full px-3 py-2 border border-second-grey rounded-lg bg-bg-main focus:outline-none focus:ring-1 focus:ring-main-blue pr-10"
+                            className="w-full px-3 py-2 border border-light-grey rounded-lg bg-bg-main focus:outline-none focus:ring-1 focus:ring-dark-grey pr-10"
                             required
                         />
                         <button
                             type="button"
-                            className="absolute right-3 top-2/3 transform -translate-y-1/2 text-title-blue"
+                            className="absolute right-3 top-2/3 transform -translate-y-3 text-title-blue"
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? <FiEyeOff /> : <FiEye />}
                         </button>
-                        <p className="text-second-grey text-xs mt-1">Must be at least 8 characters.</p>
                     </div>
 
                     <div className="relative">
@@ -84,12 +83,12 @@ const ResetPassword = () => {
                             placeholder="Confirm Password"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full px-3 py-2 border border-second-grey rounded-lg bg-bg-main focus:outline-none focus:ring-1 focus:ring-main-blue pr-10"
+                            className="w-full px-3 py-2 border border-light-grey rounded-lg bg-bg-main focus:outline-none focus:ring-1 focus:ring-dark-grey pr-10"
                             required
                         />
                         <button
                             type="button"
-                            className="absolute right-3 top-2/3 transform -translate-y-1/2 text-title-blue"
+                            className="absolute right-3 top-2/3 transform -translate-y-3 text-title-blue"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                         >
                             {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
