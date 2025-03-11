@@ -13,12 +13,14 @@
   "type": "module",
   "license": "ISC",
   "dependencies": {
+    "@reduxjs/toolkit": "^2.5.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "cloudinary": "^2.5.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "daisyui": "^4.12.23",
     "dotenv": "^16.4.7",
     "express": "^4.21.0",
     "ioredis": "^5.4.1",
@@ -27,6 +29,8 @@
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.3",
     "nodemailer": "^6.9.16",
+    "react-redux": "^9.2.0",
+    "react-toastify": "^11.0.5",
     "stripe": "^17.4.0"
   },
   "devDependencies": {
