@@ -12,7 +12,7 @@ import { createReviewSchema, updateReviewSchema } from '../validators/reviewVali
 import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
 import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart } from "../controllers/cart.controllers.js";
 import { addToCartSchema, updateCartItemQuantitySchema, removeFromCartSchema, clearCartSchema } from "../validators/cartValidator.js";
-import { cancelOrder, exchangePointsForCoupon, getCoupons, getOrders, placeOrder, updateOrder } from '../controllers/checkout.controllers.js';
+import { cancelOrder, exchangePointsForCoupon, getCoupons, getOrderById, getOrders, placeOrder, updateOrder } from '../controllers/checkout.controllers.js';
 import { createOrderSchema, editOrderSchema } from '../validators/checkoutValidator.js';
 
 const router = express.Router()
@@ -57,6 +57,7 @@ router.post("/coupon/create", catchAsync(protectedRoute), catchAsync(customerRou
 
 // Handling Checkout - Payments
 router.get("/orders", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getOrders))
+router.get("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getOrderById))
 router.post("/order", catchAsync(protectedRoute), catchAsync(customerRoute), validate(createOrderSchema), catchAsync(placeOrder))
 router.put("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), validate(editOrderSchema), catchAsync(updateOrder))
 router.delete("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(cancelOrder))

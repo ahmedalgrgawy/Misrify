@@ -72,6 +72,29 @@ export const getOrders = async (req, res, next) => {
     res.status(200).json({ message: "User orders", orders })
 }
 
+export const getOrderById = async (req, res, next) => {
+    const id = req.params.id;
+
+    if (!id) {
+        return next(new AppError("Order Id Must Be Provided", 400))
+    }
+
+    const order = await Order.findById(id)
+        .populate({
+            path: 'orderItems',
+            populate: {
+                path: 'product',
+                select: 'name imgUrl'
+            }
+        });
+
+    if (!order) {
+        return next(new AppError("Order Not Found", 404))
+    }
+
+    res.status(200).json({ message: "Order", order })
+}
+
 export const placeOrder = async (req, res, next) => {
 
     const {
