@@ -180,9 +180,9 @@ export const placeOrder = async (req, res, next) => {
 
 export const updateOrder = async (req, res, next) => {
     const orderId = req.params.id;
-    const { shippingAddress, shippingMethod, orderItems, itemOperations } = req.body;
+    const { shippingAddress, shippingMethod, orderItems, itemOperations, couponCode } = req.body;
 
-    const order = await Order.findById(orderId)
+    const order = await Order.findById(orderId);
 
     if (!order) {
         return next(new AppError('Order not found', 404));
@@ -201,6 +201,30 @@ export const updateOrder = async (req, res, next) => {
     // Update order fields if provided
     order.shippingAddress = shippingAddress || order.shippingAddress;
     order.shippingMethod = shippingMethod || order.shippingMethod;
+
+    // Handle coupon application
+    if (couponCode) {
+        // Find coupon by code
+        const coupon = await Coupon.findOne({ code: couponCode });
+
+        if (!coupon) {
+            return next(new AppError('Invalid coupon code', 400));
+        }
+
+        // Check if coupon is active
+        if (!coupon.isActive) {
+            return next(new AppError('This coupon is not active', 400));
+        }
+
+        // Check if coupon is expired
+        const currentDate = new Date();
+        if (coupon.expirationDate && new Date(coupon.expirationDate) < currentDate) {
+            return next(new AppError('This coupon has expired', 400));
+        }
+
+        // Apply coupon to order
+        order.coupon = coupon._id;
+    }
 
     // Handle item operations (add, update, delete)
     if (itemOperations && itemOperations.length > 0) {
@@ -375,19 +399,21 @@ export const updateOrder = async (req, res, next) => {
         _id: { $in: order.orderItems }
     });
 
-    const totalPrice = updatedOrderItems.reduce((sum, item) => sum + item.price, 0);
+    let totalPrice = updatedOrderItems.reduce((sum, item) => sum + item.price, 0);
 
-    // Apply coupon if it exists
+    // Apply coupon discount if exists
     if (order.coupon) {
-        const coupon = await Coupon.findById(order.coupon);
-        if (coupon) {
-            order.totalPrice = totalPrice * (1 - coupon.discount / 100);
-        } else {
-            order.totalPrice = totalPrice;
+        const couponDb = await Coupon.findById(order.coupon);
+        if (couponDb && couponDb.isActive) {
+            // Different discount types handling
+            totalPrice = totalPrice * (1 - couponDb.discount / 100);
+            couponDb.isActive = false;
+            await couponDb.save()
         }
-    } else {
-        order.totalPrice = totalPrice;
     }
+
+    // Update the order total price
+    order.totalPrice = totalPrice;
 
     // Save the updated order
     await order.save();
@@ -400,7 +426,7 @@ export const updateOrder = async (req, res, next) => {
                 path: 'product',
             }
         })
-        .populate('coupon', 'code discount');
+        .populate('coupon', 'code discount ');
 
     res.status(200).json({
         success: true,
