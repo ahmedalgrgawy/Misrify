@@ -384,3 +384,38 @@ export const updateOrder = async (req, res, next) => {
         order: updatedOrder
     });
 };
+
+export const cancelOrder = async (req, res, next) => {
+    const { id } = req.params;
+
+    if (!id) {
+        return next(new AppError('Order ID is required', 400));
+    }
+
+    const order = await Order.findById(id);
+
+    if (!order) {
+        return next(new AppError('Order not found', 404));
+    }
+
+    // Check if user owns the order or is admin
+    if (order.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+        return next(new AppError('Not authorized to cancel this order', 403));
+    }
+
+    if (order.status !== 'pending') {
+        return next(new AppError('Only pending orders can be canceled', 400));
+    }
+
+    // order.status = 'canceled';
+    // await order.save();
+
+    // It will be automated later
+
+    await Order.findByIdAndDelete(id);
+
+    res.status(200).json({
+        success: true,
+        message: 'Order canceled successfully'
+    });
+}
