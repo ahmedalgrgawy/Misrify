@@ -42,7 +42,7 @@ export const createOrderSchema = Joi.object({
 export const editOrderSchema = Joi.object({
     shippingAddress: Joi.string().optional(),
     shippingMethod: Joi.string().valid('standard', 'express', 'overnight').optional(),
-
+    couponCode: Joi.string().optional(),
     // Original orderItems schema for backward compatibility
     orderItems: Joi.array().items(
         Joi.object({
