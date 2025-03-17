@@ -57,6 +57,13 @@ export const exchangePointsForCoupon = async (req, res, next) => {
 
 export const getOrders = async (req, res, next) => {
     const orders = await Order.find({ user: req.user.id })
+        .populate({
+            path: 'orderItems',
+            populate: {
+                path: 'product',
+                select: 'name imgUrl'
+            }
+        });
 
     if (!orders || orders.length === 0) {
         return next(new AppError("User Does Not Have orders yet", 404))
@@ -148,6 +155,232 @@ export const placeOrder = async (req, res, next) => {
     });
 }
 
-export const editOrder = async (req, res, next) => {
+export const updateOrder = async (req, res, next) => {
+    const orderId = req.params.id;
+    const { shippingAddress, shippingMethod, orderItems, itemOperations } = req.body;
 
-}
+    const order = await Order.findById(orderId)
+
+    if (!order) {
+        return next(new AppError('Order not found', 404));
+    }
+
+    // Check if user owns the order or is admin
+    if (order.user.toString() !== req.user._id.toString()) {
+        return next(new AppError('Not authorized to edit this order', 403));
+    }
+
+    // Check if order can be edited (only pending orders can be edited)
+    if (order.status !== 'pending') {
+        return next(new AppError('Only pending orders can be edited', 400));
+    }
+
+    // Update order fields if provided
+    order.shippingAddress = shippingAddress || order.shippingAddress;
+    order.shippingMethod = shippingMethod || order.shippingMethod;
+
+    // Handle item operations (add, update, delete)
+    if (itemOperations && itemOperations.length > 0) {
+        for (const operation of itemOperations) {
+            const { type, orderItemId, productId, quantity, color, size } = operation;
+
+            switch (type) {
+                case 'add':
+                    // Validate required fields for adding a new item
+                    if (!productId || !quantity) {
+                        return next(new AppError('Product ID and quantity required to add an item', 400));
+                    }
+
+                    // Get the product to check stock and get price
+                    const newProduct = await Product.findById(productId);
+                    if (!newProduct) {
+                        return next(new AppError(`Product with ID ${productId} not found`, 404));
+                    }
+
+                    // Check stock
+                    if (newProduct.quantityInStock < quantity) {
+                        return next(new AppError(`Insufficient stock for ${newProduct.name}`, 400));
+                    }
+
+                    // Create a new order item
+                    const newOrderItem = await OrderItem.create({
+                        product: productId,
+                        quantity,
+                        price: newProduct.price * quantity,
+                        color: color || undefined,
+                        size: size || undefined
+                    });
+
+                    // Add to order's orderItems array
+                    order.orderItems.push(newOrderItem._id);
+                    break;
+
+                case 'update':
+                    // Validate required fields for updating
+                    if (!orderItemId) {
+                        return next(new AppError('Order item ID required for update operation', 400));
+                    }
+
+                    // Find the order item
+                    const orderItem = await OrderItem.findById(orderItemId);
+                    if (!orderItem) {
+                        return next(new AppError(`Order item with ID ${orderItemId} not found`, 404));
+                    }
+
+                    // Verify this order item belongs to the current order
+                    const orderItemBelongsToOrder = order.orderItems.some(
+                        item => item.toString() === orderItemId
+                    );
+
+                    if (!orderItemBelongsToOrder) {
+                        return next(new AppError(`Order item does not belong to this order`, 400));
+                    }
+
+                    // Get the product to check stock and get price
+                    const product = await Product.findById(orderItem.product);
+                    if (!product) {
+                        return next(new AppError('Product associated with order item not found', 404));
+                    }
+
+                    // Update quantity if provided and check stock
+                    if (quantity !== undefined) {
+                        if (product.quantityInStock < quantity) {
+                            return next(new AppError(`Insufficient stock for ${product.name}`, 400));
+                        }
+                        orderItem.quantity = quantity;
+                        orderItem.price = product.price * quantity;
+                    }
+
+                    // Update color if provided
+                    if (color !== undefined) {
+                        orderItem.color = color;
+                    }
+
+                    // Update size if provided
+                    if (size !== undefined) {
+                        orderItem.size = size;
+                    }
+
+                    // Save the updated order item
+                    await orderItem.save();
+                    break;
+
+                case 'delete':
+                    // Validate required fields for deletion
+                    if (!orderItemId) {
+                        return next(new AppError('Order item ID required for delete operation', 400));
+                    }
+
+                    // Verify this order item belongs to the current order
+                    const itemBelongsToOrder = order.orderItems.some(
+                        item => item.toString() === orderItemId
+                    );
+
+                    if (!itemBelongsToOrder) {
+                        return next(new AppError(`Order item does not belong to this order`, 400));
+                    }
+
+                    // Remove from order's orderItems array
+                    order.orderItems = order.orderItems.filter(
+                        item => item.toString() !== orderItemId
+                    );
+
+                    // Delete the order item
+                    await OrderItem.findByIdAndDelete(orderItemId);
+                    break;
+
+                default:
+                    return next(new AppError(`Unknown operation type: ${type}`, 400));
+            }
+        }
+    }
+
+    // Handle backward compatibility for updating existing items
+    if (orderItems && orderItems.length > 0) {
+        for (const item of orderItems) {
+            const { orderItemId, quantity, color, size } = item;
+
+            // Find the order item
+            const orderItem = await OrderItem.findById(orderItemId);
+
+            if (!orderItem) {
+                return next(new AppError(`Order item with ID ${orderItemId} not found`, 404));
+            }
+
+            // Verify this order item belongs to the current order
+            const orderItemBelongsToOrder = order.orderItems.some(
+                item => item.toString() === orderItemId
+            );
+
+            if (!orderItemBelongsToOrder) {
+                return next(new AppError(`Order item does not belong to this order`, 400));
+            }
+
+            // Get the product to check stock and get price
+            const product = await Product.findById(orderItem.product);
+
+            if (!product) {
+                return next(new AppError('Product associated with order item not found', 404));
+            }
+
+            // Update quantity if provided and check stock
+            if (quantity !== undefined) {
+                if (product.quantityInStock < quantity) {
+                    return next(new AppError(`Insufficient stock for ${product.name}`, 400));
+                }
+                orderItem.quantity = quantity;
+                orderItem.price = product.price * quantity;
+            }
+
+            // Update color if provided
+            if (color) {
+                orderItem.color = color;
+            }
+
+            // Update size if provided
+            if (size) {
+                orderItem.size = size;
+            }
+
+            // Save the updated order item
+            await orderItem.save();
+        }
+    }
+
+    // Recalculate total price for the entire order
+    const updatedOrderItems = await OrderItem.find({
+        _id: { $in: order.orderItems }
+    });
+
+    const totalPrice = updatedOrderItems.reduce((sum, item) => sum + item.price, 0);
+
+    // Apply coupon if it exists
+    if (order.coupon) {
+        const coupon = await Coupon.findById(order.coupon);
+        if (coupon) {
+            order.totalPrice = totalPrice * (1 - coupon.discount / 100);
+        } else {
+            order.totalPrice = totalPrice;
+        }
+    } else {
+        order.totalPrice = totalPrice;
+    }
+
+    // Save the updated order
+    await order.save();
+
+    // Return the updated order with populated fields
+    const updatedOrder = await Order.findById(orderId)
+        .populate({
+            path: 'orderItems',
+            populate: {
+                path: 'product',
+            }
+        })
+        .populate('coupon', 'code discount');
+
+    res.status(200).json({
+        success: true,
+        order: updatedOrder
+    });
+};

@@ -12,8 +12,8 @@ import { createReviewSchema, updateReviewSchema } from '../validators/reviewVali
 import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
 import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart } from "../controllers/cart.controllers.js";
 import { addToCartSchema, updateCartItemQuantitySchema, removeFromCartSchema, clearCartSchema } from "../validators/cartValidator.js";
-import { exchangePointsForCoupon, getCoupons, getOrders, placeOrder } from '../controllers/checkout.controllers.js';
-import { createOrderSchema } from '../validators/checkoutValidator.js';
+import { exchangePointsForCoupon, getCoupons, getOrders, placeOrder, updateOrder } from '../controllers/checkout.controllers.js';
+import { createOrderSchema, editOrderSchema } from '../validators/checkoutValidator.js';
 
 const router = express.Router()
 
@@ -58,5 +58,6 @@ router.post("/coupon/create", catchAsync(protectedRoute), catchAsync(customerRou
 // Handling Checkout - Payments
 router.get("/orders", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getOrders))
 router.post("/order", catchAsync(protectedRoute), catchAsync(customerRoute), validate(createOrderSchema), catchAsync(placeOrder))
+router.put("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), validate(editOrderSchema), catchAsync(updateOrder))
 
 export default router;

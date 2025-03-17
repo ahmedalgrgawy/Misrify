@@ -39,17 +39,92 @@ export const createOrderSchema = Joi.object({
     })
 });
 
-// Update order validation schema
-export const updateOrderSchema = Joi.object({
-    shippingAddress: Joi.string().optional().messages({
-        'string.base': 'Shipping address must be a string'
-    }),
-    shippingMethod: Joi.string().valid('standard', 'express', 'overnight').optional().messages({
-        'string.base': 'Shipping method must be a string',
-        'any.only': 'Shipping method must be one of: standard, express, overnight'
-    }),
-    status: Joi.string().valid('pending', 'success', 'failed').optional().messages({
-        'string.base': 'Status must be a string',
-        'any.only': 'Status must be one of: pending, success, failed'
-    })
+export const editOrderSchema = Joi.object({
+    shippingAddress: Joi.string().optional(),
+    shippingMethod: Joi.string().valid('standard', 'express', 'overnight').optional(),
+
+    // Original orderItems schema for backward compatibility
+    orderItems: Joi.array().items(
+        Joi.object({
+            orderItemId: Joi.string().required().messages({
+                'string.empty': 'Order item ID is required',
+                'any.required': 'Order item ID is required'
+            }),
+            quantity: Joi.number().integer().min(1).optional().messages({
+                'number.base': 'Quantity must be a number',
+                'number.min': 'Quantity must be at least 1'
+            }),
+            color: Joi.string().optional().messages({
+                'string.base': 'Color must be a string'
+            }),
+            size: Joi.string().optional().messages({
+                'string.base': 'Size must be a string'
+            })
+        })
+    ).optional(),
+
+    // New itemOperations schema for add, update, delete operations
+    itemOperations: Joi.array().items(
+        Joi.object({
+            // Required type field to specify the operation
+            type: Joi.string().valid('add', 'update', 'delete').required().messages({
+                'string.empty': 'Operation type is required',
+                'any.required': 'Operation type is required',
+                'any.only': 'Operation type must be add, update, or delete'
+            }),
+
+            // Fields for 'add' operation
+            productId: Joi.string().when('type', {
+                is: 'add',
+                then: Joi.required(),
+                otherwise: Joi.forbidden()
+            }).messages({
+                'string.empty': 'Product ID is required for add operation',
+                'any.required': 'Product ID is required for add operation',
+                'any.unknown': 'Product ID should only be provided for add operation'
+            }),
+
+            // Fields for 'update' and 'delete' operations
+            orderItemId: Joi.string().when('type', {
+                is: Joi.valid('update', 'delete'),
+                then: Joi.required(),
+                otherwise: Joi.forbidden()
+            }).messages({
+                'string.empty': 'Order item ID is required for update/delete operations',
+                'any.required': 'Order item ID is required for update/delete operations',
+                'any.unknown': 'Order item ID should only be provided for update/delete operations'
+            }),
+
+            // Common fields that can be used in 'add' and 'update' operations
+            quantity: Joi.number().integer().min(1).when('type', {
+                is: Joi.valid('add', 'update'),
+                then: Joi.optional(),
+                otherwise: Joi.forbidden()
+            }).messages({
+                'number.base': 'Quantity must be a number',
+                'number.min': 'Quantity must be at least 1',
+                'any.unknown': 'Quantity should only be provided for add/update operations'
+            }),
+
+            color: Joi.string().when('type', {
+                is: Joi.valid('add', 'update'),
+                then: Joi.optional(),
+                otherwise: Joi.forbidden()
+            }).messages({
+                'string.base': 'Color must be a string',
+                'any.unknown': 'Color should only be provided for add/update operations'
+            }),
+
+            size: Joi.string().when('type', {
+                is: Joi.valid('add', 'update'),
+                then: Joi.optional(),
+                otherwise: Joi.forbidden()
+            }).messages({
+                'string.base': 'Size must be a string',
+                'any.unknown': 'Size should only be provided for add/update operations'
+            })
+        })
+    ).optional()
+}).or('shippingAddress', 'shippingMethod', 'orderItems', 'itemOperations').messages({
+    'object.missing': 'At least one field to update must be provided'
 });
