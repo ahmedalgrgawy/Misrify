@@ -12,6 +12,8 @@ import { createReviewSchema, updateReviewSchema } from '../validators/reviewVali
 import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
 import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart } from "../controllers/cart.controllers.js";
 import { addToCartSchema, updateCartItemQuantitySchema, removeFromCartSchema, clearCartSchema } from "../validators/cartValidator.js";
+import { cancelOrder, exchangePointsForCoupon, getCoupons, getOrderById, getOrders, handlePaymentCallback, initializePayment, placeOrder, updateOrder } from '../controllers/checkout.controllers.js';
+import { createOrderSchema, editOrderSchema } from '../validators/checkoutValidator.js';
 
 const router = express.Router()
 
@@ -48,5 +50,19 @@ router.post("/addToCart", catchAsync(protectedRoute), catchAsync(customerRoute),
 router.put("/update-quantity", catchAsync(protectedRoute), catchAsync(customerRoute), validate(updateCartItemQuantitySchema), catchAsync(updateCartItemQuantity));
 router.delete("/remove-item", catchAsync(protectedRoute), catchAsync(customerRoute), validate(removeFromCartSchema), catchAsync(removeFromCart));
 router.delete("/clear", catchAsync(protectedRoute), catchAsync(customerRoute), validate(clearCartSchema), catchAsync(clearCart));
+
+// Handling Coupons
+router.get("/coupon", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getCoupons))
+router.post("/coupon/create", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(exchangePointsForCoupon))
+
+// Handling Checkout - Payments
+router.get("/orders", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getOrders))
+router.get("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getOrderById))
+router.post("/order", catchAsync(protectedRoute), catchAsync(customerRoute), validate(createOrderSchema), catchAsync(placeOrder))
+router.put("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), validate(editOrderSchema), catchAsync(updateOrder))
+router.delete("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(cancelOrder))
+
+router.post("/payment", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(initializePayment))
+router.get('/payment/callback', catchAsync(handlePaymentCallback));
 
 export default router;
