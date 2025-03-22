@@ -21,13 +21,13 @@ export const addToCartSchema = Joi.object({
         }),
     color: Joi.string()
         .trim()
-        .optional()
+        .required()
         .messages({
             'string.empty': 'Color cannot be empty',
         }),
     size: Joi.string()
         .trim()
-        .optional()
+        .required()
         .messages({
             'string.empty': 'Size cannot be empty',
         }),
