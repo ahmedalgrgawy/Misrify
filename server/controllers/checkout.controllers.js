@@ -6,6 +6,9 @@ import Coupon from "../models/coupon.model.js";
 import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
 import OrderItem from "../models/orderItem.model.js";
+import { CLIENT_FAILURE_URL, CLIENT_SUCCESS_URL, PAYMOB_API_KEY, PAYMOB_BASE_URL, PAYMOB_IFRAME_ID, PAYMOB_INTEGRATION_ID } from "../lib/paymob.js";
+import Payment from "../models/payment.model.js";
+import axios from "axios";
 
 
 export const getCoupons = async (req, res, next) => {
@@ -468,3 +471,511 @@ export const cancelOrder = async (req, res, next) => {
         message: 'Order canceled successfully'
     });
 }
+
+export const initializePayment = async (req, res) => {
+    try {
+        // Get user ID from authentication middleware
+        const userId = req.user._id;
+        const { orderId } = req.body;
+
+        console.log(`Initializing payment for orderId: ${orderId}, userId: ${userId}`);
+
+        // Find order by ID
+        const order = await Order.findById(orderId).populate('orderItems');
+        if (!order) {
+            console.log(`Order not found: ${orderId}`);
+            return res.status(404).json({
+                success: false,
+                message: 'Order not found'
+            });
+        }
+
+        // Check if order belongs to user
+        if (order.user.toString() !== userId.toString()) {
+            console.log(`Order ${orderId} does not belong to user ${userId}`);
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to make payment for this order'
+            });
+        }
+
+        // Check if order is already paid
+        if (order.status !== 'pending') {
+            console.log(`Order ${orderId} already processed with status: ${order.status}`);
+            return res.status(400).json({
+                success: false,
+                message: 'This order is already processed'
+            });
+        }
+
+        console.log(`Processing payment for order: ${orderId}, amount: ${order.totalPrice}`);
+
+        // Step 1: Authenticate with Paymob to get auth token
+        console.log('Getting Paymob auth token...');
+        let authResponse;
+        try {
+            authResponse = await axios.post(`${PAYMOB_BASE_URL}/auth/tokens`, {
+                api_key: PAYMOB_API_KEY
+            });
+            console.log('Auth token received successfully');
+        } catch (error) {
+            console.error('Paymob authentication error:', error.response?.data || error.message);
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to authenticate with payment gateway',
+                error: error.response?.data || error.message
+            });
+        }
+
+        const authToken = authResponse.data.token;
+
+        // Step 2: Create an order on Paymob
+        console.log('Creating Paymob order...');
+        let orderResponse;
+        try {
+            const orderItems = order.orderItems.map(item => ({
+                name: item.product?.name || 'Product',
+                amount_cents: Math.round(item.price * 100),
+                quantity: item.quantity
+            }));
+
+            console.log(`Order items: ${JSON.stringify(orderItems)}`);
+
+            orderResponse = await axios.post(`${PAYMOB_BASE_URL}/ecommerce/orders`, {
+                auth_token: authToken,
+                delivery_needed: false,
+                amount_cents: Math.round(order.totalPrice * 100), // Convert to cents
+                currency: 'EGP', // Adjust as needed
+                items: orderItems
+            });
+            console.log('Paymob order created successfully');
+        } catch (error) {
+            console.error('Paymob order creation error:', error.response?.data || error.message);
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to create order with payment gateway',
+                error: error.response?.data || error.message
+            });
+        }
+
+        const paymobOrderId = orderResponse.data.id;
+        console.log(`Paymob order ID: ${paymobOrderId}`);
+
+        // Step 3: Create a payment key
+        console.log('Creating payment key...');
+        let paymentKeyResponse;
+        try {
+            // Get user information safely with defaults
+            const userEmail = req.user.email || 'customer@example.com';
+            const firstName = req.user.firstName || req.user.name?.split(' ')[0] || 'Customer';
+            const lastName = req.user.lastName || req.user.name?.split(' ').slice(1).join(' ') || 'Customer';
+            const phone = req.user.phone || '00000000000';
+
+            paymentKeyResponse = await axios.post(`${PAYMOB_BASE_URL}/acceptance/payment_keys`, {
+                auth_token: authToken,
+                amount_cents: Math.round(order.totalPrice * 100),
+                expiration: 3600, // Token expiry time in seconds
+                order_id: paymobOrderId,
+                billing_data: {
+                    apartment: 'NA',
+                    email: userEmail,
+                    floor: 'NA',
+                    first_name: firstName,
+                    street: 'NA',
+                    building: 'NA',
+                    phone_number: phone,
+                    shipping_method: order.shippingMethod || 'NA',
+                    postal_code: 'NA',
+                    city: 'NA',
+                    country: 'EG', // Default to Egypt
+                    last_name: lastName,
+                    state: 'NA'
+                },
+                currency: 'EGP', // Adjust as needed
+                integration_id: parseInt(PAYMOB_INTEGRATION_ID), // Make sure it's an integer
+                lock_order_when_paid: true
+            });
+            console.log('Payment key created successfully');
+        } catch (error) {
+            console.error('Payment key creation error:', error.response?.data || error.message);
+            return res.status(500).json({
+                success: false,
+                message: 'Failed to create payment key',
+                error: error.response?.data || error.message
+            });
+        }
+
+        const paymentToken = paymentKeyResponse.data.token;
+        console.log(`Payment token: ${paymentToken}`);
+
+        // Create a pending payment record in database
+        console.log('Creating payment record in database...');
+        const payment = new Payment({
+            user: userId,
+            order: order._id,
+            status: 'pending',
+            method: 'paymob_iframe',
+            paymentDetails: {
+                paymobOrderId: paymobOrderId,
+                provider: 'paymob',
+                amount: order.totalPrice
+            }
+        });
+
+        await payment.save();
+        console.log(`Payment record created with ID: ${payment._id}`);
+
+        // Generate the iframe URL
+        const iframeUrl = `https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentToken}`;
+        console.log(`Iframe URL: ${iframeUrl}`);
+
+        // Return response with URL to redirect client
+        return res.status(200).json({
+            success: true,
+            message: 'Payment initialized successfully',
+            data: {
+                paymentId: payment._id,
+                iframeUrl: iframeUrl,
+                orderId: order._id,
+                trackCode: order.trackCode
+            }
+        });
+    } catch (error) {
+        console.error('Unexpected error in payment initialization:', error);
+        return res.status(500).json({
+            success: false,
+            message: `Payment initialization failed: ${error.message}`,
+            error: error.stack
+        });
+    }
+};
+
+export const handlePaymentCallback = async (req, res) => {
+    // Log both query params and body to help with debugging
+    console.log('Payment callback received - Query:', req.query);
+    console.log('Payment callback received - Body:', req.body);
+
+    // Get data from either query params or request body
+    const data = req.method === 'POST' ? req.body : req.query;
+    const { order, success, transaction_id } = data;
+
+    // For Paymob specifically, they might use different parameter names
+    const paymobOrderId = order || data.order_id || data.merchant_order_id;
+    const isSuccess = success === 'true' || data.is_success === 'true' || data.success === true;
+    const transactionId = transaction_id || data.txn_id || data.transaction_id;
+
+    if (!paymobOrderId) {
+        console.log('No order ID found in callback data');
+        return res.redirect(`${CLIENT_FAILURE_URL}?error=missing_order_id`);
+    }
+
+    // Find the payment by Paymob order ID
+    const payment = await Payment.findOne({ 'paymentDetails.paymobOrderId': paymobOrderId });
+
+    if (!payment) {
+        console.log(`Payment not found for Paymob order ID: ${paymobOrderId}`);
+        return res.redirect(`${CLIENT_FAILURE_URL}?error=payment_not_found`);
+    }
+
+    console.log(`Found payment record: ${payment._id}`);
+
+    // Update payment status
+    payment.status = isSuccess ? 'success' : 'failed';
+    payment.paymentDetails.transactionId = transactionId;
+    await payment.save();
+    console.log(`Updated payment status to: ${payment.status}`);
+
+    // If payment was successful, update order status
+    if (isSuccess) {
+        const orderRecord = await Order.findById(payment.order);
+        if (orderRecord) {
+            orderRecord.status = 'paid';
+            await orderRecord.save();
+            console.log(`Updated order status to paid: ${orderRecord._id}`);
+            return res.status(200).json({
+                success: true,
+                message: 'Payment status updated successfully'
+            });
+        }
+    } else {
+        return res.status(400).json({
+            success: true,
+            message: 'Payment Failed'
+        });
+    }
+};
+
+// export const initializePayment = async (req, res) => {
+//     try {
+//         // Get user ID from authentication middleware
+//         const userId = req.user._id;
+//         const { orderId } = req.body;
+
+//         console.log(`Initializing payment for orderId: ${orderId}, userId: ${userId}`);
+
+//         // Find order by ID
+//         const order = await Order.findById(orderId).populate('orderItems');
+//         if (!order) {
+//             console.log(`Order not found: ${orderId}`);
+//             return res.status(404).json({
+//                 success: false,
+//                 message: 'Order not found'
+//             });
+//         }
+
+//         // Check if order belongs to user
+//         if (order.user.toString() !== userId.toString()) {
+//             console.log(`Order ${orderId} does not belong to user ${userId}`);
+//             return res.status(403).json({
+//                 success: false,
+//                 message: 'You are not authorized to make payment for this order'
+//             });
+//         }
+
+//         // Check if order is already paid
+//         if (order.status !== 'pending') {
+//             console.log(`Order ${orderId} already processed with status: ${order.status}`);
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'This order is already processed'
+//             });
+//         }
+
+//         console.log(`Processing payment for order: ${orderId}, amount: ${order.totalPrice}`);
+
+//         // Step 1: Authenticate with Paymob to get auth token
+//         console.log('Getting Paymob auth token...');
+//         let authResponse;
+//         try {
+//             authResponse = await axios.post(`${PAYMOB_BASE_URL}/auth/tokens`, {
+//                 api_key: PAYMOB_API_KEY
+//             });
+//             console.log('Auth token received successfully');
+//         } catch (error) {
+//             console.error('Paymob authentication error:', error.response?.data || error.message);
+//             return res.status(500).json({
+//                 success: false,
+//                 message: 'Failed to authenticate with payment gateway',
+//                 error: error.response?.data || error.message
+//             });
+//         }
+
+//         const authToken = authResponse.data.token;
+
+//         // Step 2: Register a transaction (Checkout API)
+//         console.log('Creating Paymob checkout order...');
+//         let orderResponse;
+//         try {
+//             orderResponse = await axios.post(`${PAYMOB_BASE_URL}/acceptance/payment_keys`, {
+//                 auth_token: authToken,
+//                 amount_cents: Math.round(order.totalPrice * 100), // Convert to cents
+//                 currency: 'EGP', // Adjust as needed
+//                 delivery_needed: false,
+//                 items: [],  // Not required for checkout API
+//                 order_id: orderId,  // Use your system's order ID directly
+//                 expiration: 3600  // Token expiry time in seconds
+//             });
+//             console.log('Paymob checkout order created successfully');
+//         } catch (error) {
+//             console.error('Paymob checkout order creation error:', error.response?.data || error.message);
+//             return res.status(500).json({
+//                 success: false,
+//                 message: 'Failed to create checkout order with payment gateway',
+//                 error: error.response?.data || error.message
+//             });
+//         }
+
+//         // Get user information safely with defaults
+//         const userEmail = req.user.email || 'customer@example.com';
+//         const firstName = req.user.firstName || req.user.name?.split(' ')[0] || 'Customer';
+//         const lastName = req.user.lastName || req.user.name?.split(' ').slice(1).join(' ') || 'Customer';
+//         const phone = req.user.phone || '00000000000';
+
+//         // Step 3: Create payment token
+//         console.log('Creating payment token...');
+//         let paymentKeyResponse;
+//         try {
+//             paymentKeyResponse = await axios.post(`${PAYMOB_BASE_URL}/acceptance/payment_keys`, {
+//                 auth_token: authToken,
+//                 amount_cents: Math.round(order.totalPrice * 100),
+//                 expiration: 3600,
+//                 order_id: orderResponse.data.id,
+//                 billing_data: {
+//                     apartment: 'NA',
+//                     email: userEmail,
+//                     floor: 'NA',
+//                     first_name: firstName,
+//                     street: 'NA',
+//                     building: 'NA',
+//                     phone_number: phone,
+//                     shipping_method: order.shippingMethod || 'NA',
+//                     postal_code: 'NA',
+//                     city: 'NA',
+//                     country: 'EG',
+//                     last_name: lastName,
+//                     state: 'NA'
+//                 },
+//                 currency: 'EGP',
+//                 integration_id: parseInt(PAYMOB_INTEGRATION_ID),
+//                 lock_order_when_paid: true
+//             });
+//             console.log('Payment token created successfully');
+//         } catch (error) {
+//             console.error('Payment token creation error:', error.response?.data || error.message);
+//             return res.status(500).json({
+//                 success: false,
+//                 message: 'Failed to create payment token',
+//                 error: error.response?.data || error.message
+//             });
+//         }
+
+//         const paymentToken = paymentKeyResponse.data.token;
+//         console.log(`Payment token: ${paymentToken}`);
+
+//         // Create a pending payment record in database
+//         console.log('Creating payment record in database...');
+//         const payment = new Payment({
+//             user: userId,
+//             order: order._id,
+//             status: 'pending',
+//             method: 'paymob_iframe',
+//             paymentDetails: {
+//                 paymobOrderId: orderResponse.data.id,
+//                 provider: 'paymob',
+//                 amount: order.totalPrice
+//             }
+//         });
+
+//         await payment.save();
+//         console.log(`Payment record created with ID: ${payment._id}`);
+
+//         // Generate the iframe URL
+//         const iframeUrl = `https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentToken}`;
+//         console.log(`Iframe URL: ${iframeUrl}`);
+
+//         // Return response with URL to redirect client
+//         return res.status(200).json({
+//             success: true,
+//             message: 'Payment initialized successfully',
+//             data: {
+//                 paymentId: payment._id,
+//                 iframeUrl: iframeUrl,
+//                 orderId: order._id,
+//                 trackCode: order.trackCode
+//             }
+//         });
+//     } catch (error) {
+//         console.error('Unexpected error in payment initialization:', error);
+//         return res.status(500).json({
+//             success: false,
+//             message: `Payment initialization failed: ${error.message}`,
+//             error: error.stack
+//         });
+//     }
+// };
+
+// export const handlePaymentCallback = async (req, res) => {
+//     try {
+//         // Log both query params and body to help with debugging
+//         console.log('Payment callback received - Query:', req.query);
+//         console.log('Payment callback received - Body:', req.body);
+
+//         // Paymob can send data via query params, POST body, or transaction_processed webhook
+//         const hmacSecret = process.env.PAYMOB_HMAC_SECRET || '';
+
+//         // Handle different callback types
+//         let paymentData = {};
+//         if (req.body && req.body.obj) {
+//             // This is the transaction_processed webhook format
+//             console.log('Processing transaction_processed webhook');
+//             paymentData = req.body.obj;
+//         } else if (req.query && req.query.id) {
+//             // This is the response callback format
+//             console.log('Processing response callback');
+//             paymentData = req.query;
+//         } else if (req.body && req.body.id) {
+//             // This might be a direct POST callback
+//             console.log('Processing direct POST callback');
+//             paymentData = req.body;
+//         } else {
+//             console.log('Unknown callback format', { query: req.query, body: req.body });
+//             return res.status(400).json({ success: false, message: 'Invalid callback data' });
+//         }
+
+//         // Extract relevant data
+//         const orderId = paymentData.order?.id || paymentData.order_id || paymentData.merchant_order_id;
+//         const success = paymentData.success === 'true' || paymentData.success === true || paymentData.is_success === true;
+//         const transactionId = paymentData.id || paymentData.transaction_id;
+
+//         if (!orderId) {
+//             console.log('No order ID found in callback data');
+//             return res.redirect(`${CLIENT_FAILURE_URL}?error=missing_order_id`);
+//         }
+
+//         // Find the payment by Paymob order ID
+//         const payment = await Payment.findOne({ 'paymentDetails.paymobOrderId': orderId });
+
+//         if (!payment) {
+//             console.log(`Payment not found for Paymob order ID: ${orderId}`);
+//             return res.redirect(`${CLIENT_FAILURE_URL}?error=payment_not_found`);
+//         }
+
+//         console.log(`Found payment record: ${payment._id}`);
+
+//         // Update payment status
+//         payment.status = success ? 'success' : 'failed';
+//         payment.paymentDetails.transactionId = transactionId;
+//         payment.paymentDetails.rawResponse = JSON.stringify(paymentData);
+//         await payment.save();
+//         console.log(`Updated payment status to: ${payment.status}`);
+
+//         // If payment was successful, update order status
+//         if (success) {
+//             const orderRecord = await Order.findById(payment.order);
+//             if (orderRecord) {
+//                 orderRecord.status = 'paid';
+//                 await orderRecord.save();
+//                 console.log(`Updated order status to paid: ${orderRecord._id}`);
+
+//                 // For API callbacks, respond with JSON
+//                 if (req.headers['accept'] === 'application/json') {
+//                     return res.status(200).json({
+//                         success: true,
+//                         message: 'Payment processed successfully',
+//                         orderId: orderRecord._id,
+//                         trackCode: orderRecord.trackCode
+//                     });
+//                 }
+
+//                 // For browser callbacks, redirect
+//                 return res.redirect(`${CLIENT_SUCCESS_URL}?order=${orderRecord._id}&track=${orderRecord.trackCode}`);
+//             }
+//         }
+
+//         // For API callbacks
+//         if (req.headers['accept'] === 'application/json') {
+//             return res.status(200).json({
+//                 success: false,
+//                 message: 'Payment processing failed',
+//                 paymentId: payment._id
+//             });
+//         }
+
+//         // For browser callbacks
+//         return res.redirect(`${CLIENT_FAILURE_URL}?payment=${payment._id}`);
+//     } catch (error) {
+//         console.error('Error in payment callback:', error);
+
+//         // For API callbacks
+//         if (req.headers['accept'] === 'application/json') {
+//             return res.status(500).json({
+//                 success: false,
+//                 message: 'Payment callback processing error',
+//                 error: error.message
+//             });
+//         }
+
+//         // For browser callbacks
+//         return res.redirect(`${CLIENT_FAILURE_URL}?error=callback_error`);
+//     }
+// };

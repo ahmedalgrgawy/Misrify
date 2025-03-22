@@ -29,7 +29,8 @@ const orderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["pending", "success", "failed"],
+        enum: ["pending", "paid", "unpaid", "shipped", "delivered", "cancelled"],
+        default: "pending",
     },
     totalPrice: {
         type: Number,

@@ -128,3 +128,19 @@ export const editOrderSchema = Joi.object({
 }).or('shippingAddress', 'shippingMethod', 'orderItems', 'itemOperations').messages({
     'object.missing': 'At least one field to update must be provided'
 });
+
+export const paymentValidationSchema = Joi.object({
+    orderId: Joi.string().required(),
+    cardNumber: Joi.string().pattern(/^[0-9]{16}$/).required(),
+    cardExpiryMonth: Joi.string().pattern(/^(0[1-9]|1[0-2])$/).required(),
+    cardExpiryYear: Joi.string().pattern(/^[0-9]{2}$/).required(),
+    cardCvv: Joi.string().pattern(/^[0-9]{3,4}$/).required(),
+    cardHolderName: Joi.string().min(3).max(100).required(),
+    billingAddress: Joi.object({
+        street: Joi.string().required(),
+        city: Joi.string().required(),
+        state: Joi.string().required(),
+        country: Joi.string().required(),
+        postalCode: Joi.string().required()
+    }).required()
+});
