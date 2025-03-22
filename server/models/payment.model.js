@@ -16,16 +16,29 @@ const paymentSchema = new mongoose.Schema({
         enum: ["pending", "success", "failed"],
         default: "pending"
     },
-    stripeId: {
-        type: String,
-        required: [true, "Stripe ID is required"],
-    },
-    methodId: {
-        type: String, // Stores Stripe's payment method ID
+    method: {
+        type: String, // Stores payment method type (card, wallet, etc.)
         required: true,
     },
-})
+    paymentDetails: {
+        transactionId: String,
+        provider: {
+            type: String,
+            default: 'paymob'
+        },
+        amount: Number,
+        currency: {
+            type: String,
+            default: 'EGP'
+        },
+        paymentDate: {
+            type: Date,
+            default: Date.now
+        },
+        paymobOrderId: String,
+    }
+}, { timestamps: true });
 
-const Payment = mongoose.model("Payment", paymentSchema);
+const Payment = mongoose.model('Payment', paymentSchema);
 
 export default Payment

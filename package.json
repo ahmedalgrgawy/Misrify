@@ -13,7 +13,11 @@
   "type": "module",
   "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
     "@reduxjs/toolkit": "^2.5.1",
+=======
+    "axios": "^1.8.3",
+>>>>>>> ahmed/server/checkout
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "cloudinary": "^2.5.1",
@@ -29,9 +33,14 @@
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.3",
     "nodemailer": "^6.9.16",
+<<<<<<< HEAD
     "react-redux": "^9.2.0",
     "react-toastify": "^11.0.5",
     "stripe": "^17.4.0"
+=======
+    "stripe": "^17.4.0",
+    "uuid": "^11.1.0"
+>>>>>>> ahmed/server/checkout
   },
   "devDependencies": {
     "nodemon": "^3.1.6"
