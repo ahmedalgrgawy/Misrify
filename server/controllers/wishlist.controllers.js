@@ -47,8 +47,6 @@ export const toggleWishlist = async (req, res, next) => {
         return res.status(200).json({ success: true, message: "Product Removed From Wishlist" })
     }
 
-    const product = await Product.findById(productId)
-
     const productExists = await Product.exists({ _id: productId });
     if (!productExists) return next(new AppError("Product not found", 404));
 
