@@ -3,6 +3,8 @@ import cloudinary from "../lib/cloudinary.js";
 import Brand from "../models/brand.model.js";
 import Product from "../models/product.model.js";
 import Category from "../models/category.model.js";
+import Review from "../models/review.model.js";
+import { isValidObjectId } from "../validators/validateCollegeEmail.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res, next) => {
@@ -116,9 +118,7 @@ export const editProduct = async (req, res, next) => {
 
     const user = req.user
 
-    if (!id) {
-        return next(new AppError("Product Id is Required", 400))
-    }
+    if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
 
     const product = await Product.findById(id).populate("category").populate("brand");
 
@@ -163,9 +163,7 @@ export const deleteProduct = async (req, res, next) => {
     const { id } = req.params;
     const user = req.user;
 
-    if (!id) {
-        return next(new AppError("Product Id is Required", 400))
-    }
+    if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
 
     const product = await Product.findById(id).populate("category").populate("brand");
 
@@ -178,6 +176,17 @@ export const deleteProduct = async (req, res, next) => {
             return next(new AppError("You Are Not Authorized To Delete This Product", 401))
         }
     }
+
+    await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
+
+    product.reviews.map(async (singleReview) => {
+
+        await Review.findById(singleReview).comments.map(async (singleComment) => {
+            await Comment.deleteOne({ _id: singleComment });
+        })
+
+        await Review.deleteOne({ _id: singleReview });
+    })
 
     await product.deleteOne();
 
