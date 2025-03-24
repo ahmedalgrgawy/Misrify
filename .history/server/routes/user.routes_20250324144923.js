@@ -67,7 +67,7 @@ router.delete("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute
 router.post("/payment", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(initializePayment))
 router.get('/payment/callback', catchAsync(handlePaymentCallback));
 
-// Handling contact us
-router.post("/contact", validate(contactSchema), catchAsync(submitContactForm));
+// contact
+router.post("/", validate(contactSchema), catchAsync(submitContactForm));
 
 export default router;
