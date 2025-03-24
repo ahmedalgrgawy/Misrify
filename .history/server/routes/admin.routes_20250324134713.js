@@ -61,14 +61,10 @@ router.delete("/delete-product/:id", catchAsync(protectedRoute), catchAsync(admi
 router.delete("/delete-comment/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteComment))
 
 // Handling Team Members 
-router.post("/team", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(createTeamMember));
-
 router.get("/team", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllTeamMembers));
-
 router.get("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getTeamMemberById));
-
+router.post("/team", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(createTeamMember));
 router.put("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(updateTeamMember));
-
 router.delete("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteTeamMember));
 
 

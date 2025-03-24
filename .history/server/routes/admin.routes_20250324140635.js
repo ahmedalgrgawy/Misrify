@@ -67,6 +67,7 @@ router.get("/team", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsy
 
 router.get("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getTeamMemberById));
 
+
 router.put("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(updateTeamMember));
 
 router.delete("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteTeamMember));
