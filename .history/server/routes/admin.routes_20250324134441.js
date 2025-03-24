@@ -11,10 +11,8 @@ import { editBrandSchema, createBrandSchema } from '../validators/brandValidator
 import { createCategorySchema } from '../validators/categoryValidator.js'
 import { createProductSchema, editProductSchema } from '../validators/productValidator.js'
 import { deleteComment } from '../controllers/comment.controllers.js'
-import { createTeamMemberSchema, updateTeamMemberSchema } from '../validators/teamValidator.js';
-import {createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember} from "../controllers/team.controllers.js";
-import { getAllMessages } from "../controllers/contact.controllers.js";
-
+import {
+    createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember} from "../controllers/team.controllers.js";
 const router = express.Router()
 
 // Handling Users
@@ -61,20 +59,5 @@ router.delete("/delete-product/:id", catchAsync(protectedRoute), catchAsync(admi
 
 // Delete Comment
 router.delete("/delete-comment/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteComment))
-
-// Handling Team Members 
-router.post("/team", catchAsync(protectedRoute), catchAsync(adminRoute), validate(createTeamMemberSchema), catchAsync(createTeamMember));
-
-router.get("/team", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllTeamMembers));
-
-router.get("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getTeamMemberById));
-
-router.put("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), validate(updateTeamMemberSchema), catchAsync(updateTeamMember));
-
-router.delete("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteTeamMember));
-
-// get all the contact us messages 
-router.get("/contact-messages", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllMessages));
-
 
 export default router;
