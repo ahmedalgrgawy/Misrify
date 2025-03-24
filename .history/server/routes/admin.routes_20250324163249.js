@@ -13,7 +13,6 @@ import { createProductSchema, editProductSchema } from '../validators/productVal
 import { deleteComment } from '../controllers/comment.controllers.js'
 import { createTeamMemberSchema, updateTeamMemberSchema } from '../validators/teamValidator.js';
 import {createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember} from "../controllers/team.controllers.js";
-import { getAllMessages } from "../controllers/contact.controllers.js";
 
 const router = express.Router()
 
@@ -72,9 +71,6 @@ router.get("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catc
 router.put("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), validate(updateTeamMemberSchema), catchAsync(updateTeamMember));
 
 router.delete("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteTeamMember));
-
-// get all the contact us messages 
-router.get("/contact-messages", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllMessages));
 
 
 export default router;
