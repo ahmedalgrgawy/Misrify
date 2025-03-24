@@ -13,7 +13,7 @@ import { createProductSchema, editProductSchema } from '../validators/productVal
 import { deleteComment } from '../controllers/comment.controllers.js'
 import { createTeamMemberSchema, updateTeamMemberSchema } from '../validators/teamValidator.js';
 import {createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember} from "../controllers/team.controllers.js";
-import { getAllMessages } from "../controllers/contact.controllers.js";
+import { getAllMessages } from "../controllers/contact.controller.js";
 
 const router = express.Router()
 

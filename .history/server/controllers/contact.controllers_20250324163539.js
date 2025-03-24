@@ -10,7 +10,7 @@ export const submitContactForm = async (req, res, next) => {
     res.status(201).json({ success: true, message: "Message sent successfully" });
     
 };
-export const getAllMessages = async (req, res, next) => {
+export const getAllMessages = async(async (req, res, next) => {
     const messages = await Contact.find().sort({ createdAt: -1 });
 
     if (!messages || messages.length === 0) {
@@ -18,4 +18,4 @@ export const getAllMessages = async (req, res, next) => {
     }
 
     res.status(200).json({ success: true, count: messages.length, data: messages });
-};
+});
