@@ -68,6 +68,6 @@ router.post("/payment", catchAsync(protectedRoute), catchAsync(customerRoute), c
 router.get('/payment/callback', catchAsync(handlePaymentCallback));
 
 // Handling contact us
-router.post("/contact", validate(contactSchema), catchAsync(submitContactForm));
+router.post("/", validate(contactSchema), catchAsync(submitContactForm));
 
 export default router;

@@ -14,8 +14,6 @@ import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart }
 import { addToCartSchema, updateCartItemQuantitySchema, removeFromCartSchema, clearCartSchema } from "../validators/cartValidator.js";
 import { cancelOrder, exchangePointsForCoupon, getCoupons, getOrderById, getOrders, handlePaymentCallback, initializePayment, placeOrder, updateOrder } from '../controllers/checkout.controllers.js';
 import { createOrderSchema, editOrderSchema } from '../validators/checkoutValidator.js';
-import { submitContactForm } from "../controllers/contact.controllers.js";
-import { contactSchema } from "../validators/contactValidator.js";
 
 const router = express.Router()
 
@@ -66,8 +64,5 @@ router.delete("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute
 
 router.post("/payment", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(initializePayment))
 router.get('/payment/callback', catchAsync(handlePaymentCallback));
-
-// Handling contact us
-router.post("/contact", validate(contactSchema), catchAsync(submitContactForm));
 
 export default router;
