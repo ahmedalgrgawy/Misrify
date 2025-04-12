@@ -16,7 +16,6 @@ import { cancelOrder, exchangePointsForCoupon, getCoupons, getOrderById, getOrde
 import { createOrderSchema, editOrderSchema } from '../validators/checkoutValidator.js';
 import { submitContactForm } from "../controllers/contact.controllers.js";
 import { contactSchema } from "../validators/contactValidator.js";
-import { getUserAnalytics } from "../controllers/userAnalytics.controllers.js";
 
 const router = express.Router()
 
@@ -71,8 +70,8 @@ router.get('/payment/callback', catchAsync(handlePaymentCallback));
 // Handling contact us
 router.post("/contact", validate(contactSchema), catchAsync(submitContactForm));
 
-// Handling User Analytics
-router.get("/user-analytics/:userId", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getUserAnalytics));
+// Handing UserAnalytics 
+
 
 
 export default router;
