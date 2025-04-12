@@ -79,6 +79,5 @@ router.get("/contact-messages", catchAsync(protectedRoute), catchAsync(adminRout
 
 // Handling Admin Analytics 
 router.get("/platform-stats", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getPlatformStats));
-router.get("/orders-sales", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getOrdersAndSales));
 
 export default router;

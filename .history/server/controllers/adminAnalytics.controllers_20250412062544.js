@@ -1,7 +1,6 @@
 import Category from "../models/category.model.js";
 import Brand from "../models/brand.model.js";
 import Product from "../models/product.model.js";
-import Order from "../models/order.model.js";
 
 export const getPlatformStats = async (req, res, next) => {
     const totalCategories = await Category.countDocuments();
@@ -19,18 +18,3 @@ export const getPlatformStats = async (req, res, next) => {
     });
 };
 
-export const getOrdersAndSales = async (req, res, next) => {
-    const orders = await Order.find().select("totalPrice");
-
-    const totalOrders = orders.length;
-    const totalMoneyPaid = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
-
-    res.status(200).json({
-        success: true,
-        message: "Orders and total sales analytics fetched successfully",
-        data: {
-            totalOrders,
-            totalMoneyPaid,
-        }
-    });
-};
