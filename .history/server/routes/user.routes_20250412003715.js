@@ -71,8 +71,9 @@ router.get('/payment/callback', catchAsync(handlePaymentCallback));
 // Handling contact us
 router.post("/contact", validate(contactSchema), catchAsync(submitContactForm));
 
-// Handling User Analytics
-router.get("/user-analytics/:userId", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getUserAnalytics));
+// Handing UserAnalytics 
+router.get("/analytics/:userId", authenticateUser, getUserAnalytics);
+
 
 
 export default router;

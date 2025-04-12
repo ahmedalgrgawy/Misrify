@@ -76,3 +76,6 @@ router.get("/user-analytics/:userId", catchAsync(protectedRoute), catchAsync(cus
 
 
 export default router;
+
+//   "email":"usertest@gmail.com",
+    "password":"user@2025"
