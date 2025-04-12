@@ -86,8 +86,6 @@ export const login = async (req, res, next) => {
         return next(new AppError("Credentials are not correct, try again!", 401))
     }
 
-    await LoginAttempt.create({ user: user._id });
-    
     if (!user.isVerified) {
         return next(new AppError("User Not Verified", 401))
     }

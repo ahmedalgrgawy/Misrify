@@ -14,7 +14,7 @@ import { deleteComment } from '../controllers/comment.controllers.js'
 import { createTeamMemberSchema, updateTeamMemberSchema } from '../validators/teamValidator.js';
 import {createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember} from "../controllers/team.controllers.js";
 import { getAllMessages } from "../controllers/contact.controllers.js";
-import { getPlatformStats,  getOrdersAndSales,  getTotalUsers, getLoginStats} from "../controllers/adminAnalytics.controllers.js";
+import { getPlatformStats,  getOrdersAndSales,  getTotalUsers} from "../controllers/adminAnalytics.controllers.js";
 
 const router = express.Router()
 

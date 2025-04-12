@@ -8,7 +8,6 @@ import { sendResetOtp, sendVerifyOtp } from "../services/otp.service.js";
 import { generateOtp, generateResetPasswordOtp } from "../utils/generators.js";
 import { validateCollegeEmail } from "../validators/validateCollegeEmail.js";
 import LoginAttempt from "../models/loginAttempt.model.js";
-
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -86,8 +85,6 @@ export const login = async (req, res, next) => {
         return next(new AppError("Credentials are not correct, try again!", 401))
     }
 
-    await LoginAttempt.create({ user: user._id });
-    
     if (!user.isVerified) {
         return next(new AppError("User Not Verified", 401))
     }
