@@ -37,7 +37,7 @@ export const getUserAnalytics = async (req, res, next) => {
         analytics.totalPoints = user.points;
     }
 
-     // Purchase History
+     // Purchase History - Populate the order details
      if (include.includes('purchaseHistory')) {
         const populatedPurchaseHistory = await Order.find({ '_id': { $in: user.purchaseHistory } })
             .populate({

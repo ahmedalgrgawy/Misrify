@@ -165,13 +165,6 @@ export const placeOrder = async (req, res, next) => {
         coupon: appliedCoupon
     });
 
-     // Add the newly created order to the user's purchaseHistory
-     await User.findByIdAndUpdate(
-        req.user._id, 
-        { $push: { purchaseHistory: order._id } }, // Push the order ID to purchaseHistory
-        { new: true }
-    );
-
     // Populate the order with order items for the response
     const populatedOrder = await Order.findById(order._id)
         .populate({
