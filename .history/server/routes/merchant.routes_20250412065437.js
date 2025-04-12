@@ -23,8 +23,8 @@ router.post("/create-comment", catchAsync(protectedRoute), catchAsync(merchantRo
 
 // Handling Merchant Analytics 
 router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getStockLevel))
-router.get("/products-with-ratings", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getProductsWithAvgRatings))
 
 
+// products-with-ratings
 
 export default router;

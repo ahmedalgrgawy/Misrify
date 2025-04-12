@@ -28,11 +28,11 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
         }
       },
       {
-        $group: {  
+        $group: {  // Group by the product _id to re-aggregate reviews and calculate statistics
           _id: "$_id",
           name: { $first: "$name" },
-          totalReviews: { $sum: 1 },  
-          averageRating: { $avg: "$reviewArray.rating" }, 
+          totalReviews: { $sum: 1 },  // Count the number of reviews
+          averageRating: { $avg: "$reviewArray.rating" },  // Calculate the average rating
         }
       },
       {
@@ -41,7 +41,7 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
           totalReviews: 1,
           averageRating: {
             $cond: {
-              if: { $gt: ["$totalReviews", 0] },  
+              if: { $gt: ["$totalReviews", 0] },  // If there are reviews, calculate the average
               then: "$averageRating",
               else: 0
             }

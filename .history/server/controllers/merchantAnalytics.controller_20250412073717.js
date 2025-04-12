@@ -41,7 +41,7 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
           totalReviews: 1,
           averageRating: {
             $cond: {
-              if: { $gt: ["$totalReviews", 0] },  
+              if: { $gt: ["$totalReviews", 0] },  // If there are reviews, calculate the average
               then: "$averageRating",
               else: 0
             }
