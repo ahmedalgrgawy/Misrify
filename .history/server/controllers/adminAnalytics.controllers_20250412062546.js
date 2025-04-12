@@ -1,7 +1,6 @@
 import Category from "../models/category.model.js";
 import Brand from "../models/brand.model.js";
 import Product from "../models/product.model.js";
-import Order from "../models/order.model.js";
 
 export const getPlatformStats = async (req, res, next) => {
     const totalCategories = await Category.countDocuments();
