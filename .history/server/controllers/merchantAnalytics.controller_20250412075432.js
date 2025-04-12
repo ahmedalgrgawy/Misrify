@@ -138,6 +138,7 @@ export const getSalesGrowth = async (req, res, next) => {
             }
         ]);
 
+        // Get total sales for the previous month
         const lastMonthSales = await Order.aggregate([
             {
                 $match: {
@@ -156,6 +157,7 @@ export const getSalesGrowth = async (req, res, next) => {
         const currentMonthTotal = currentMonthSales.length > 0 ? currentMonthSales[0].totalSales : 0;
         const lastMonthTotal = lastMonthSales.length > 0 ? lastMonthSales[0].totalSales : 0;
 
+        // Calculate the sales growth rate
         let salesGrowthRate = 0;
         if (lastMonthTotal > 0) {
             salesGrowthRate = ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
