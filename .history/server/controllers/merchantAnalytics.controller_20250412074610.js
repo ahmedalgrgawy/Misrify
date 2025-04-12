@@ -108,6 +108,6 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Orders stats fetched successfully",
-      data: result[0], 
+      data: result[0],  // Return the stats for the merchant
     });
   };

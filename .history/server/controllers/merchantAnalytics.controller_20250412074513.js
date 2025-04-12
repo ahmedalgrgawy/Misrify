@@ -60,42 +60,44 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
   };
   
   export const getMerchantOrdersStats = async (req, res, next) => {
-    const merchantId = req.user._id;  
+    const merchantId = req.user._id;  // Assuming that merchant's id is in the authenticated user's data.
   
+    // Aggregation pipeline
     const result = await Order.aggregate([
       {
-        $match: { merchant: merchantId }  
+        $match: { merchant: merchantId }  // Filter orders that belong to the merchant
       },
       {
-        $unwind: "$products" 
+        $unwind: "$products"  // Unwind the products in each order
       },
       {
         $lookup: {
-          from: "products",  
-          localField: "products.product",  
-          foreignField: "_id", 
-          as: "productDetails"  
+          from: "products",  // Join the products collection
+          localField: "products.product",  // The field that holds the reference to the product (Product _id).
+          foreignField: "_id",  // The _id field in the Product collection.
+          as: "productDetails"  // Store the product details in this field
         }
       },
       {
-        $unwind: "$productDetails" 
+        $unwind: "$productDetails"  // Unwind the product details to access its properties (like price)
       },
       {
         $group: {
-          _id: "$merchant",  
-          totalOrders: { $sum: 1 }, 
-          totalMoneyEarned: { $sum: { $multiply: ["$products.quantity", "$productDetails.price"] } } 
+          _id: "$merchant",  // Group by the merchant's id (one group for each merchant)
+          totalOrders: { $sum: 1 },  // Count the total number of orders
+          totalMoneyEarned: { $sum: { $multiply: ["$products.quantity", "$productDetails.price"] } }  // Multiply quantity and price for each product in the order
         }
       },
       {
         $project: {
-          _id: 0,  
-          totalOrders: 1, 
-          totalMoneyEarned: 1 
+          _id: 0,  // Don't include the _id in the output
+          totalOrders: 1,  // Include the total number of orders
+          totalMoneyEarned: 1  // Include the total money earned
         }
       }
     ]);
   
+    // If no result, return 0 for both totalOrders and totalMoneyEarned
     if (result.length === 0) {
       return res.status(200).json({
         success: true,
@@ -108,6 +110,6 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Orders stats fetched successfully",
-      data: result[0], 
+      data: result[0],  // Return the stats for the merchant
     });
   };
