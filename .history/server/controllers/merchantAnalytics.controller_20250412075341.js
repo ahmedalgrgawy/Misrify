@@ -58,9 +58,9 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
       message: "Products with their reviews count and average ratings fetched successfully",
       products,
     });
-};
+  };
   
-export const getMerchantOrdersStats = async (req, res, next) => {
+  export const getMerchantOrdersStats = async (req, res, next) => {
     const merchantId = req.user._id;  
   
     const result = await Order.aggregate([
@@ -111,18 +111,20 @@ export const getMerchantOrdersStats = async (req, res, next) => {
       message: "Orders stats fetched successfully",
       data: result[0], 
     });
-};
+  };
 
-
-export const getSalesGrowth = async (req, res, next) => {
+  export const getSalesGrowth = async (req, res, next) => {
         const userId = req.user._id;
 
+        // Get the start and end dates for this month
         const startOfCurrentMonth = moment().startOf("month").toDate();
         const endOfCurrentMonth = moment().endOf("month").toDate();
 
+        // Get the start and end dates for the previous month
         const startOfLastMonth = moment().subtract(1, "month").startOf("month").toDate();
         const endOfLastMonth = moment().subtract(1, "month").endOf("month").toDate();
 
+        // Get total sales for the current month
         const currentMonthSales = await Order.aggregate([
             {
                 $match: {
@@ -138,6 +140,7 @@ export const getSalesGrowth = async (req, res, next) => {
             }
         ]);
 
+        // Get total sales for the previous month
         const lastMonthSales = await Order.aggregate([
             {
                 $match: {
@@ -156,6 +159,7 @@ export const getSalesGrowth = async (req, res, next) => {
         const currentMonthTotal = currentMonthSales.length > 0 ? currentMonthSales[0].totalSales : 0;
         const lastMonthTotal = lastMonthSales.length > 0 ? lastMonthSales[0].totalSales : 0;
 
+        // Calculate the sales growth rate
         let salesGrowthRate = 0;
         if (lastMonthTotal > 0) {
             salesGrowthRate = ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
@@ -168,4 +172,5 @@ export const getSalesGrowth = async (req, res, next) => {
             lastMonthTotal,
             salesGrowthRate: salesGrowthRate.toFixed(2),
         });
+   
 };

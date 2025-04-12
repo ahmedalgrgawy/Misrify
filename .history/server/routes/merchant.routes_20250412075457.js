@@ -25,7 +25,7 @@ router.post("/create-comment", catchAsync(protectedRoute), catchAsync(merchantRo
 router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getStockLevel))
 router.get("/products-with-ratings", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getProductsWithAvgRatings))
 router.get("/merchant-orders-stats", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getMerchantOrdersStats));
-router.get("/sales-growth", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getSalesGrowth));
+
 
 
 export default router;

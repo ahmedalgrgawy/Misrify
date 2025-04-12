@@ -58,9 +58,9 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
       message: "Products with their reviews count and average ratings fetched successfully",
       products,
     });
-};
+  };
   
-export const getMerchantOrdersStats = async (req, res, next) => {
+  export const getMerchantOrdersStats = async (req, res, next) => {
     const merchantId = req.user._id;  
   
     const result = await Order.aggregate([
@@ -111,61 +111,4 @@ export const getMerchantOrdersStats = async (req, res, next) => {
       message: "Orders stats fetched successfully",
       data: result[0], 
     });
-};
-
-
-export const getSalesGrowth = async (req, res, next) => {
-        const userId = req.user._id;
-
-        const startOfCurrentMonth = moment().startOf("month").toDate();
-        const endOfCurrentMonth = moment().endOf("month").toDate();
-
-        const startOfLastMonth = moment().subtract(1, "month").startOf("month").toDate();
-        const endOfLastMonth = moment().subtract(1, "month").endOf("month").toDate();
-
-        const currentMonthSales = await Order.aggregate([
-            {
-                $match: {
-                    user: userId,
-                    createdAt: { $gte: startOfCurrentMonth, $lte: endOfCurrentMonth }
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    totalSales: { $sum: "$totalPrice" }
-                }
-            }
-        ]);
-
-        const lastMonthSales = await Order.aggregate([
-            {
-                $match: {
-                    user: userId,
-                    createdAt: { $gte: startOfLastMonth, $lte: endOfLastMonth }
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    totalSales: { $sum: "$totalPrice" }
-                }
-            }
-        ]);
-
-        const currentMonthTotal = currentMonthSales.length > 0 ? currentMonthSales[0].totalSales : 0;
-        const lastMonthTotal = lastMonthSales.length > 0 ? lastMonthSales[0].totalSales : 0;
-
-        let salesGrowthRate = 0;
-        if (lastMonthTotal > 0) {
-            salesGrowthRate = ((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100;
-        }
-
-        res.status(200).json({
-            success: true,
-            message: "Sales growth data fetched successfully",
-            currentMonthTotal,
-            lastMonthTotal,
-            salesGrowthRate: salesGrowthRate.toFixed(2),
-        });
-};
+  };
