@@ -4,6 +4,7 @@ import Product from "../models/product.model.js";
 import Order from "../models/order.model.js";
 import User from "../models/user.model.js";
 
+
 export const getPlatformStats = async (req, res, next) => {
     const totalCategories = await Category.countDocuments();
     const totalBrands = await Brand.countDocuments();
