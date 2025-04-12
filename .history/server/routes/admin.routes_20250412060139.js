@@ -14,7 +14,6 @@ import { deleteComment } from '../controllers/comment.controllers.js'
 import { createTeamMemberSchema, updateTeamMemberSchema } from '../validators/teamValidator.js';
 import {createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember} from "../controllers/team.controllers.js";
 import { getAllMessages } from "../controllers/contact.controllers.js";
-import { getPlatformStats } from "../controllers/adminAnalytics.controllers.js";
 
 const router = express.Router()
 
@@ -77,7 +76,6 @@ router.delete("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), c
 // get all the contact us messages 
 router.get("/contact-messages", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllMessages));
 
-// get Platform Stats 
-router.get("/platform-stats", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getPlatformStats));
+// get
 
 export default router;

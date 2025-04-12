@@ -78,6 +78,6 @@ router.delete("/team/:id", catchAsync(protectedRoute), catchAsync(adminRoute), c
 router.get("/contact-messages", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllMessages));
 
 // get Platform Stats 
-router.get("/platform-stats", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getPlatformStats));
+router.get("/contact-messages", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllMessages));
 
 export default router;
