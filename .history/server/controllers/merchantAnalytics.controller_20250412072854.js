@@ -15,34 +15,20 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
     const products = await Product.aggregate([
       {
         $lookup: {
-          from: "reviews",  
-          localField: "reviews",  
-          foreignField: "_id",  
-          as: "reviewArray", 
-        }
-      },
-      {
-        $unwind: {  
-          path: "$reviewArray", 
-          preserveNullAndEmptyArrays: true 
-        }
-      },
-      {
-        $group: {  
-          _id: "$_id",
-          name: { $first: "$name" },
-          totalReviews: { $sum: 1 },  
-          averageRating: { $avg: "$reviewArray.rating" }, 
+          from: "Review",  
+          localField: "_id",
+          foreignField: "product",
+          as: "reviewArray"  // This will contain an array of review documents
         }
       },
       {
         $project: {
           name: 1,
-          totalReviews: 1,
+          totalReviews: { $size: "$reviewArray" },  // Get the number of reviews
           averageRating: {
             $cond: {
-              if: { $gt: ["$totalReviews", 0] },  
-              then: "$averageRating",
+              if: { $gt: [{ $size: "$reviewArray" }, 0] },
+              then: { $avg: "$reviewArray.rating" },
               else: 0
             }
           }
