@@ -1,6 +1,6 @@
 import Product from "../models/product.model.js";
 import Review from "../models/review.model.js";
-import Order from "../models/order.model.js";  
+import Order from "../models/order.model.js";  // Assuming you have an Order model.
 
 
 export const getStockLevel = async (req, res, next) => {
@@ -59,55 +59,3 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
     });
   };
   
-  export const getMerchantOrdersStats = async (req, res, next) => {
-    const merchantId = req.user._id;  
-  
-    const result = await Order.aggregate([
-      {
-        $match: { merchant: merchantId }  
-      },
-      {
-        $unwind: "$products" 
-      },
-      {
-        $lookup: {
-          from: "products",  
-          localField: "products.product",  
-          foreignField: "_id", 
-          as: "productDetails"  
-        }
-      },
-      {
-        $unwind: "$productDetails" 
-      },
-      {
-        $group: {
-          _id: "$merchant",  
-          totalOrders: { $sum: 1 }, 
-          totalMoneyEarned: { $sum: { $multiply: ["$products.quantity", "$productDetails.price"] } } 
-        }
-      },
-      {
-        $project: {
-          _id: 0,  
-          totalOrders: 1, 
-          totalMoneyEarned: 1 
-        }
-      }
-    ]);
-  
-    if (result.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: "Merchant has no orders yet",
-        totalOrders: 0,
-        totalMoneyEarned: 0
-      });
-    }
-  
-    res.status(200).json({
-      success: true,
-      message: "Orders stats fetched successfully",
-      data: result[0], 
-    });
-  };

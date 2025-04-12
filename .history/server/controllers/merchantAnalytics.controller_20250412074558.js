@@ -89,13 +89,14 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
       },
       {
         $project: {
-          _id: 0,  
-          totalOrders: 1, 
-          totalMoneyEarned: 1 
+          _id: 0,  // Don't include the _id in the output
+          totalOrders: 1,  // Include the total number of orders
+          totalMoneyEarned: 1  // Include the total money earned
         }
       }
     ]);
   
+    // If no result, return 0 for both totalOrders and totalMoneyEarned
     if (result.length === 0) {
       return res.status(200).json({
         success: true,
@@ -108,6 +109,6 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Orders stats fetched successfully",
-      data: result[0], 
+      data: result[0],  // Return the stats for the merchant
     });
   };

@@ -96,6 +96,7 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
       }
     ]);
   
+    // If no result, return 0 for both totalOrders and totalMoneyEarned
     if (result.length === 0) {
       return res.status(200).json({
         success: true,
@@ -108,6 +109,6 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Orders stats fetched successfully",
-      data: result[0], 
+      data: result[0],  // Return the stats for the merchant
     });
   };
