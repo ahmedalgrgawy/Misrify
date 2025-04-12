@@ -22,7 +22,6 @@ router.delete("/delete-product/:id", catchAsync(protectedRoute), catchAsync(merc
 router.post("/create-comment", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(createComment))
 
 // Handling Merchant Analytics 
-router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getStockLevel))
 
 
 export default router;
