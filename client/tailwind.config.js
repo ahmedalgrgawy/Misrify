@@ -16,6 +16,7 @@ export default {
         'main-blue': '#2B3D5B',
         'title-blue': '#15253F',
         'dark-blue': '#081120',
+        'bg-footer': '#0B172A',
       },
       screens: {
         sm: { max: "767px" },

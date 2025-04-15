@@ -20,16 +20,16 @@ const Navbar = () => {
     };
 
     const menuItems = isAuthenticated
-        ? [
-            { name: 'Home', path: '/' },
-            { name: 'About', path: '/about' },
-            { name: 'Dashboard', path: '/dashboard' },
-            { name: 'Analytics', path: '/analytics' }
+      ? [
+          { name: "Home", path: "/" },
+          { name: "About", path: "/aboutus" },
+          { name: "Dashboard", path: "/dashboard" },
+          { name: "Analytics", path: "/analytics" },
         ]
-        : [
-            { name: 'Home', path: '/' },
-            { name: 'About', path: '/about' },
-            { name: 'Contact Us', path: '/contact' }
+      : [
+          { name: "Home", path: "/" },
+          { name: "About", path: "/aboutus" },
+          { name: "Contact Us", path: "/contact" },
         ];
 
     return (

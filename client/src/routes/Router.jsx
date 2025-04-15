@@ -7,28 +7,30 @@ import Verification from '../Pages/Verification/Verification';
 import ForgotPassword from '../Pages/ForgetPassword/ForgetPassword';
 import ResetPassword from '../Pages/ResetPassword/ResetPassword';
 import CheckGmail from '../Pages/CheckGmail/CheckGmail';
-import PasswordSuccess from '../Pages/PasswordSuccess/PasswordSuccess';
+import PasswordSuccess from "../Pages/PasswordSuccess/PasswordSuccess";
 import Layout from '../Components/Layout/Layout';
+import AboutUs from '../Pages/ِAboutUs/AboutUs';
 
 const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <Layout />,
-        children: [
-            { index: true, element: <Home /> },
-            { path: '/verification', element: <Verification /> },
-            { path: '/login', element: <Login /> },
-            { path: '/signup', element: <Signup /> },
-            { path: '/forgot-password', element: <ForgotPassword /> },
-            { path: '/check-gmail', element: <CheckGmail /> },
-            { path: '/reset-password', element: <ResetPassword /> },
-            { path: '/password-success', element: <PasswordSuccess /> },
-        ],
-    },
-    {
-        path: '*',
-        element: <NotFound />,
-    },
+  {
+    path: "/",
+    element: <Layout />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "/aboutus", element: <AboutUs /> },
+      { path: "/verification", element: <Verification /> },
+      { path: "/login", element: <Login /> },
+      { path: "/signup", element: <Signup /> },
+      { path: "/forgot-password", element: <ForgotPassword /> },
+      { path: "/check-gmail", element: <CheckGmail /> },
+      { path: "/reset-password", element: <ResetPassword /> },
+      { path: "/password-success", element: <PasswordSuccess /> },
+    ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
 ]);
 
 export default router;
