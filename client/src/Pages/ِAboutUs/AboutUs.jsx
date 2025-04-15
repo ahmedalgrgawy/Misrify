@@ -13,11 +13,11 @@ const AboutUs = () => {
   return (
     <>
       <div className="flex flex-col lg:flex-row items-center justify-between p-6 md:p-12 lg:p-20 gap-8">
-        <div className="w-full lg:w-2/6 order-2 lg:order-1">
+        <div className="w-full lg:w-3/6 order-2 lg:order-1">
           <h2 className={`${style.title} mb-5`}>What We Do ?</h2>
           <p className={`${style.description}`}>
             This project aims to establish a comprehensive online marketplace
-            exclusively dedicated to Egyptian brands and stores. The platform
+            exclusively dedicated to Egyptian brands and stores.<br/> The platform
             will serve as a centralized hub for local businesses to showcase
             their products and reach a wider customer base, while also offering
             consumers a convenient and unique shopping experience.
@@ -40,7 +40,7 @@ const AboutUs = () => {
             alt="team work"
           />
         </div>
-        <div className="w-full lg:w-2/6">
+        <div className="w-full lg:w-3/6">
           <h2 className={`${style.title} mb-5`}>Who We Are?</h2>
           <p className={`${style.description}`}>
             This project aims to establish a comprehensive online marketplace
