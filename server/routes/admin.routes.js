@@ -30,7 +30,7 @@ router.put("/edit-user/:id", catchAsync(protectedRoute), catchAsync(adminRoute),
 router.delete("/delete-user/:id", catchAsync(protectedRoute), catchAsync(adminRoute), validate(editUserSchema), catchAsync(deleteUser))
 
 // Handling Categories
-router.get("/categories", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getAllCategories))
+router.get("/categories", catchAsync(getAllCategories))
 
 router.post("/create-category", catchAsync(protectedRoute), catchAsync(adminRoute), validate(createCategorySchema), catchAsync(createCategory))
 
@@ -39,7 +39,7 @@ router.put("/edit-category/:id", catchAsync(protectedRoute), catchAsync(adminRou
 router.delete("/delete-category/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteCategory))
 
 // Handling Brands
-router.get("/brands", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getBrands))
+router.get("/brands", catchAsync(getBrands))
 
 router.post("/create-brand", catchAsync(protectedRoute), catchAsync(adminRoute), validate(createBrandSchema), catchAsync(createBrand))
 
