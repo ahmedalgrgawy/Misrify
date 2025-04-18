@@ -40,7 +40,7 @@ class VerificationController extends GetxController {
 
     setLoading = true;
 
-    Uri url = Uri.parse('$appBaseUrl/verify-email');
+    Uri url = Uri.parse('$appBaseUrl/auth/verify-email');
     var requestBody = jsonEncode({
       "email": box.read('email'),
       "otp": code,

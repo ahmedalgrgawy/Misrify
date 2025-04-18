@@ -25,8 +25,7 @@ class SearchContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController _searchController = TextEditingController();
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 25.w, vertical: 20.h),
-      padding: EdgeInsets.symmetric(horizontal: 8.w),
+      margin: EdgeInsets.only(left: 30.w, right: 30.w, top: 30.h),
       decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(color: Colors.white, width: 0.4),
