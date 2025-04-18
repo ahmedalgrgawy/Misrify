@@ -39,11 +39,11 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-              scaffoldBackgroundColor: Kbackground,
+              scaffoldBackgroundColor: kLightWhite,
               iconTheme: const IconThemeData(color: kLightWhite),
               primarySwatch: Colors.grey),
           home: const Scaffold(
-            backgroundColor: Kbackground,
+            backgroundColor: kLightWhite,
             body: Center(
               child: CircularProgressIndicator(
                 color: kGray,

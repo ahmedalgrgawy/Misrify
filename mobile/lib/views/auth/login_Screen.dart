@@ -15,7 +15,7 @@ import 'package:graduation_project1/views/auth/register_Screen.dart';
 import 'package:graduation_project1/views/auth/widgets/email_textfield.dart';
 import 'package:graduation_project1/views/auth/widgets/iconbutton.dart';
 import 'package:graduation_project1/views/auth/widgets/password_textfield.dart';
-import 'package:graduation_project1/views/home/Home_Screen.dart';
+import 'package:graduation_project1/views/entrypoint.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -126,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: 20.h),
                       CustomButton(
                         onTap: () {
-                          Get.to(() => const HomeScreen(),
+                          Get.to(() => MainScreen(),
                               transition: Transition.fade,
                               duration: const Duration(milliseconds: 900));
                         },
