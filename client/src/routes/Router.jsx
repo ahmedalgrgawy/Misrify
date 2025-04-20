@@ -1,5 +1,4 @@
 import { createBrowserRouter } from 'react-router-dom';
-import Home from '../Components/Home/Home';
 import NotFound from '../Components/Errors/NotFound';
 import Login from '../Pages/Login/Login';
 import Signup from '../Pages/Signup/Signup';
@@ -10,6 +9,7 @@ import CheckGmail from '../Pages/CheckGmail/CheckGmail';
 import PasswordSuccess from "../Pages/PasswordSuccess/PasswordSuccess";
 import Layout from '../Components/Layout/Layout';
 import AboutUs from '../Pages/ِAboutUs/AboutUs';
+import Home from '../Pages/Home/Home';
 
 const router = createBrowserRouter([
   {
