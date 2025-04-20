@@ -9,6 +9,7 @@ import ResetPassword from '../Pages/ResetPassword/ResetPassword';
 import CheckGmail from '../Pages/CheckGmail/CheckGmail';
 import PasswordSuccess from '../Pages/PasswordSuccess/PasswordSuccess';
 import Layout from '../Components/Layout/Layout';
+import Contact from '../Components/Contact/Contact';
 
 const router = createBrowserRouter([
     {
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
             { path: '/check-gmail', element: <CheckGmail /> },
             { path: '/reset-password', element: <ResetPassword /> },
             { path: '/password-success', element: <PasswordSuccess /> },
+            { path: '/contact', element: <Contact /> }
         ],
     },
     {

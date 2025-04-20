@@ -10,12 +10,16 @@ export default {
       colors: {
         'white': '#FFFFFF',
         'bg-main': '#EBEBEF',
+        'bg-second':"#EFF2F6",
         'light-grey': '#DDDEE5',
         'second-grey': '#C3C3C3',
         'dark-grey': '#6E7786',
         'main-blue': '#2B3D5B',
         'title-blue': '#15253F',
         'dark-blue': '#081120',
+      },
+      boxShadow: {
+        'custom-md': '0px 3px 6px rgba(0, 0, 0, 0.15), 0px 3px 6px rgba(0, 0, 0, 0.23)',
       },
       screens: {
         sm: { max: "767px" },
