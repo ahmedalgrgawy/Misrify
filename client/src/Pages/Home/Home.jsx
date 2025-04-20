@@ -63,7 +63,7 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="relative mt-10 xl:mt-0 xl:w-2/5 2xl:w-2/5 self-center xl:self-end flex justify-end 2xl:w-fit">
+          <div className="relative mt-10 xl:mt-0 xl:w-2/5 self-center xl:self-end flex justify-end 2xl:w-fit">
             <img className="" src={HeroPic} alt="couple Picture" />
             <img
               className="absolute md:top-0 -top-8 md:right-0 -right-7"
