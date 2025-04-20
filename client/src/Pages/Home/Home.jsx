@@ -1,17 +1,17 @@
 import style from "./Home.module.css";
-import HeroPic from "../../assets/home imgs/HeroPic3.png";
+import HeroPic from "../../assets/home imgs/HeroPic.png";
 import Versace from "../../assets/home imgs/versace.png";
 import CalvinKlien from "../../assets/home imgs/CalvinKlien.png";
 import Gucci from "../../assets/home imgs/Gucci.png";
 import Prada from "../../assets/home imgs/Prada.png";
 import Zara from "../../assets/home imgs/Zara.png";
-import Shoes from "../../assets/home imgs/Shoes2.png";
-import Clothes from "../../assets/home imgs/Clothes2.png";
+import Shoes from "../../assets/home imgs/Shoes.png";
+import Clothes from "../../assets/home imgs/Clothes.png";
 import Makeup from "../../assets/home imgs/Makeup.png";
 import Bags from "../../assets/home imgs/Bags.png";
 import AppStore from "../../assets/home imgs/AppStore.png";
 import GooglePlay from "../../assets/home imgs/GooglePlay.png";
-import AppPic from "../../assets/home imgs/AppPic2.png";
+import AppPic from "../../assets/home imgs/AppPic.png";
 import star1 from "../../assets/home imgs/Bstar.png";
 import star2 from "../../assets/home imgs/Sstar.png";
 import { PiDownloadSimpleBold } from "react-icons/pi";
@@ -152,7 +152,7 @@ const Home = () => {
         className={`pb-20 px-10 lg:px-20 xl:px-24 flex flex-col justify-center lg:flex-row lg:items-center lg:justify-around`}
       >
         <div
-          className={`${style.download} text-center w-full xl:w-1/2 mt-10 xl:mt-0`}
+          className={`${style.download} text-center md:text-start w-full xl:w-1/2 mt-10 xl:mt-0`}
         >
           <h2 className="text-dark-blue mb-2">Download App Now</h2>
 
