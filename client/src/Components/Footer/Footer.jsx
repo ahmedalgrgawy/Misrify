@@ -1,4 +1,3 @@
-import logo from "../../assets/logo.png";
 import QR from "../../assets/Qrcode.png";
 import googlePlay from "../../assets/GooglePlay.png";
 import appStore from "../../assets/AppStore.png";

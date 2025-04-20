@@ -1,4 +1,4 @@
-import pic from "../../assets/About imgs/Pic.png";
+import pic from  "../../assets/About imgs/Pic.png";
 import team from "../../assets/About imgs/Misrify team.png";
 import Greg from "../../assets/About imgs/Greg.png";
 import Negm from "../../assets/About imgs/Negm.png";
