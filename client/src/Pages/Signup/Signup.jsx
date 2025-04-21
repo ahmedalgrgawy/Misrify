@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { useState, useEffect } from "react";
+import { FiEye, FiEyeOff, FiAlertCircle } from "react-icons/fi";
 import signImg from "../../assets/Sign imgs/signup.png";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { signup } from "../../features/authSlice";
+import { TailSpin } from "react-loader-spinner";
 
 const Signup = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -20,138 +21,185 @@ const Signup = () => {
         gender: "female",
     });
 
+    const [touched, setTouched] = useState({});
+    const [fieldErrors, setFieldErrors] = useState({});
+
+    useEffect(() => {
+        if (error && error.toLowerCase().includes("exist")) {
+            setFieldErrors({ general: "This user already exists" });
+        }
+    }, [error]);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
+        setFieldErrors((prev) => ({ ...prev, [name]: null }));
+    };
+
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        setTouched((prev) => ({ ...prev, [name]: true }));
+        if (!value.trim()) {
+            setFieldErrors((prev) => ({ ...prev, [name]: "This input is required" }));
+        }
+    };
+
+    const validateFields = () => {
+        const errors = {};
+        Object.entries(formData).forEach(([key, value]) => {
+            if (!value.trim()) {
+                errors[key] = "This input is required";
+            }
+        });
+        setFieldErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const result = await dispatch(signup(formData));
+        if (!validateFields()) return;
 
+        const result = await dispatch(signup(formData));
         if (result.meta.requestStatus === "fulfilled") {
             navigate("/verification");
         }
     };
 
+    const ErrorBox = ({ message }) => (
+        <div className="flex items-start gap-2 bg-red-100 text-red-800 border border-red-300 p-2 rounded-lg text-sm my-2">
+            <FiAlertCircle className="mt-0.5" />
+            <span>{message}</span>
+        </div>
+    );
+
     return (
-        <div className="w-full max-h-screen flex flex-col md:flex-row overflow-hidden">
-            <div className="hidden md:flex md:w-2/3 lg:w-1/2 h-full">
-                <img className="w-screen h-screen object-cover" src={signImg} alt="sign up" />
+        <div className="min-h-screen w-full flex flex-col md:flex-row bg-white">
+            {/* Left side image */}
+            <div className="hidden md:flex md:w-1/2">
+                <img className="w-full h-full object-cover" src={signImg} alt="sign up" />
             </div>
 
-            <div className="w-full md:w-2/3 lg:w-1/2 h-full bg-white flex flex-col p-4 md:p-6 items-center justify-center overflow-auto">
-                <div className="w-full max-w-md mx-auto">
-                    <h1 className="text-title-blue text-2xl font-bold mb-2">Sign Up</h1>
-                    {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
+            {/* Right side form */}
+            <div className="w-full md:w-1/2 flex items-center justify-center p-4 md:p-10">
+                <div className="w-full max-w-md space-y-6">
+                    <h1 className="text-title-blue text-2xl font-bold">Sign Up</h1>
 
-                    <form className="w-full" onSubmit={handleSubmit}>
-                        {/* Username */}
-                        <label htmlFor="name" className="text-title-blue font-small">Name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            id="name"
-                            value={formData.name}
-                            onChange={handleChange}
-                            className="input-field"
-                            autoComplete="name"
-                            required
-                        />
+                    {fieldErrors.general && <ErrorBox message={fieldErrors.general} />}
 
-                        {/* Email */}
-                        <label htmlFor="email" className="text-title-blue font-small mt-4">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            autoComplete="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            className="input-field"
-                            required
-                        />
-
-                        {/* Password */}
-                        <label htmlFor="password" className="text-title-blue font-small mt-4">Password</label>
-                        <div className="relative">
+                    <form className="space-y-4" onSubmit={handleSubmit}>
+                        <div>
+                            <label htmlFor="name" className="text-title-blue font-small">Name</label>
                             <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                id="password"
-                                autoComplete="new-password"
-                                value={formData.password}
+                                type="text"
+                                name="name"
+                                id="name"
+                                value={formData.name}
                                 onChange={handleChange}
+                                onBlur={handleBlur}
                                 className="input-field"
-                                required
                             />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute inset-y-0 right-2 flex items-center"
-                            >
-                                {showPassword ? (
-                                    <FiEyeOff className="text-title-blue" />
-                                ) : (
-                                    <FiEye className="text-title-blue" />
-                                )}
-                            </button>
+                            {touched.name && fieldErrors.name && <ErrorBox message={fieldErrors.name} />}
                         </div>
 
-                        {/* Phone Number */}
-                        <label htmlFor="phoneNumber" className="text-title-blue font-small mt-4">Phone Number</label>
-                        <input
-                            type="text"
-                            name="phoneNumber"
-                            id="phoneNumber"
-                            value={formData.phoneNumber}
-                            onChange={handleChange}
-                            className="input-field"
-                            required
-                        />
-
-                        {/* Address */}
-                        <label htmlFor="address" className="text-title-blue font-small mt-4">Address</label>
-                        <input
-                            type="text"
-                            name="address"
-                            id="address"
-                            value={formData.address}
-                            onChange={handleChange}
-                            className="input-field"
-                            required
-                        />
-
-                        {/* Gender */}
-                        <label className="text-title-blue font-small mt-4">Gender</label>
-                        <div className="flex bg-bg-main rounded-full p-1 w-40">
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, gender: "male" })}
-                                className={`flex-1 text-center py-1 rounded-full ${formData.gender === "male" ? "bg-title-blue text-white" : "text-dark-grey"}`}
-                            >
-                                Male
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => setFormData({ ...formData, gender: "female" })}
-                                className={`flex-1 text-center py-1 rounded-full ${formData.gender === "female" ? "bg-title-blue text-white" : "text-dark-grey"}`}
-                            >
-                                Female
-                            </button>
+                        <div>
+                            <label htmlFor="email" className="text-title-blue font-small">Email</label>
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="input-field"
+                            />
+                            {touched.email && fieldErrors.email && <ErrorBox message={fieldErrors.email} />}
                         </div>
 
-                        {/* Submit Button */}
+                        <div>
+                            <label htmlFor="password" className="text-title-blue font-small">Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    name="password"
+                                    id="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    className="input-field"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute inset-y-0 right-2 flex items-center"
+                                >
+                                    {showPassword ? <FiEyeOff className="text-title-blue" /> : <FiEye className="text-title-blue" />}
+                                </button>
+                            </div>
+                            {touched.password && fieldErrors.password && <ErrorBox message={fieldErrors.password} />}
+                        </div>
+
+                        <div>
+                            <label htmlFor="phoneNumber" className="text-title-blue font-small">Phone Number</label>
+                            <input
+                                type="text"
+                                name="phoneNumber"
+                                id="phoneNumber"
+                                value={formData.phoneNumber}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="input-field"
+                            />
+                            {touched.phoneNumber && fieldErrors.phoneNumber && <ErrorBox message={fieldErrors.phoneNumber} />}
+                        </div>
+
+                        <div>
+                            <label htmlFor="address" className="text-title-blue font-small">Address</label>
+                            <input
+                                type="text"
+                                name="address"
+                                id="address"
+                                value={formData.address}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                                className="input-field"
+                            />
+                            {touched.address && fieldErrors.address && <ErrorBox message={fieldErrors.address} />}
+                        </div>
+
+                        <div>
+                            <label className="text-title-blue font-small">Gender</label>
+                            <div className="flex bg-bg-main rounded-full p-1 w-40">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, gender: "male" })}
+                                    className={`flex-1 text-center py-1 rounded-full ${formData.gender === "male" ? "bg-title-blue text-white" : "text-dark-grey"}`}
+                                >
+                                    Male
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, gender: "female" })}
+                                    className={`flex-1 text-center py-1 rounded-full ${formData.gender === "female" ? "bg-title-blue text-white" : "text-dark-grey"}`}
+                                >
+                                    Female
+                                </button>
+                            </div>
+                        </div>
+
                         <button
                             type="submit"
-                            className="w-full bg-title-blue text-white py-2 mt-4 rounded-lg hover:bg-dark-blue"
+                            className="w-full bg-title-blue text-white py-2 mt-2 rounded-lg hover:bg-dark-blue duration-300 ease-in disabled:opacity-50 flex items-center justify-center"
                             disabled={loading}
                         >
-                            {loading ? "Signing up..." : "Sign Up"}
+                            {loading ? (
+                                <TailSpin height={20} width={20} color="#ffffff" ariaLabel="loading" />
+                            ) : (
+                                "Sign Up"
+                            )}
                         </button>
                     </form>
 
-                    <p className="text-dark-blue text-center mt-4">
+                    <p className="text-dark-blue text-center">
                         Already have an account?{" "}
                         <Link to="/login" className="text-dark-blue font-medium underline">
                             Sign in

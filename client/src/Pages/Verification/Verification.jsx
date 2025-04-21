@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyAccount } from "../../features/authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
+import { TailSpin } from "react-loader-spinner";
 
 const Verification = () => {
     const location = useLocation();
@@ -105,13 +106,21 @@ const Verification = () => {
                             required
                         />
                     </div>
-
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full bg-title-blue text-white text-lg py-2 rounded-lg hover:bg-dark-blue transition duration-300"
+                        className="w-full bg-title-blue text-white py-2 mt-6 rounded-lg hover:bg-dark-blue transition duration-300 ease-in disabled:opacity-50 flex items-center justify-center"
                     >
-                        {loading ? "Verifying..." : "Verify"}
+                        {loading ? (
+                            <TailSpin
+                                height={20}
+                                width={20}
+                                color="#ffffff"
+                                ariaLabel="loading"
+                            />
+                        ) : (
+                            "Verify"
+                        )}
                     </button>
                 </form>
             </div>
