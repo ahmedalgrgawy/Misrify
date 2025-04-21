@@ -1,4 +1,3 @@
-import pic from  "../../assets/About imgs/Pic.png";
 import team from "../../assets/About imgs/Misrify team.png";
 import Greg from "../../assets/About imgs/Greg.png";
 import Negm from "../../assets/About imgs/Negm.png";
@@ -17,7 +16,7 @@ const AboutUs = () => {
           <h2 className={`${style.title} mb-5`}>What We Do ?</h2>
           <p className={`${style.description}`}>
             This project aims to establish a comprehensive online marketplace
-            exclusively dedicated to Egyptian brands and stores.<br/> The platform
+            exclusively dedicated to Egyptian brands and stores.<br /> The platform
             will serve as a centralized hub for local businesses to showcase
             their products and reach a wider customer base, while also offering
             consumers a convenient and unique shopping experience.
@@ -26,7 +25,7 @@ const AboutUs = () => {
         <div className="w-full lg:w-3/6 order-1 lg:order-2">
           <img
             className="w-full rounded-lg shadow-2xl"
-            src={pic}
+            src={team}
             alt="team work"
           />
         </div>
