@@ -22,17 +22,25 @@ const Navbar = memo(() => {
     };
 
     const menuItems = isAuthenticated
+<<<<<<< HEAD
         ? [
             { name: 'Home', path: '/' },
             { name: 'About', path: '/about' },
             { name: 'Dashboard', path: '/dashboard' },
             { name: 'Analytics', path: '/analytics' },
             { name: 'Contact Us', path: '/contact' }
+=======
+      ? [
+          { name: "Home", path: "/" },
+          { name: "About", path: "/aboutus" },
+          { name: "Dashboard", path: "/dashboard" },
+          { name: "Analytics", path: "/analytics" },
+>>>>>>> zeyad/aboutus
         ]
-        : [
-            { name: 'Home', path: '/' },
-            { name: 'About', path: '/about' },
-            { name: 'Contact Us', path: '/contact' }
+      : [
+          { name: "Home", path: "/" },
+          { name: "About", path: "/aboutus" },
+          { name: "Contact Us", path: "/contact" },
         ];
 
     return (

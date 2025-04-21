@@ -17,6 +17,7 @@ export default {
         'main-blue': '#2B3D5B',
         'title-blue': '#15253F',
         'dark-blue': '#081120',
+        'bg-footer': '#0B172A',
       },
       boxShadow: {
         'custom-md': '0px 3px 6px rgba(0, 0, 0, 0.15), 0px 3px 6px rgba(0, 0, 0, 0.23)',
