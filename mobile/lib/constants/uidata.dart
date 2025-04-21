@@ -1,60 +1,52 @@
 List<dynamic> categories = [
   {
     "_id": "6537ece708ff5b7de97d0695",
-    "title": "Fried Rice",
-    "value": "fried_rice",
+    "title": "Hoodies",
+    "value": "hoodies",
     "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/025/268/566/non_2x/fried-rice-with-ai-generated-free-png.png",
+        "https://static.vecteezy.com/system/resources/previews/035/438/654/non_2x/ai-generated-blue-hoodie-isolated-on-transparent-background-free-png.png",
     "createdAt": "2023-10-24T16:12:23.571Z",
     "updatedAt": "2023-10-24T16:12:23.571Z",
     "__v": 0
   },
   {
     "_id": "65310f3381e4d98d60b093c5",
-    "title": "Curry",
-    "value": "curry",
+    "title": "Pants",
+    "value": "pants",
     "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/025/269/798/non_2x/rogan-josh-with-ai-generated-free-png.png",
+        "https://static.vecteezy.com/system/resources/previews/034/928/389/non_2x/ai-generated-linen-pants-clip-art-free-png.png",
     "__v": 0
   },
   {
     "_id": "6531206cbbe4998e90af3feb",
-    "title": "Pizza",
-    "value": "pizza",
+    "title": "T-shirts",
+    "value": "t-shirts",
     "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/042/894/160/non_2x/pizza-with-a-cut-piece-ai-generativ-free-png.png",
+        "https://static.vecteezy.com/system/resources/previews/035/277/002/non_2x/ai-generated-isolated-blue-t-shirt-front-view-free-png.png",
     "__v": 0
   },
   {
     "_id": "6531209dbbe4998e90af3fef",
-    "title": "Pasta",
-    "value": "pasta",
+    "title": "Shoes",
+    "value": "shoes",
     "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/025/065/195/non_2x/spaghetti-with-ai-generated-free-png.png",
+        "https://static.vecteezy.com/system/resources/previews/056/522/177/non_2x/a-pair-of-black-and-white-running-shoes-free-png.png",
     "__v": 0
   },
   {
     "_id": "653120babbe4998e90af3ff1",
-    "title": "Beverages",
-    "value": "beverages",
+    "title": "Skin Care",
+    "value": "Skin_care",
     "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/046/592/140/non_2x/cocktails-beverages-illustration-watercolor-style-free-png.png",
+        "https://static.vecteezy.com/system/resources/previews/025/028/064/non_2x/anti-aging-cream-cosmetics-skin-face-face-cream-face-people-generative-ai-free-png.png",
     "__v": 0
   },
   {
     "_id": "65312084bbe4998e90af3fed",
-    "title": "Burgers",
-    "value": "burgers",
+    "title": "Makeup",
+    "value": "makeup",
     "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/023/522/925/non_2x/beef-burger-cutout-free-png.png",
-    "__v": 0
-  },
-  {
-    "_id": "65310efb81e4d98d60b093c3",
-    "title": "Chicken",
-    "value": "chicken",
-    "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/041/766/422/non_2x/ai-generated-whole-chicken-on-a-plate-isolated-on-transparent-background-free-png.png",
+        "https://static.vecteezy.com/system/resources/previews/047/821/087/non_2x/high-quality-realistic-beautiful-cosmetic-product-image-free-png.png",
     "__v": 0
   },
   {
@@ -62,7 +54,7 @@ List<dynamic> categories = [
     "title": "More",
     "value": "more",
     "imageUrl":
-        "https://static.vecteezy.com/system/resources/previews/019/858/703/non_2x/menu-flat-color-outline-icon-free-png.png",
+        "https://static.vecteezy.com/system/resources/previews/025/268/566/non_2x/fried-rice-with-ai-generated-free-png.png",
     "__v": 0
   }
 ];
@@ -405,4 +397,14 @@ class LogoImages {
   static const String firstPage = "assets/onboarding/1.svg";
   static const String secondPage = "assets/onboarding/2.svg";
   static const String thirdPage = "assets/onboarding/3.svg";
+}
+
+class BannersImages {
+  static const List<String> banners = [
+    'assets/banners/banner1.png',
+    'assets/banners/banner2.png',
+    'assets/banners/banner3.png',
+    'assets/banners/banner4.png',
+    'assets/banners/banner5.png',
+  ];
 }

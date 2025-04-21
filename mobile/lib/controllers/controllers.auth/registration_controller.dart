@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
 import 'package:get/get.dart';
@@ -13,9 +12,8 @@ import 'package:http/http.dart' as http;
 class RegistrationController extends GetxController {
   final RxBool _isLoading = false.obs;
   final agreement = false.obs;
-  final RxString generalError = ''.obs; // Store general error message
-  final RxMap<String, String> fieldErrors =
-      <String, String>{}.obs; // Store field-specific errors
+  final RxString generalError = ''.obs;
+  final RxMap<String, String> fieldErrors = <String, String>{}.obs;
   final box = GetStorage();
 
   bool get isLoading => _isLoading.value;
@@ -26,7 +24,7 @@ class RegistrationController extends GetxController {
   /// ✅ Register function with improved validation & error handling
   void registerUser(String data) async {
     setLoading = true;
-    Uri url = Uri.parse('$appBaseUrl/signup');
+    Uri url = Uri.parse('$appBaseUrl/auth/signup');
     Map<String, String> headers = {'Content-Type': 'application/json'};
 
     // ✅ Ensure user agrees to terms before proceeding
@@ -105,7 +103,6 @@ class RegistrationController extends GetxController {
     }
   }
 
-  /// ✅ Logout function
   void logout() {
     box.erase();
     Get.offAll(() => const LoginScreen(),
@@ -113,7 +110,6 @@ class RegistrationController extends GetxController {
         duration: const Duration(milliseconds: 900));
   }
 
-  /// ✅ Get saved email for pre-filling fields
   String getSavedEmail() {
     return box.read('email') ?? "";
   }

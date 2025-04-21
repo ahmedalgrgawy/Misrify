@@ -15,7 +15,7 @@ class SectionHeading extends StatelessWidget {
       this.buttontitle = 'See All',
       this.showButton = true,
       this.onPress,
-      this.padd = const EdgeInsets.symmetric(vertical: 8, horizontal: 20)});
+      this.padd = const EdgeInsets.symmetric(vertical: 8, horizontal: 14)});
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +25,13 @@ class SectionHeading extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ReusableText(
-              text: title, style: appStyle(18, kNavy, FontWeight.w500)),
+              text: title, style: appStyle(16, KNavyBlack, FontWeight.w500)),
           if (showButton)
             TextButton(
                 onPressed: onPress,
                 child: ReusableText(
                     text: buttontitle,
-                    style: appStyle(16, kLightBlue, FontWeight.w500))),
+                    style: appStyle(12, KblueOcean, FontWeight.w500))),
         ],
       ),
     );

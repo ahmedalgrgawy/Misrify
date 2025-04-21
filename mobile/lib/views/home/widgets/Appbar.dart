@@ -44,15 +44,18 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
           Row(
             children: [
               InkWell(
-                onTap: () => Get.to(const WishlistScreen()),
-                child: const Icon(
-                  CupertinoIcons.heart,
-                  color: kBlue,
-                  size: 30,
-                ),
-              ),
+                  onTap: () => Get.to(const WishlistScreen()),
+                  child: const Badge(
+                    backgroundColor: Colors.amber,
+                    label: Text('1'),
+                    child: Icon(
+                      CupertinoIcons.bell,
+                      color: kBlue,
+                      size: 25,
+                    ),
+                  )),
               SizedBox(
-                width: 5.w,
+                width: 7.w,
               ),
               InkWell(
                   onTap: () => Get.to(const CartScreen()),
