@@ -167,7 +167,7 @@ const Contact = () => {
                                     name="firstName"
                                     value={formData.firstName}
                                     onChange={handleChange}
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 text-dark-grey focus:outline-none focus:border-dark-grey hover:shadow ${errors.firstName ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.firstName ? 'border-red-500' : ''}`}
                                 />
                                 {errors.firstName && <p className="text-red-500 text-xs">{errors.firstName}</p>}
                             </div>
@@ -179,7 +179,7 @@ const Contact = () => {
                                     name="lastName"
                                     value={formData.lastName}
                                     onChange={handleChange}
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 text-dark-grey focus:outline-none focus:border-dark-grey hover:shadow ${errors.lastName ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.lastName ? 'border-red-500' : ''}`}
                                 />
                                 {errors.lastName && <p className="text-red-500 text-xs">{errors.lastName}</p>}
                             </div>
@@ -196,7 +196,7 @@ const Contact = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="Your Email"
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 text-dark-grey focus:outline-none focus:border-dark-grey hover:shadow ${errors.email ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.email ? 'border-red-500' : ''}`}
                                 />
                             </div>
                             {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
@@ -212,7 +212,7 @@ const Contact = () => {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 text-dark-grey focus:outline-none focus:border-dark-grey hover:shadow ${errors.phone ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.phone ? 'border-red-500' : ''}`}
                                 />
                             </div>
                             {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
@@ -226,7 +226,7 @@ const Contact = () => {
                                 value={formData.message}
                                 onChange={handleChange}
                                 rows="5"
-                                className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 text-dark-grey focus:outline-none focus:border-dark-grey hover:shadow resize-none ${errors.message ? 'border-red-500' : ''}`}
+                                className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow resize-none ${errors.message ? 'border-red-500' : ''}`}
                                 placeholder="Type Here..."
                                 style={{ height: '100px' }}
                             ></textarea>
