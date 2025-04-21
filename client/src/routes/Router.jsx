@@ -8,54 +8,31 @@ import ResetPassword from '../Pages/ResetPassword/ResetPassword';
 import CheckGmail from '../Pages/CheckGmail/CheckGmail';
 import PasswordSuccess from "../Pages/PasswordSuccess/PasswordSuccess";
 import Layout from '../Components/Layout/Layout';
-<<<<<<< HEAD
 import Contact from '../Components/Contact/Contact';
-
-const router = createBrowserRouter([
-    {
-        path: '/',
-        element: <Layout />,
-        children: [
-            { index: true, element: <Home /> },
-            { path: '/verification', element: <Verification /> },
-            { path: '/login', element: <Login /> },
-            { path: '/signup', element: <Signup /> },
-            { path: '/forgot-password', element: <ForgotPassword /> },
-            { path: '/check-gmail', element: <CheckGmail /> },
-            { path: '/reset-password', element: <ResetPassword /> },
-            { path: '/password-success', element: <PasswordSuccess /> },
-            { path: '/contact', element: <Contact /> }
-        ],
-    },
-    {
-        path: '*',
-        element: <NotFound />,
-    },
-=======
 import AboutUs from '../Pages/ِAboutUs/AboutUs';
 import Home from '../Pages/Home/Home';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
       { path: "/aboutus", element: <AboutUs /> },
-      { path: "/verification", element: <Verification /> },
-      { path: "/login", element: <Login /> },
-      { path: "/signup", element: <Signup /> },
-      { path: "/forgot-password", element: <ForgotPassword /> },
-      { path: "/check-gmail", element: <CheckGmail /> },
-      { path: "/reset-password", element: <ResetPassword /> },
-      { path: "/password-success", element: <PasswordSuccess /> },
+      { path: '/verification', element: <Verification /> },
+      { path: '/login', element: <Login /> },
+      { path: '/signup', element: <Signup /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
+      { path: '/check-gmail', element: <CheckGmail /> },
+      { path: '/reset-password', element: <ResetPassword /> },
+      { path: '/password-success', element: <PasswordSuccess /> },
+      { path: '/contact', element: <Contact /> }
     ],
   },
   {
-    path: "*",
+    path: '*',
     element: <NotFound />,
   },
->>>>>>> zeyad/aboutus
 ]);
 
 export default router;
