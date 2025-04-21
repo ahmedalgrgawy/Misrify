@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/data/repositories/authentication_repository.dart';
-import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/models/login_response.dart';
 import 'package:graduation_project1/models/resetpassword_model.dart';
 import 'package:graduation_project1/models/validation_error_model.dart';
@@ -25,18 +24,40 @@ class LoginController extends GetxController {
 
   void loginFunction(String data) async {
     setLoading = true;
-    Uri url = Uri.parse('$appBaseUrl/login');
+    Uri url = Uri.parse('$appBaseUrl/auth/login');
     Map<String, String> headers = {'Content-Type': 'application/json'};
+
     try {
       var response = await http.post(url, headers: headers, body: data);
+
       if (response.statusCode == 200) {
         generalError.value = '';
         errors.clear();
+
         LoginResponse data = loginResponseFromJson(response.body);
+
+        // ✅ Extract and store accessToken & refreshToken
+        String? rawCookie = response.headers['set-cookie'];
+        if (rawCookie != null) {
+          final parts = rawCookie.split(',');
+          for (var part in parts) {
+            if (part.contains('accessToken=')) {
+              final access = part.trim().split(';')[0]; // accessToken=...
+              box.write('token', access.split('=')[1]); // Store only the token
+              print('🔐 accessToken: ${box.read('token')}');
+            }
+
+            if (part.contains('refreshToken=')) {
+              final refresh = part.trim().split(';')[0];
+              box.write('refreshToken', refresh); // Save full: refreshToken=...
+              print('🔁 refreshToken: ${box.read('refreshToken')}');
+            }
+          }
+        }
+
         String userId = data.user.id;
         String userData = jsonEncode(data);
         box.write(userId, userData);
-        //box.write('token', data.userToken);
         box.write('userId', data.user.id);
         box.write('verification', data.user.isVerified);
 
@@ -61,6 +82,7 @@ class LoginController extends GetxController {
         var error = validationErrorResponseFromJson(response.body);
         generalError.value = error.message;
         errors.assignAll(error.errors ?? []);
+
         if (error.message != "Validation errors") {
           Get.snackbar('Failed to login', error.message,
               colorText: kLightWhite,

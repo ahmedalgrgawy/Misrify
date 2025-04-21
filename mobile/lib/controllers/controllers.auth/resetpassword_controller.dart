@@ -34,7 +34,7 @@ class ResetpasswordController extends GetxController {
 
     setLoading = true;
 
-    Uri url = Uri.parse('$appBaseUrl/reset-password');
+    Uri url = Uri.parse('$appBaseUrl/auth/reset-password');
     var requestBody = jsonEncode({
       "email": box.read('saved_email'),
       "resetPasswordOtp": box.read('forgetPassword_otp').toString(),

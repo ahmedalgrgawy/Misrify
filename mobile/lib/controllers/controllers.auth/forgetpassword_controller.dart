@@ -21,7 +21,7 @@ class ForgetpasswordController extends GetxController {
   void ForgetpasswordFunction(String data) async {
     setLoading = true;
 
-    Uri url = Uri.parse('$appBaseUrl/forgot-password');
+    Uri url = Uri.parse('$appBaseUrl/auth/forgot-password');
     Map<String, String> headers = {'Content-Type': 'application/json'};
 
     try {

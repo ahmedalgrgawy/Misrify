@@ -25,6 +25,7 @@ class ReusableText extends StatelessWidget {
         maxLines: maxlines ?? 1,
         textAlign: align ?? TextAlign.left,
         softWrap: SoftWrap ?? false,
+        overflow: TextOverflow.ellipsis,
         style: style);
   }
 }

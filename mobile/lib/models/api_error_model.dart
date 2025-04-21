@@ -5,11 +5,11 @@ ApiError apiErrorFromJson(String str) => ApiError.fromJson(json.decode(str));
 String apiErrorToJson(ApiError data) => json.encode(data.toJson());
 
 class ApiError {
-  final bool success;
+  final bool? success;
   final String message;
 
   ApiError({
-    required this.success,
+    this.success,
     required this.message,
   });
 
