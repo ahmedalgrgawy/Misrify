@@ -30,7 +30,7 @@ class SearchContainer extends StatelessWidget {
           onFieldSubmitted: (query) {
             if (query.trim().isNotEmpty) {
               Get.to(() => SearchScreen(initialSearch: query.trim()));
-              controller.clear(); // ✅ clear input
+              controller.clear();
             }
           },
           decoration: InputDecoration(
@@ -40,7 +40,7 @@ class SearchContainer extends StatelessWidget {
             prefixIcon: const Icon(
               Ionicons.search,
               size: 27,
-              color: kLightGray,
+              color: kNavy,
             ),
           ),
         ));

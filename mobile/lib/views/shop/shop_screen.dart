@@ -147,7 +147,7 @@ class ShopScreen extends HookWidget {
                             ),
                             IconButton(
                               icon: const Icon(
-                                Icons.filter_list,
+                                CupertinoIcons.slider_horizontal_3,
                                 color: kDarkBlue,
                                 size: 25,
                               ),
