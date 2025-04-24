@@ -13,7 +13,7 @@ import 'package:graduation_project1/views/home/widgets/Appbar.dart';
 import 'package:graduation_project1/views/home/widgets/SectionHeading.dart';
 import 'package:graduation_project1/views/categories/widgets/category_list.dart';
 import 'package:graduation_project1/views/home/widgets/banner_slider.dart';
-import 'package:graduation_project1/views/home/widgets/search_container.dart';
+import 'package:graduation_project1/views/search/widgets/search_container.dart';
 import 'package:graduation_project1/views/products/widgets/product_list.dart';
 
 class HomeScreen extends StatelessWidget {
