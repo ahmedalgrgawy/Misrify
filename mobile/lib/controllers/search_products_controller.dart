@@ -20,25 +20,23 @@ class SearchProductsController extends GetxController {
 
   List<Product>? searcResults;
 
-  void searchProduct(String key) async {
+  void searchProduct(String query) async {
     setLoading = true;
-    Uri url = Uri.parse("$appBaseUrl/user/search?query=$key");
-
     try {
-      var response = await http.get(url);
+      final response =
+          await http.get(Uri.parse('$appBaseUrl/user/search?query=$query'));
 
       if (response.statusCode == 200) {
         final parsedModel = productsModelFromJson(response.body);
-        searcResults =
-            parsedModel.products.where((p) => p.name != null).toList();
-        setLoading = false;
+        searcResults = parsedModel.products ?? [];
       } else {
-        setLoading = false;
-        var error = apiErrorFromJson(response.body);
+        searcResults = [];
       }
     } catch (e) {
+      searcResults = [];
+      debugPrint("Search error: $e");
+    } finally {
       setLoading = false;
-      debugPrint(e.toString());
     }
   }
 }

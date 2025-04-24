@@ -22,6 +22,8 @@ class ShopScreen extends HookWidget {
   @override
   Widget build(BuildContext context) {
     final filterController = Get.put(FilterController(), permanent: true);
+    final TextEditingController searchController = TextEditingController();
+
     final sortType = useState<String>('Most Popular');
 
     final selectedBrands =
@@ -85,6 +87,7 @@ class ShopScreen extends HookWidget {
                       top: 20.h,
                       bottom: 5.h,
                     ),
+                    controller: searchController,
                   ),
                   SizedBox(height: 6.h),
                   Padding(
@@ -170,14 +173,15 @@ class ShopScreen extends HookWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Center(
-                        child: Text(
-                          selectedCategories.value.isNotEmpty
-                              ? "No products found in selected categories."
-                              : selectedBrands.value.isNotEmpty
-                                  ? "No products found in selected brands."
-                                  : "No products found.",
-                          style: appStyle(14, kDarkBlue, FontWeight.w500),
-                          textAlign: TextAlign.center,
+                        child: Center(
+                          child: Text(
+                            selectedCategories.value.isNotEmpty
+                                ? "No products found in selected categories."
+                                : selectedBrands.value.isNotEmpty
+                                    ? "No products found in selected brands."
+                                    : "No products found.",
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     )
