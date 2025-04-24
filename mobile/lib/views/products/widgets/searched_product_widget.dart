@@ -1,29 +1,24 @@
-// ignore_for_file: must_be_immutable
-
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
+import 'package:graduation_project1/models/products_model.dart';
+import 'package:graduation_project1/views/products/Product_page.dart';
 
-class ProductWidget extends StatelessWidget {
-  ProductWidget(
-      {super.key,
-      this.image,
-      required this.brand,
-      required this.price,
-      this.onTap,
-      required this.title});
-  final String? image;
-  final String title;
-  final String brand;
-  final String price;
-  void Function()? onTap;
+class SearchedProductWidget extends StatelessWidget {
+  SearchedProductWidget({super.key, required this.product});
+  Product product;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: () {
+        Get.to(() => ProductPage(
+            // : food
+            ));
+      },
       child: Padding(
         padding: EdgeInsets.only(left: 10.w, right: 5.w),
         child: Container(
@@ -81,7 +76,7 @@ class ProductWidget extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             ReusableText(
-                                text: title,
+                                text: product.name,
                                 maxlines: 4,
                                 SoftWrap: true,
                                 style:
@@ -90,13 +85,13 @@ class ProductWidget extends StatelessWidget {
                               height: 10.h,
                             ),
                             ReusableText(
-                                text: brand,
+                                text: product.brand.name,
                                 style: appStyle(10, kGray, FontWeight.w400)),
                             SizedBox(
                               height: 10.h,
                             ),
                             ReusableText(
-                                text: "\$ $price",
+                                text: "\$ ${product.price}",
                                 style:
                                     appStyle(12, KTextColor, FontWeight.w700)),
                           ],
