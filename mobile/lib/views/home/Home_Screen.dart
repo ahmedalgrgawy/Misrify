@@ -25,6 +25,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final login = Get.put(LoginController());
     final controller = Get.put(CategoryController());
+    final TextEditingController searchController = TextEditingController();
 
     return SafeArea(
       child: Scaffold(
@@ -35,7 +36,9 @@ class HomeScreen extends StatelessWidget {
         ),
         body: ListView(
           children: [
-            const SearchContainer(),
+            SearchContainer(
+              controller: searchController,
+            ),
             const BannerSlider(),
 //category
             SectionHeading(
