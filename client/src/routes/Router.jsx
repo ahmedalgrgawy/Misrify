@@ -11,6 +11,9 @@ import Layout from '../Components/Layout/Layout';
 import Contact from '../Components/Contact/Contact';
 import AboutUs from '../Pages/ِAboutUs/AboutUs';
 import Home from '../Pages/Home/Home';
+import Dashboard from '../Components/Dashboard/Dashboard';
+import DashboardLayout from '../Components/DashboardLayout/DashboardLayout';
+import Users from '../Components/Users/Users';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +31,18 @@ const router = createBrowserRouter([
       { path: '/password-success', element: <PasswordSuccess /> },
       { path: '/contact', element: <Contact /> }
     ],
+  },
+  {
+    path: '/dashboard',
+    element: <DashboardLayout />,
+    children: [
+      { index: true, element: <Dashboard /> },
+      { path: 'users', element: <Users /> },
+      // { path: 'products', element: <Products /> },
+      // { path: 'support', element: <Support /> },
+      // { path: 'categories', element: <Categories /> },
+      // { path: 'settings', element: <Settings /> },
+    ]
   },
   {
     path: '*',

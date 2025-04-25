@@ -26,16 +26,27 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url.includes('/auth/refresh-token')
+    ) {
       originalRequest._retry = true;
       try {
-        const refreshResponse = await axiosInstance.post('/auth/refresh-token', {}, { withCredentials: true });
+        // Use a clean Axios instance for the refresh
+        const rawAxios = axios.create({
+          baseURL,
+          withCredentials: true,
+        });
+
+        const refreshResponse = await rawAxios.post('/auth/refresh-token');
         const newAccessToken = refreshResponse.data.accessToken;
 
         const { store } = await import('../app/store');
         store.dispatch(setAccessToken(newAccessToken));
 
-        axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
+        // Set the new token for retry
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
         return axiosInstance(originalRequest);
       } catch (refreshError) {
