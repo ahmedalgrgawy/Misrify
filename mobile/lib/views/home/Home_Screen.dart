@@ -13,7 +13,7 @@ import 'package:graduation_project1/views/home/widgets/Appbar.dart';
 import 'package:graduation_project1/views/home/widgets/SectionHeading.dart';
 import 'package:graduation_project1/views/categories/widgets/category_list.dart';
 import 'package:graduation_project1/views/home/widgets/banner_slider.dart';
-import 'package:graduation_project1/views/home/widgets/search_container.dart';
+import 'package:graduation_project1/views/search/widgets/search_container.dart';
 import 'package:graduation_project1/views/products/widgets/product_list.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -25,6 +25,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final login = Get.put(LoginController());
     final controller = Get.put(CategoryController());
+    final TextEditingController searchController = TextEditingController();
 
     return SafeArea(
       child: Scaffold(
@@ -35,7 +36,9 @@ class HomeScreen extends StatelessWidget {
         ),
         body: ListView(
           children: [
-            const SearchContainer(),
+            SearchContainer(
+              controller: searchController,
+            ),
             const BannerSlider(),
 //category
             SectionHeading(

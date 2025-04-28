@@ -77,7 +77,6 @@ FetchHook useFetchCategories() {
       }
     } catch (e) {
       debugPrint("Exception: $e");
-      error.value = e as Exception;
     } finally {
       isLoading.value = false;
     }
