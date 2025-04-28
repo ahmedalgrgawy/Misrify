@@ -4,13 +4,13 @@ import DashNavbar from "../DashNavbar/DashNavbar";
 
 const DashboardLayout = () => {
     return (
-        <div className="flex min-h-screen">
-            <div className="bg-white shadow h-screen">
+        <div className="flex h-screen overflow-hidden">
+            <div className="bg-white shadow h-full">
                 <Sidebar />
             </div>
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1 h-full overflow-hidden shadow-lg">
                 <DashNavbar />
-                <main className="flex-1 bg-bg-second p-6 overflow-auto">
+                <main className="flex-1 overflow-auto bg-bg-second p-6">
                     <Outlet />
                 </main>
             </div>
