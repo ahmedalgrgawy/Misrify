@@ -1,9 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graduation_project1/common/custom_navbar.dart';
 import 'package:graduation_project1/controllers/tap_index_controller.dart';
-import 'package:graduation_project1/views/cart/widgets/cart_screen.dart';
+import 'package:graduation_project1/views/shop/shop_screen.dart';
 import 'package:graduation_project1/views/home/Home_Screen.dart';
 import 'package:graduation_project1/views/profile/profile_screen.dart';
 import 'package:graduation_project1/views/search/search_screen.dart';
@@ -17,7 +16,7 @@ class MainScreen extends StatelessWidget {
     const HomeScreen(),
     const SearchScreen(),
     const WishlistScreen(),
-    const CartScreen(),
+    const ShopScreen(),
     const ProfileScreen(),
   ];
 

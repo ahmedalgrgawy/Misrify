@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final productsModel = productsModelFromJson(jsonString);
-
 import 'dart:convert';
 
 ProductsModel productsModelFromJson(String str) =>
@@ -19,9 +15,11 @@ class ProductsModel {
   });
 
   factory ProductsModel.fromJson(Map<String, dynamic> json) => ProductsModel(
-        success: json["success"],
-        products: List<Product>.from(
-            json["products"].map((x) => Product.fromJson(x))),
+        success: json["success"] ?? false,
+        products: json["products"] != null
+            ? List<Product>.from(
+                json["products"].map((x) => Product.fromJson(x)))
+            : [],
       );
 
   Map<String, dynamic> toJson() => {
@@ -43,7 +41,7 @@ class Product {
   final bool isDiscounted;
   final int discountAmount;
   final bool isApproved;
-  final List<Review> reviews;
+  final List<String> reviews;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int v;
@@ -68,23 +66,32 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
-        id: json["_id"],
-        name: json["name"],
-        category: Brand.fromJson(json["category"]),
-        brand: Brand.fromJson(json["brand"]),
-        description: json["description"],
-        quantityInStock: json["quantityInStock"],
-        price: json["price"]?.toDouble(),
-        colors: List<String>.from(json["colors"].map((x) => x)),
-        sizes: List<String>.from(json["sizes"].map((x) => x)),
-        isDiscounted: json["isDiscounted"],
-        discountAmount: json["discountAmount"],
-        isApproved: json["isApproved"],
-        reviews:
-            List<Review>.from(json["reviews"].map((x) => Review.fromJson(x))),
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
-        v: json["__v"],
+        id: json["_id"] ?? '',
+        name: json["name"] ?? '',
+        category: json["category"] != null
+            ? Brand.fromJson(json["category"])
+            : Brand.empty(),
+        brand: json["brand"] != null
+            ? Brand.fromJson(json["brand"])
+            : Brand.empty(),
+        description: json["description"] ?? '',
+        quantityInStock: json["quantityInStock"] ?? 0,
+        price: (json["price"] != null ? json["price"].toDouble() : 0.0),
+        colors: json["colors"] != null
+            ? List<String>.from(json["colors"].map((x) => x.toString()))
+            : [],
+        sizes: json["sizes"] != null
+            ? List<String>.from(json["sizes"].map((x) => x.toString()))
+            : [],
+        isDiscounted: json["isDiscounted"] ?? false,
+        discountAmount: json["discountAmount"] ?? 0,
+        isApproved: json["isApproved"] ?? false,
+        reviews: json["reviews"] != null
+            ? List<String>.from(json["reviews"].map((x) => x.toString()))
+            : [],
+        createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
+        v: json["__v"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -100,7 +107,7 @@ class Product {
         "isDiscounted": isDiscounted,
         "discountAmount": discountAmount,
         "isApproved": isApproved,
-        "reviews": List<dynamic>.from(reviews.map((x) => x.toJson())),
+        "reviews": List<dynamic>.from(reviews.map((x) => x)),
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
@@ -127,13 +134,23 @@ class Brand {
   });
 
   factory Brand.fromJson(Map<String, dynamic> json) => Brand(
-        id: json["_id"],
-        name: json["name"],
+        id: json["_id"] ?? '',
+        name: json["name"] ?? '',
         owner: json["owner"],
         description: json["description"],
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
-        v: json["__v"],
+        createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
+        v: json["__v"] ?? 0,
+      );
+
+  factory Brand.empty() => Brand(
+        id: '',
+        name: '',
+        owner: '',
+        description: '',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        v: 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -169,14 +186,16 @@ class Review {
   });
 
   factory Review.fromJson(Map<String, dynamic> json) => Review(
-        id: json["_id"],
-        user: json["user"],
-        rating: json["rating"],
-        reviewText: json["reviewText"],
-        comments: List<dynamic>.from(json["comments"].map((x) => x)),
-        createdAt: DateTime.parse(json["createdAt"]),
-        updatedAt: DateTime.parse(json["updatedAt"]),
-        v: json["__v"],
+        id: json["_id"] ?? '',
+        user: json["user"] ?? '',
+        rating: json["rating"] ?? 0,
+        reviewText: json["reviewText"] ?? '',
+        comments: json["comments"] != null
+            ? List<dynamic>.from(json["comments"].map((x) => x))
+            : [],
+        createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
+        updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
+        v: json["__v"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {

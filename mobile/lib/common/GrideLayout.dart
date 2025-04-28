@@ -2,25 +2,40 @@ import 'package:flutter/material.dart';
 
 class GrideLayout extends StatelessWidget {
   final int itemCount;
+  final int crossAxiscount;
   final double? mainAxis;
+  final double crossAxisspacing;
+  final bool shrinkwrap;
+  final double mainAxisspacing;
   final Widget? Function(BuildContext, int) itemBuilder;
-  const GrideLayout(
-      {super.key,
-      this.itemCount = 4,
-      required this.itemBuilder,
-      this.mainAxis = 205});
+  final Axis scrooldirection;
+  final ScrollPhysics? physics; // NEW
+
+  const GrideLayout({
+    super.key,
+    this.shrinkwrap = true,
+    this.itemCount = 4,
+    required this.itemBuilder,
+    this.mainAxis = 205,
+    this.scrooldirection = Axis.horizontal,
+    this.crossAxiscount = 1,
+    this.crossAxisspacing = 0,
+    this.mainAxisspacing = 0,
+    this.physics, // NEW
+  });
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
       itemCount: itemCount,
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
+      shrinkWrap: shrinkwrap,
+      scrollDirection: scrooldirection,
+      physics: physics, // 🔥 ADD THIS
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 1,
+        crossAxisCount: crossAxiscount,
         mainAxisExtent: mainAxis,
-        crossAxisSpacing: 20,
-        //mainAxisSpacing: 20
+        crossAxisSpacing: crossAxisspacing,
+        mainAxisSpacing: mainAxisspacing,
       ),
       itemBuilder: itemBuilder,
     );

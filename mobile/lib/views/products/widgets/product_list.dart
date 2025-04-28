@@ -9,7 +9,8 @@ import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 
 class ProductList extends HookWidget {
-  const ProductList({super.key});
+  const ProductList({super.key, this.isAll = false});
+  final bool isAll;
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +24,8 @@ class ProductList extends HookWidget {
       child: isLoading
           ? const NearbyShimmer()
           : GrideLayout(
+              crossAxisspacing: 20,
+              scrooldirection: Axis.horizontal,
               itemCount: products.length < 4 ? products.length : 4,
               itemBuilder: (context, i) {
                 final product = products[i];
@@ -35,6 +38,7 @@ class ProductList extends HookWidget {
                   brand: product.brand.name,
                   price: product.price.toStringAsFixed(2),
                   title: product.name,
+
                   // image: product.colors.isNotEmpty
                   //     ? product.colors.first
                   //     : 'https://via.placeholder.com/150',
