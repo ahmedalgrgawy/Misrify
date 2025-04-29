@@ -17,34 +17,28 @@ const Footer = () => {
           <div className=" w-full mb-8 lg:mb-0 lg:w-2/6">
             <h2 className={[style.logoText]}>MISRIFY</h2>
             <p>
-              Welcome to Paradise Tours Egypt, your ultimate destination for all
-              your travel needs in Egypt! We specialize in guided day tours,
-              holiday packages, airport transfers, hotel reservations, and
-              layover tours.
+              Welcome to MISRIFY , your Favourate Website to get Egyption local
+              Brands ! you can start as merchant to sell your local products here ,
+              Also we provide these products to all the egyptians then to all over the world .
             </p>
           </div>
 
           <div className="w-full md:w-2/6 mb-8 lg:mb-0 lg:w-1/6">
-            <h6 className="font-bold">COMPANY</h6>
+            <h6 className="font-bold">Pages</h6>
             <ul>
+              <li className="my-3 ">
+                <Link className="hover:text-dark-grey" to={"/"}>
+                  Home
+                </Link>
+              </li>
               <li className="my-3">
                 <Link className="hover:text-dark-grey" to={"/aboutus"}>
                   About Us
                 </Link>
               </li>
               <li className="mb-3 ">
-                <Link className="hover:text-dark-grey" to={""}>
-                  Legal Information
-                </Link>
-              </li>
-              <li className="mb-3 ">
-                <Link className="hover:text-dark-grey" to={"/Contactus"}>
+                <Link className="hover:text-dark-grey" to={"/contact"}>
                   Contact Us
-                </Link>
-              </li>
-              <li className="mb-3 ">
-                <Link className="hover:text-dark-grey" to={""}>
-                  Blogs
                 </Link>
               </li>
             </ul>
@@ -60,22 +54,11 @@ const Footer = () => {
               </li>
               <li className="mb-3">
                 <Link className=" hover:text-dark-grey" to={""}>
-                  Login / Register
+                  Login
                 </Link>
-              </li>
-              <li className="mb-3">
+                <span> / </span>
                 <Link className=" hover:text-dark-grey" to={""}>
-                  Cart
-                </Link>
-              </li>
-              <li className="mb-3">
-                <Link className=" hover:text-dark-grey" to={""}>
-                  Wishlist
-                </Link>
-              </li>
-              <li className="mb-3">
-                <Link className=" hover:text-dark-grey" to={""}>
-                  Shop
+                  Register
                 </Link>
               </li>
             </ul>
