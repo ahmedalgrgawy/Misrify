@@ -22,7 +22,7 @@ class CustomNavBar extends StatelessWidget {
     _NavItemData("assets/icons/search.png", "Search"),
     _NavItemData("assets/icons/Heart.png", "Wishlist"),
     _NavItemData("assets/icons/Frame.png", "Shop"),
-    _NavItemData("assets/icons/user.png", "Profile"),
+    _NavItemData("assets/icons/Frame.png", "Cart"),
   ];
 
   @override

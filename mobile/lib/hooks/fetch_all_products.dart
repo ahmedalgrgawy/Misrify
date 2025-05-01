@@ -37,7 +37,7 @@ FetchHook useFetchAllProducts() {
     return null;
   }, []);
 
-  void refetch() {
+  Future<void> refetch() async {
     isLoading.value = true;
     fetchData();
   }
