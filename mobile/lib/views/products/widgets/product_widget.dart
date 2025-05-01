@@ -1,10 +1,13 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
+import 'package:graduation_project1/controllers/wishlist_controller.dart';
 
 class ProductWidget extends StatelessWidget {
   ProductWidget(
@@ -13,15 +16,21 @@ class ProductWidget extends StatelessWidget {
       required this.brand,
       required this.price,
       this.onTap,
-      required this.title});
+      required this.title,
+      required this.id});
   final String? image;
   final String title;
   final String brand;
   final String price;
+  final RxBool isSelected = false.obs;
+
+  final String id;
   void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.put(WishlistController());
+
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -59,13 +68,20 @@ class ProductWidget extends StatelessWidget {
                         radius: 12.r,
                         backgroundColor: Kblack,
                         child: Center(
-                          child: InkWell(
-                            child: const Icon(
-                              Icons.favorite_outline,
-                              color: Colors.white,
-                              size: 16,
+                          child: Obx(
+                            () => InkWell(
+                              child: Icon(
+                                isSelected.value
+                                    ? CupertinoIcons.heart_fill
+                                    : CupertinoIcons.heart,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              onTap: () {
+                                isSelected.toggle();
+                                controller.addAndRemoveWishList(id);
+                              },
                             ),
-                            onTap: () {},
                           ),
                         ),
                       ),

@@ -38,7 +38,7 @@ class ProductList extends HookWidget {
                   brand: product.brand.name,
                   price: product.price.toStringAsFixed(2),
                   title: product.name,
-
+                  id: product.id,
                   // image: product.colors.isNotEmpty
                   //     ? product.colors.first
                   //     : 'https://via.placeholder.com/150',
