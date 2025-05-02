@@ -1,8 +1,4 @@
-// To parse this JSON data, do
-//
-//     final wishlistResponse = wishlistResponseFromJson(jsonString);
-
-import 'package:meta/meta.dart';
+// Final version that handles brand as either ID or object
 import 'dart:convert';
 
 WishlistResponse wishlistResponseFromJson(String str) =>
@@ -53,7 +49,8 @@ class Wishlist {
         id: json["_id"],
         user: json["user"],
         wishlistItems: List<WishlistItem>.from(
-            json["wishlistItems"].map((x) => WishlistItem.fromJson(x))),
+          json["wishlistItems"].map((x) => WishlistItem.fromJson(x)),
+        ),
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
@@ -74,7 +71,7 @@ class WishlistItem {
   final String id;
   final String name;
   final String category;
-  final String brand;
+  final Brand brand;
   final String description;
   final int quantityInStock;
   final double price;
@@ -111,10 +108,12 @@ class WishlistItem {
         id: json["_id"],
         name: json["name"],
         category: json["category"],
-        brand: json["brand"],
+        brand: json["brand"] is Map<String, dynamic>
+            ? Brand.fromJson(json["brand"])
+            : Brand(id: json["brand"], name: "Unknown"),
         description: json["description"],
         quantityInStock: json["quantityInStock"],
-        price: json["price"]?.toDouble(),
+        price: (json["price"] ?? 0).toDouble(),
         colors: List<String>.from(json["colors"].map((x) => x)),
         sizes: List<String>.from(json["sizes"].map((x) => x)),
         isDiscounted: json["isDiscounted"],
@@ -130,7 +129,7 @@ class WishlistItem {
         "_id": id,
         "name": name,
         "category": category,
-        "brand": brand,
+        "brand": brand.toJson(),
         "description": description,
         "quantityInStock": quantityInStock,
         "price": price,
@@ -143,5 +142,22 @@ class WishlistItem {
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
+      };
+}
+
+class Brand {
+  final String id;
+  final String name;
+
+  Brand({required this.id, required this.name});
+
+  factory Brand.fromJson(Map<String, dynamic> json) => Brand(
+        id: json["_id"] ?? '',
+        name: json["name"] ?? 'Unknown',
+      );
+
+  Map<String, dynamic> toJson() => {
+        "_id": id,
+        "name": name,
       };
 }

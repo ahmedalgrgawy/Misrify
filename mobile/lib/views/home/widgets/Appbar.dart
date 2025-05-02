@@ -29,7 +29,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Container(
       height: height,
-      color: kLightWhite,
+      color: Kbackground,
       padding: padd,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

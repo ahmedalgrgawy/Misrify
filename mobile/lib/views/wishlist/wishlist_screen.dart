@@ -108,7 +108,6 @@ class WishlistScreen extends HookWidget {
                           itemBuilder: (context, i) {
                             final wishlist = wishlistProducts.value[i];
                             return WishlistTile(
-                              color: kLightWhite,
                               wishlist: wishlist,
                               refetch: () async {
                                 if (refetch != null) await refetch();

@@ -1,4 +1,3 @@
-// wishlist_controller.dart
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,9 +14,12 @@ class WishlistController extends GetxController {
   bool get isLoading => _isLoading.value;
   set setLoading(bool value) => _isLoading.value = value;
 
-  Future<bool> _refreshToken() async {
+  Future<void> refreshTokenAndRetry(String productId) async {
     final refreshToken = box.read('refreshToken');
-    if (refreshToken == null) return false;
+    if (refreshToken == null) {
+      Get.offAll(() => const LoginScreen());
+      return;
+    }
 
     final refreshUrl = Uri.parse('$appBaseUrl/auth/refresh-token');
     final refreshResponse = await http.post(
@@ -35,11 +37,14 @@ class WishlistController extends GetxController {
         if (match != null) {
           final newToken = match.group(1);
           box.write('token', newToken);
-          return true;
+          await addAndRemoveWishList(productId, isRetrying: true); // retry
+          return;
         }
       }
     }
-    return false;
+
+    // If refresh fails
+    Get.offAll(() => const LoginScreen());
   }
 
   Future<void> addAndRemoveWishList(String productId,
@@ -68,13 +73,7 @@ class WishlistController extends GetxController {
           icon: const Icon(Icons.check_circle_outline, color: kLightWhite),
         );
       } else if (response.statusCode == 401 && !isRetrying) {
-        final refreshed = await _refreshToken();
-        if (refreshed) {
-          await addAndRemoveWishList(productId, isRetrying: true);
-          return;
-        } else {
-          Get.offAll(() => const LoginScreen());
-        }
+        await refreshTokenAndRetry(productId);
       } else {
         final error = apiErrorFromJson(response.body);
         Get.snackbar(

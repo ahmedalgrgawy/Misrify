@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-              scaffoldBackgroundColor: kLightWhite,
+              scaffoldBackgroundColor: Kbackground,
               iconTheme: const IconThemeData(color: kLightWhite),
               primarySwatch: Colors.grey),
           home: const Scaffold(
