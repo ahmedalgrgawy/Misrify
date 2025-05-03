@@ -21,18 +21,9 @@ const DashNavbar = () => {
             )}
             <div className="w-full bg-white shadow-lg">
                 <nav className="h-16 flex justify-between items-center px-5 lg:px-10">
-                    <div className="flex items-center flex-grow">
-                        <label htmlFor="search" className="sr-only">Search</label>
-                        <input
-                            id="search"
-                            type="search"
-                            className="hidden md:block bg-bg-main px-4 py-2 rounded-md border border-light-grey focus:outline-none focus:ring-2 
-                            focus:ring-second-grey hover:shadow transition ease-in-out duration-300"
-                            placeholder="Type to search..."
-                        />
-                    </div>
+                    <div className="flex-grow" />
                     {user && (
-                        <div className="flex items-center">
+                        <div className="flex justify-end items-center">
                             <div className="flex flex-col justify-center items-end">
                                 <span className="text-lg font-bold text-main-blue">{user.name}</span>
                                 <span className="text-base capitalize text-second-grey">{user.role}</span>

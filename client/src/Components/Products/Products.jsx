@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 
 const Products = () => {
   const dispatch = useDispatch();
-  const { products, Loading } = useSelector((state) => state.products);
+  const { products, loading } = useSelector((state) => state.products);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
@@ -16,12 +16,12 @@ const Products = () => {
     setProductToDelete(productId);
     setShowDeleteModal(true);
   };
-  // Handle the cancellation of the delete action
+
   const handleCancelDelete = () => {
     setShowDeleteModal(false);
     setProductToDelete(null);
   };
-  // Handle the confirmation of the delete action
+
   const handleConfirmDelete = () => {
     dispatch(deleteProduct(productToDelete))
       .then(() => {
@@ -29,7 +29,7 @@ const Products = () => {
         setProductToDelete(null);
       })
       .catch((error) => {
-        console.error("Error deleting user:", error);
+        console.error("Error deleting product:", error);
       });
   };
 
@@ -37,7 +37,7 @@ const Products = () => {
     dispatch(getAllProducts());
   }, [dispatch]);
 
-  if (Loading) {
+  if (loading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
         <TailSpin color="#2B3D5B" height={100} width={100} />
@@ -52,17 +52,11 @@ const Products = () => {
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h3 className="text-3xl font-bold text-title-blue">Products</h3>
         <div>
-          <Link
-            to="/dashboard"
-            className="text-lg font-semibold text-dark-grey"
-          >
+          <Link to="/dashboard" className="text-lg font-semibold text-dark-grey">
             Dashboard
           </Link>
           <span className="mx-2 font-semi text-dark-grey">/</span>
-          <Link
-            to="/products"
-            className="text-lg font-semibold text-title-blue"
-          >
+          <Link to="/dashboard/products" className="text-lg font-semibold text-title-blue">
             Products
           </Link>
         </div>
@@ -84,18 +78,15 @@ const Products = () => {
           <tbody>
             {arrProducts.length > 0 ? (
               arrProducts.map((product, index) => (
-                <tr
-                  key={product.id || index}
-                  className={index % 2 !== 0 ? "bg-[#F9F9FF]" : ""}
-                >
+                <tr key={product.id || index} className={index % 2 !== 0 ? "bg-[#F9F9FF]" : ""}>
                   <td className="py-4 px-6 flex justify-center">
-                    <img src={""} alt="" className="w-16 h-16 rounded-xl" />
+                    <img src={product.image || ""} alt={product.name} className="w-16 h-16 rounded-xl" />
                   </td>
                   <td className="py-4 px-6 text-main-blue text-center">
                     {product.name}
                   </td>
                   <td className="py-4 px-6 text-main-blue text-center">
-                    {product.category.name}
+                    {product.category ? product.category.name : "N/A"}
                   </td>
                   <td className="py-4 px-6 text-main-blue text-center">
                     {product.price}
@@ -103,16 +94,21 @@ const Products = () => {
                   <td className="py-4 px-6 text-main-blue text-center">
                     {product.quantityInStock}
                   </td>
-
                   <td>
                     <div className="py-4 px-6 flex justify-evenly items-center">
-                      {product.colors > 0 ? (
-                        product.colors.map((color, index) => {
+                      {product.colors && product.colors.length > 0 ? (
+                        product.colors.map((color, index) => (
                           <span
                             key={index}
-                            className={`w-5 h-5 rounded-full bg-${color}-500 transition duration-300 transform hover:scale-125`}
-                          ></span>;
-                        })
+                            className={`w-5 h-5 rounded-full ${color === 'red' ? 'bg-red-500' :
+                              color === 'green' ? 'bg-green-500' :
+                                color === 'blue' ? 'bg-blue-500' :
+                                  color === 'Navy' ? 'bg-indigo-900' :
+                                    color === 'Teal' ? 'bg-teal-500' :
+                                      color === 'Orange' ? 'bg-orange-500' :
+                                        'bg-gray-500'} transition duration-300 transform hover:scale-125`}
+                          ></span>
+                        ))
                       ) : (
                         <span className="py-4 px-6 text-main-blue text-center">
                           No colors provided
@@ -124,7 +120,7 @@ const Products = () => {
                     <div className="py-4 px-6 text-center space-x-4 flex justify-center items-center">
                       <Link
                         to={`/admin/edit-product/${product._id}`}
-                        className="text-blue-500 hover:text-blue-600 transition duration-300 transform hover:scale-110"
+                        className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110"
                       >
                         <FaEdit />
                       </Link>
