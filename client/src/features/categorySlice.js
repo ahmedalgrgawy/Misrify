@@ -14,16 +14,13 @@ export const getAllCategories = createAsyncThunk(
   }
 );
 
-// create Category  (Need to test)
+// create Category
 export const createCategory = createAsyncThunk(
   "categories/createCategory",
   async (newCategory, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post(
-        `admin/create-category`,
-        newCategory
-      );
-      return response.data; // okay ? 
+      const response = await axiosInstance.post(`admin/create-category`, newCategory);
+      return response.data.newCategory; 
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -89,9 +86,9 @@ const CategorySlice = createSlice({
         state.error = null;
       })
       .addCase(createCategory.fulfilled, (state, action) => {
-        state.categoryLoading = false;
-        state.categories = action.payload;
-      })
+       state.categoryLoading = false;
+       state.categories.push(action.payload);
+       })
       .addCase(createCategory.rejected, (state, action) => {
         state.categoryLoading = false;
         state.error = action.payload;
@@ -118,7 +115,6 @@ const CategorySlice = createSlice({
       })
       .addCase(editCategory.fulfilled, (state, action) => {
         state.categoryLoading = false;
-        // Update the category in the state
         const updatedCategory = action.payload;
         state.categories = state.categories.map((category) =>
           category._id === updatedCategory._id ? updatedCategory : category

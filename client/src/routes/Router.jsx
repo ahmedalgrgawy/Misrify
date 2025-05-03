@@ -16,6 +16,8 @@ import DashboardLayout from '../Components/DashboardLayout/DashboardLayout';
 import Users from '../Components/Users/Users';
 import Products from '../Components/Products/Products';
 import Categories from '../Components/Categories/Categories';
+import Merchants from '../Components/Merchants/Merchants';
+import Support from '../Components/Support/Support';
 
 const router = createBrowserRouter([
   {
@@ -40,9 +42,10 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Dashboard /> },
       { path: 'users', element: <Users /> },
+      { path: 'merchants', element: <Merchants /> },
       { path: 'products', element: <Products /> },
       { path: 'categories', element: <Categories /> },
-      // { path: 'support', element: <Support /> },
+      { path: 'support', element: <Support /> },
       // { path: 'settings', element: <Settings /> },
     ]
   },

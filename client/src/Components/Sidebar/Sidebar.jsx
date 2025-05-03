@@ -42,6 +42,15 @@ const Sidebar = () => {
                         <span className="text-sm font-medium">Products</span>
                     </NavLink>
                     <NavLink
+                        to="categories"
+                        className={({ isActive }) => `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition
+                         ${isActive ? "bg-title-blue text-white" : "text-title-blue hover:bg-bg-second"}`
+                        }
+                    >
+                        <FaClipboardList className="text-xl" />
+                        <span className="text-sm font-medium">Categories</span>
+                    </NavLink>
+                    <NavLink
                         to="users"
                         className={({ isActive }) => `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition 
                         ${isActive ? "bg-title-blue text-white" : "text-title-blue hover:bg-bg-second"}`
@@ -51,22 +60,22 @@ const Sidebar = () => {
                         <span className="text-sm font-medium">Users</span>
                     </NavLink>
                     <NavLink
+                        to="merchants"
+                        className={({ isActive }) => `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition 
+                        ${isActive ? "bg-title-blue text-white" : "text-title-blue hover:bg-bg-second"}`
+                        }
+                    >
+                        <FaUsers className="text-xl" />
+                        <span className="text-sm font-medium">Merchants</span>
+                    </NavLink>
+                    <NavLink
                         to="support"
                         className={({ isActive }) => `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition 
                         ${isActive ? "bg-title-blue text-white" : "text-title-blue hover:bg-bg-second"}`
                         }
                     >
                         <FaHeadset className="text-xl" />
-                        <span className="text-sm font-medium">Support</span>
-                    </NavLink>
-                    <NavLink
-                        to="categories"
-                        className={({ isActive }) => `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition
-                         ${isActive ? "bg-title-blue text-white" : "text-title-blue hover:bg-bg-second"}`
-                        }
-                    >
-                        <FaClipboardList className="text-xl" />
-                        <span className="text-sm font-medium">Categories</span>
+                        <span className="text-sm font-medium">Help & Support</span>
                     </NavLink>
                 </nav>
             </div>
