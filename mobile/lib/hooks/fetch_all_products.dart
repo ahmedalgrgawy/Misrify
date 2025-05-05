@@ -6,46 +6,70 @@ import 'package:graduation_project1/models/hook_result.dart';
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:http/http.dart' as http;
 
-FetchHook useFetchAllProducts() {
-  final products = useState<List<Product>?>(null);
-  final isLoading = useState<bool>(false);
-  final error = useState<Exception?>(null);
-  final apiError = useState<ApiError?>(null);
+import 'generic_fetch_hook.dart'; // 🔁 new utility import
 
-  Future<void> fetchData() async {
-    isLoading.value = true;
-    try {
-      Uri url = Uri.parse('$appBaseUrl/user/products');
+// 🔁 Hook 1: All Products
+FetchHook useFetchAllProducts() {
+  return useGenericFetch<Product>(
+    onFetch: () async {
+      final url = Uri.parse('$appBaseUrl/user/products');
       final response = await http.get(url);
+      debugPrint('fetch all: ${response.statusCode}');
 
       if (response.statusCode == 200) {
-        final parsedModel = productsModelFromJson(response.body);
-        products.value = parsedModel.products;
+        return productsModelFromJson(response.body).products;
       } else {
-        apiError.value = apiErrorFromJson(response.body);
+        throw apiErrorFromJson(response.body);
       }
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      isLoading.value = false;
-    }
-  }
+    },
+  );
+}
 
-  useEffect(() {
-    Future.delayed(const Duration(seconds: 3));
-    fetchData();
-    return null;
-  }, []);
+// 🔁 Hook 2: New Arrivals
+FetchHook useFetchNewArrivals() {
+  return useGenericFetch<Product>(
+    onFetch: () async {
+      final url = Uri.parse('$appBaseUrl/user/products');
+      final response = await http.get(url);
+      debugPrint('fetch new: ${response.statusCode}');
 
-  Future<void> refetch() async {
-    isLoading.value = true;
-    fetchData();
-  }
+      if (response.statusCode == 200) {
+        final now = DateTime.now();
+        final products = productsModelFromJson(response.body).products;
 
-  return FetchHook(
-    data: products.value,
-    isLoading: isLoading.value,
-    error: error.value,
-    refetch: refetch,
+        for (var p in products) {
+          debugPrint('Product: ${p.name}, createdAt: ${p.createdAt}');
+        }
+
+        return products
+            .where((p) => now.difference(p.createdAt).inDays <= 365)
+            .toList()
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      } else {
+        throw apiErrorFromJson(response.body);
+      }
+    },
+  );
+}
+
+// 🔁 Hook 3: Discounted Products
+FetchHook useFetchDiscountedProducts() {
+  return useGenericFetch<Product>(
+    onFetch: () async {
+      final url = Uri.parse('$appBaseUrl/user/products');
+      final response = await http.get(url);
+      debugPrint('fetch discount: ${response.statusCode}');
+
+      if (response.statusCode == 200) {
+        final products = productsModelFromJson(response.body).products;
+
+        return products
+            .where((p) => p.isDiscounted && p.discountAmount > 0)
+            .toList()
+          ..sort((a, b) => b.discountAmount.compareTo(a.discountAmount));
+      } else {
+        throw apiErrorFromJson(response.body);
+      }
+    },
   );
 }
