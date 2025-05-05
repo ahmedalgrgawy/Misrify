@@ -1,92 +1,130 @@
-import { useState } from 'react';
-import { FaShoppingCart, FaBars, FaRegUserCircle } from 'react-icons/fa';
+import { memo, useState } from 'react';
+import { FaBars, FaRegUserCircle } from 'react-icons/fa';
+import { IoNotifications } from "react-icons/io5";
 import { AiOutlineClose } from 'react-icons/ai';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { PiSignOutBold } from "react-icons/pi";
 import { useDispatch, useSelector } from 'react-redux';
 import logo from '../../assets/logo.png';
-import { logout } from '../../features/authSlice';
+import { logoutUser } from '../../features/authSlice';
 
-const Navbar = () => {
+const Navbar = memo(() => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isMenuOpen, setMenuOpen] = useState(false);
     const { isAuthenticated } = useSelector(state => state.auth);
-
     const handleToggle = () => setMenuOpen(!isMenuOpen);
     const handleClose = () => setMenuOpen(false);
 
     const handleLogout = () => {
-        dispatch(logout());
+        dispatch(logoutUser());
+        navigate('/login');
     };
 
     const menuItems = isAuthenticated
         ? [
-            { name: "Home", path: "/" },
-            { name: "About", path: "/aboutus" },
-            { name: "Dashboard", path: "/dashboard" },
-            { name: "Analytics", path: "/analytics" },
+            { name: 'Home', path: '/' },
+            { name: 'About', path: '/aboutus' },
+            { name: 'Dashboard', path: '/dashboard' },
+            { name: 'Analytics', path: '/analytics' },
+            { name: 'Contact Us', path: '/contact' }
         ]
         : [
-            { name: "Home", path: "/" },
-            { name: "About", path: "/aboutus" },
-            { name: "Contact Us", path: "/contact" },
+            { name: 'Home', path: '/' },
+            { name: 'About', path: '/aboutus' },
+            { name: 'Contact Us', path: '/contact' }
         ];
 
     return (
         <div className="fixed top-0 left-0 w-full bg-white shadow-lg z-50">
-            <nav className="h-16 flex justify-between items-center px-5 py-4">
+            {isMenuOpen && (
+                <div
+                    onClick={handleClose}
+                    className="fixed inset-0 bg-dark-blue bg-opacity-50 z-40 md:hidden"
+                />
+            )}
+            <nav className="h-16 flex justify-between items-center px-5 lg:px-10">
                 <NavLink to="/" className="text-2xl font-bold text-title-blue">
-                    <img src={logo} className="h-6" alt="Logo" />
+                    <img src={logo} className="h-6 inline-block" alt="Logo" />
                 </NavLink>
 
-                <div className={`fixed top-0 right-0 h-full bg-bg-main p-16 duration-700 ease-in-out ${isMenuOpen ? 'top-0' : '-top-full'} md:static md:flex md:p-0 md:bg-transparent`}>
-                    <ul className="flex flex-col md:flex-row md:gap-x-6 text-center bg-transparent">
+                {/* Mobile */}
+                <div className={`fixed top-0 right-0 h-full w-64 bg-bg-main z-50 transition-transform duration-300 ease-in-out transform
+                 md:hidden ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                    <ul className="flex flex-col p-4 space-y-4">
                         {menuItems.map((item, index) => (
-                            <li key={index} className="uppercase font-semibold text-[17px] py-2">
-                                <NavLink to={item.path} className={({ isActive }) =>
-                                    isActive
-                                        ? "text-dark-grey"
-                                        : "text-main-blue hover:text-dark-blue transition-colors duration-500 relative after:block after:content-[''] after:border-b-2 after:border-dark-blue after:scale-x-0 after:transition-transform after:duration-300 hover:after:scale-x-100"}>
+                            <li key={index} className="uppercase font-semibold text-lg">
+                                <NavLink
+                                    to={item.path}
+                                    onClick={handleClose}
+                                    className={({ isActive }) =>
+                                        isActive
+                                            ? "text-dark-grey"
+                                            : "text-main-blue hover:text-dark-blue font-semibold uppercase relative after:content-['']: after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-dark-blue after:transition-all after:duration-300 after:scale-x-0 hover:after:scale-x-100"
+                                    }
+                                >
                                     {item.name}
                                 </NavLink>
                             </li>
                         ))}
                     </ul>
-                    <div className="absolute top-5 right-6 cursor-pointer text-main-blue text-2xl md:hidden" onClick={handleClose}>
-                        <AiOutlineClose />
+                    <div className="absolute top-4 right-4 cursor-pointer" onClick={handleClose}>
+                        <AiOutlineClose className="text-title-blue text-2xl" />
                     </div>
+                </div>
+
+                {/* Desktop */}
+                <div className="hidden md:flex items-center gap-x-6">
+                    {menuItems.map((item, index) => (
+                        <NavLink
+                            key={index}
+                            to={item.path}
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "text-dark-grey font-semibold uppercase"
+                                    : "text-main-blue hover:text-dark-blue font-semibold uppercase relative after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-full after:h-[2px] after:bg-dark-blue after:transition-all after:duration-300 after:scale-x-0 hover:after:scale-x-100"
+                            }
+                        >
+                            {item.name}
+                        </NavLink>
+                    ))}
                 </div>
 
                 <div className="flex items-center gap-x-6">
                     {isAuthenticated ? (
                         <>
-                            <NavLink to="/cart" className="transition-opacity duration-500 opacity-100 hover:opacity-80">
-                                <FaShoppingCart className="text-main-blue text-[22px] cursor-pointer" />
+                            <NavLink to="/cart" className="hover:opacity-80 transition-opacity duration-500">
+                                <IoNotifications className="text-main-blue text-xl cursor-pointer" />
                             </NavLink>
-                            <NavLink to="/profile" className="transition-opacity duration-500 opacity-100 hover:opacity-80">
-                                <FaRegUserCircle className="text-main-blue text-[22px] cursor-pointer" />
+                            <NavLink to="/profile" className="hover:opacity-80 transition-opacity duration-500">
+                                <FaRegUserCircle className="text-main-blue text-xl cursor-pointer" />
                             </NavLink>
-                            <button onClick={handleLogout} className="text-red-600 hover:text-red-800 transition-opacity duration-500 opacity-100">
-                                <PiSignOutBold className="text-[22px]" />
+                            <button
+                                onClick={handleLogout}
+                                className="text-red-600 hover:text-red-800 transition-opacity duration-500"
+                            >
+                                <PiSignOutBold className="text-xl" />
                             </button>
                         </>
                     ) : (
-                        <div className="flex gap-x-4 transition-opacity duration-500 opacity-100">
-                            <NavLink to="/signup" className="bg-main-blue text-white px-4 py-1 rounded-xl hover:bg-dark-blue transition duration-400 ease-in">
+                        <div className="flex gap-x-4">
+                            <NavLink to="/signup" className="bg-main-blue hover:bg-title-blue text-white transition duration-400 ease-in px-4 py-1 rounded-xl
+                             font-semibold sm:px-2 sm:py-1 sm:text-sm sm:font-medium">
                                 Sign Up
                             </NavLink>
-                            <NavLink to="/login" className="border-2 border-main-blue text-main-blue px-4 py-1 rounded-xl font-semibold bg-bg-white hover:bg-main-blue hover:text-white transition duration-400 ease-in">
+                            <NavLink to="/login" className="bg-bg-main text-main-blue hover:bg-main-blue hover:text-white transition duration-400 ease-in px-4 py-1
+                             rounded-xl font-semibold sm:px-2 sm:py-1 sm:text-sm sm:font-medium">
                                 Login
                             </NavLink>
                         </div>
                     )}
-                    <div onClick={handleToggle} className="cursor-pointer text-main-blue text-[22px] md:hidden">
+                    <div onClick={handleToggle} className="cursor-pointer text-main-blue text-xl md:hidden">
                         <FaBars />
                     </div>
                 </div>
             </nav>
         </div>
     );
-};
+});
 
 export default Navbar;
