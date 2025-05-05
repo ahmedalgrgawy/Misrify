@@ -5,16 +5,24 @@ import 'package:get/get.dart';
 import 'package:graduation_project1/common/GrideLayout.dart';
 import 'package:graduation_project1/common/shimmers/nearby_shimmer.dart';
 import 'package:graduation_project1/hooks/fetch_all_products.dart';
+import 'package:graduation_project1/models/hook_result.dart';
 import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 
 class ProductList extends HookWidget {
-  const ProductList({super.key, this.isAll = false});
+  const ProductList({
+    super.key,
+    this.isAll = false,
+    this.scrooldirection = Axis.horizontal,
+    required this.hookresults,
+  });
   final bool isAll;
+  final FetchHook hookresults;
+  final Axis scrooldirection;
 
   @override
   Widget build(BuildContext context) {
-    final hookResult = useFetchAllProducts();
+    final hookResult = hookresults;
     final products = hookResult.data;
     final isLoading = hookResult.isLoading;
 
@@ -25,7 +33,7 @@ class ProductList extends HookWidget {
           ? const NearbyShimmer()
           : GrideLayout(
               crossAxisspacing: 20,
-              scrooldirection: Axis.horizontal,
+              scrooldirection: scrooldirection,
               itemCount: products.length < 4 ? products.length : 4,
               itemBuilder: (context, i) {
                 final product = products[i];

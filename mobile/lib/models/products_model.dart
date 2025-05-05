@@ -89,7 +89,7 @@ class Product {
         reviews: json["reviews"] != null
             ? List<String>.from(json["reviews"].map((x) => x.toString()))
             : [],
-        createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
+        createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime(2000),
         updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
         v: json["__v"] ?? 0,
       );
