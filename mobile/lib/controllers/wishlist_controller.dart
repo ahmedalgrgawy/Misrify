@@ -9,10 +9,39 @@ import 'package:http/http.dart' as http;
 
 class WishlistController extends GetxController {
   final box = GetStorage();
+
   RxBool _isLoading = false.obs;
+  RxSet<String> wishlistIds = <String>{}.obs;
 
   bool get isLoading => _isLoading.value;
   set setLoading(bool value) => _isLoading.value = value;
+
+  bool isInWishlist(String productId) => wishlistIds.contains(productId);
+
+  @override
+  void onInit() {
+    super.onInit();
+    final storedIds = box.read<List>('wishlistIds');
+    if (storedIds != null) {
+      wishlistIds.addAll(List<String>.from(storedIds));
+    }
+  }
+
+  void _updateLocalWishlist(String productId) {
+    if (wishlistIds.contains(productId)) {
+      wishlistIds.remove(productId);
+    } else {
+      wishlistIds.add(productId);
+    }
+    box.write('wishlistIds', wishlistIds.toList());
+    wishlistIds.refresh();
+  }
+
+  void clearWishlist() {
+    wishlistIds.clear();
+    box.write('wishlistIds', []);
+    wishlistIds.refresh();
+  }
 
   Future<void> refreshTokenAndRetry(String productId) async {
     final refreshToken = box.read('refreshToken');
@@ -37,13 +66,12 @@ class WishlistController extends GetxController {
         if (match != null) {
           final newToken = match.group(1);
           box.write('token', newToken);
-          await addAndRemoveWishList(productId, isRetrying: true); // retry
+          await addAndRemoveWishList(productId, isRetrying: true);
           return;
         }
       }
     }
 
-    // If refresh fails
     Get.offAll(() => const LoginScreen());
   }
 
@@ -65,6 +93,7 @@ class WishlistController extends GetxController {
 
       if (response.statusCode == 200) {
         final resData = jsonDecode(response.body);
+        _updateLocalWishlist(productId);
         Get.snackbar(
           'Wishlist Updated',
           resData['message'] ?? 'Updated successfully',

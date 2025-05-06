@@ -10,7 +10,6 @@ import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/controllers/wishlist_controller.dart';
 import 'package:graduation_project1/hooks/fetch_all_brands.dart';
 import 'package:graduation_project1/models/wishlist_response.dart';
-
 import 'package:graduation_project1/models/brands_model.dart' as brand_model;
 
 class WishlistTile extends HookWidget {
@@ -30,7 +29,6 @@ class WishlistTile extends HookWidget {
     final brandsHook = useFetchBrands();
     final allBrands = brandsHook.data ?? [];
 
-    // Resolve brand name from brand ID
     final brandName = allBrands
         .firstWhere(
           (b) => b.id == wishlist.brand.id,
@@ -51,6 +49,9 @@ class WishlistTile extends HookWidget {
           ),
         )
         .name;
+
+    final discountedPrice =
+        (wishlist.price - wishlist.discountAmount).clamp(0, wishlist.price);
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
@@ -100,10 +101,30 @@ class WishlistTile extends HookWidget {
                         style: appStyle(12, Colors.grey, FontWeight.w400),
                       ),
                       SizedBox(height: 20.h),
-                      ReusableText(
-                        text: "\$ ${wishlist.price}",
-                        style: appStyle(12, Kfoundation, FontWeight.w400),
-                      ),
+                      wishlist.isDiscounted && wishlist.discountAmount > 0
+                          ? Row(
+                              children: [
+                                ReusableText(
+                                  text:
+                                      "\$${discountedPrice.toStringAsFixed(2)}",
+                                  style:
+                                      appStyle(13, kDarkBlue, FontWeight.bold),
+                                ),
+                                SizedBox(width: 6.w),
+                                ReusableText(
+                                  text:
+                                      "\$${wishlist.price.toStringAsFixed(2)}",
+                                  style: appStyle(12, kGray, FontWeight.w400)
+                                      .copyWith(
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : ReusableText(
+                              text: "\$${wishlist.price.toStringAsFixed(2)}",
+                              style: appStyle(14, Kfoundation, FontWeight.w400),
+                            ),
                     ],
                   ),
                 ),

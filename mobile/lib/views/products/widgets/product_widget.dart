@@ -10,26 +10,33 @@ import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/wishlist_controller.dart';
 
 class ProductWidget extends StatelessWidget {
-  ProductWidget(
-      {super.key,
-      this.image,
-      required this.brand,
-      required this.price,
-      this.onTap,
-      required this.title,
-      required this.id});
+  ProductWidget({
+    super.key,
+    this.image,
+    required this.brand,
+    required this.price,
+    this.discountAmount = 0,
+    this.isDiscounted = false,
+    this.onTap,
+    required this.title,
+    required this.id,
+  });
+
   final String? image;
   final String title;
   final String brand;
   final String price;
-  final RxBool isSelected = false.obs;
-
+  final int discountAmount;
+  final bool isDiscounted;
   final String id;
   void Function()? onTap;
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(WishlistController());
+    final originalPrice = double.tryParse(price) ?? 0.0;
+    final discountedPrice =
+        (originalPrice - discountAmount).clamp(0, originalPrice);
 
     return GestureDetector(
       onTap: onTap,
@@ -41,9 +48,10 @@ class ProductWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(8.r),
             color: Colors.white,
           ),
-          child: ListView(
-            physics: const NeverScrollableScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Product Image
               Padding(
                 padding: EdgeInsets.all(8.w),
                 child: ClipRRect(
@@ -52,76 +60,91 @@ class ProductWidget extends StatelessWidget {
                     height: 127.h,
                     width: 170.w,
                     child: Image.network(
-                      "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                      image ??
+                          "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
                       fit: BoxFit.fitWidth,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.broken_image, size: 50);
+                      },
                     ),
                   ),
                 ),
               ),
+
+              // Title + Wishlist icon in same row
               Padding(
-                padding: EdgeInsets.symmetric(vertical: 4.w),
-                child: Stack(
+                padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Positioned(
-                      right: 6,
-                      child: CircleAvatar(
-                        radius: 12.r,
-                        backgroundColor: Kblack,
-                        child: Center(
-                          child: Obx(
-                            () => InkWell(
-                              child: Icon(
-                                isSelected.value
-                                    ? CupertinoIcons.heart_fill
-                                    : CupertinoIcons.heart,
-                                color: Colors.white,
-                                size: 16,
-                              ),
-                              onTap: () {
-                                isSelected.toggle();
-                                controller.addAndRemoveWishList(id);
-                              },
-                            ),
+                    Expanded(
+                      child: ReusableText(
+                        text: title,
+                        maxlines: 2,
+                        SoftWrap: true,
+                        style: appStyle(14, KTextColor, FontWeight.w700),
+                      ),
+                    ),
+                    Obx(() {
+                      final isInWishlist = controller.isInWishlist(id);
+                      return InkWell(
+                        onTap: () {
+                          controller.addAndRemoveWishList(id);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 6.w),
+                          child: Icon(
+                            isInWishlist
+                                ? CupertinoIcons.heart_fill
+                                : CupertinoIcons.heart,
+                            color: kDarkBlue,
+                            size: 20,
                           ),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                      ),
-                      child: SizedBox(
-                        width: 120.w,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ReusableText(
-                                text: title,
-                                maxlines: 4,
-                                SoftWrap: true,
-                                style:
-                                    appStyle(12, KTextColor, FontWeight.w700)),
-                            SizedBox(
-                              height: 10.h,
-                            ),
-                            ReusableText(
-                                text: brand,
-                                style: appStyle(10, kGray, FontWeight.w400)),
-                            SizedBox(
-                              height: 10.h,
-                            ),
-                            ReusableText(
-                                text: "\$ $price",
-                                style:
-                                    appStyle(12, KTextColor, FontWeight.w700)),
-                          ],
-                        ),
-                      ),
-                    ),
+                      );
+                    }),
                   ],
                 ),
-              )
+              ),
+
+              SizedBox(height: 10.h),
+
+              // Brand
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: ReusableText(
+                  text: brand,
+                  style: appStyle(10, kGray, FontWeight.w400),
+                ),
+              ),
+
+              SizedBox(height: 10.h),
+
+              // Price or discounted price
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 12.w),
+                child: isDiscounted && discountAmount > 0
+                    ? Row(
+                        children: [
+                          ReusableText(
+                            text: "\$${discountedPrice.toStringAsFixed(2)}",
+                            style: appStyle(14, kDarkBlue, FontWeight.bold),
+                          ),
+                          SizedBox(width: 8.w),
+                          ReusableText(
+                            text: "\$$price",
+                            style:
+                                appStyle(12, kGray, FontWeight.w400).copyWith(
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          ),
+                        ],
+                      )
+                    : ReusableText(
+                        text: "\$$price",
+                        style: appStyle(14, KTextColor, FontWeight.w700),
+                      ),
+              ),
             ],
           ),
         ),
