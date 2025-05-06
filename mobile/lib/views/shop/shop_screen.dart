@@ -11,7 +11,7 @@ import 'package:graduation_project1/data/product_sort.dart';
 import 'package:graduation_project1/hooks/fetch_filterd_products.dart';
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/search/widgets/search_container.dart';
-import 'package:graduation_project1/views/products/widgets/allproducts_list.dart';
+import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 import 'package:graduation_project1/views/shop/widgets/filter_bottom_sheet.dart';
 
 class ShopScreen extends HookWidget {
@@ -23,7 +23,6 @@ class ShopScreen extends HookWidget {
   Widget build(BuildContext context) {
     final filterController = Get.put(FilterController(), permanent: true);
     final TextEditingController searchController = TextEditingController();
-
     final sortType = useState<String>('Most Popular');
 
     final selectedBrands =
@@ -173,20 +172,46 @@ class ShopScreen extends HookWidget {
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16.w),
                       child: Center(
-                        child: Center(
-                          child: Text(
-                            selectedCategories.value.isNotEmpty
-                                ? "No products found in selected categories."
-                                : selectedBrands.value.isNotEmpty
-                                    ? "No products found in selected brands."
-                                    : "No products found.",
-                            textAlign: TextAlign.center,
-                          ),
+                        child: Text(
+                          selectedCategories.value.isNotEmpty
+                              ? "No products found in selected categories."
+                              : selectedBrands.value.isNotEmpty
+                                  ? "No products found in selected brands."
+                                  : "No products found.",
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     )
                   else
-                    AllproductsList(products: displayedProducts.value),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 12.w),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: displayedProducts.value.length,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisExtent: 260.h,
+                          crossAxisSpacing: 10,
+                          mainAxisSpacing: 10,
+                        ),
+                        itemBuilder: (context, index) {
+                          final product = displayedProducts.value[index];
+                          return ProductWidget(
+                            id: product.id,
+                            title: product.name,
+                            brand: product.brand.name,
+                            price: product.price.toStringAsFixed(2),
+                            isDiscounted: product.isDiscounted,
+                            discountAmount: product.discountAmount,
+                            image:
+                                // product.colors.isNotEmpty
+                                //     ? product.colors.first
+                                "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                          );
+                        },
+                      ),
+                    ),
                 ],
               ),
       ),

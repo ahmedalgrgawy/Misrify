@@ -76,7 +76,10 @@ class Product {
             : Brand.empty(),
         description: json["description"] ?? '',
         quantityInStock: json["quantityInStock"] ?? 0,
-        price: (json["price"] != null ? json["price"].toDouble() : 0.0),
+        price: (json["price"] != null
+                ? double.tryParse(json["price"].toString())
+                : null) ??
+            0.0,
         colors: json["colors"] != null
             ? List<String>.from(json["colors"].map((x) => x.toString()))
             : [],

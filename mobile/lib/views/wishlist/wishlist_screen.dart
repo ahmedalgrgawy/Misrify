@@ -9,7 +9,6 @@ import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/common/shimmers/foodlist_shimmer.dart';
 import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
 import 'package:graduation_project1/hooks/fetch_wishlist.dart';
-import 'package:graduation_project1/models/login_response.dart';
 import 'package:graduation_project1/models/wishlist_response.dart';
 import 'package:graduation_project1/views/auth/login_redirect.dart';
 import 'package:graduation_project1/views/entrypoint.dart';

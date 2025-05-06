@@ -31,18 +31,22 @@ FetchHook useFetchNewArrivals() {
     onFetch: () async {
       final url = Uri.parse('$appBaseUrl/user/products');
       final response = await http.get(url);
-      debugPrint('fetch new: ${response.statusCode}');
+      debugPrint('fetch new arrivals: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final now = DateTime.now();
         final products = productsModelFromJson(response.body).products;
 
+        // Optional debug logging
         for (var p in products) {
-          debugPrint('Product: ${p.name}, createdAt: ${p.createdAt}');
+          debugPrint(
+              '📦 ${p.name} | createdAt: ${p.createdAt} | discounted: ${p.isDiscounted} | amount: ${p.discountAmount}');
         }
 
         return products
-            .where((p) => now.difference(p.createdAt).inDays <= 365)
+            .where((p) =>
+                p.createdAt != null &&
+                now.difference(p.createdAt).inDays <= 365)
             .toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       } else {
