@@ -18,9 +18,7 @@ FetchHook useGenericFetch<T>({
     } catch (e) {
       if (e is ApiError) {
         apiError.value = e;
-      } else {
-        error.value = e as Exception;
-      }
+      } else {}
     } finally {
       isLoading.value = false;
     }

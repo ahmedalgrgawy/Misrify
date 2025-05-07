@@ -91,8 +91,8 @@ class CustomNavBar extends StatelessWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: kNavy,
-                    blurRadius: 12,
+                    color: kLightBlue,
+                    blurRadius: 10,
                     offset: Offset(0, 4),
                   )
                 ],

@@ -16,7 +16,7 @@ class SearchResults extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GrideLayout(
         mainAxisspacing: 20,
-        mainAxis: 275,
+        mainAxis: 260,
         crossAxiscount: 2,
         scrooldirection: Axis.vertical,
         shrinkwrap: false,

@@ -8,6 +8,7 @@ import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/common/shimmers/foodlist_shimmer.dart';
 import 'package:graduation_project1/constants/constants.dart';
+import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
 import 'package:graduation_project1/hooks/fetch_cart.dart';
 import 'package:graduation_project1/hooks/fetch_all_products.dart';
@@ -16,70 +17,84 @@ import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/auth/login_redirect.dart';
 import 'package:graduation_project1/views/cart/widgets/cart_tile.dart';
 import 'package:graduation_project1/models/products_model.dart' as models;
-
 import 'package:graduation_project1/views/entrypoint.dart';
 
 class CartScreen extends HookWidget {
-  const CartScreen({super.key});
+  final bool fromAppBar;
+  const CartScreen({super.key, this.fromAppBar = false});
 
   @override
   Widget build(BuildContext context) {
-    final hookResult = useFetchcart(); // your cart hook
-    final productsHook = useFetchAllProducts(); // your products hook
+    final hookResult = useFetchcart();
+    final productsHook = useFetchAllProducts();
+    final cartController = Get.put(CartController());
 
     final cart = hookResult.data;
     final allProducts = productsHook.data ?? [];
 
-    // Enrich cart items by matching product IDs
-    final enrichedCartItems = cart?.cartItems.map((cartItem) {
-          final matched = allProducts.firstWhere(
-            (p) => p.id == cartItem.product.id,
-            orElse: () => models.Product(
-              id: cartItem.product.id,
-              name: cartItem.product.name,
-              // image: cartItem.product.image,
-              price: cartItem.product.price,
-              category: models.Brand.empty(),
-              brand: models.Brand.empty(),
-              description: '',
-              quantityInStock: 0,
-              colors: [],
-              sizes: [],
-              isDiscounted: false,
-              discountAmount: 0,
-              isApproved: false,
-              reviews: [],
-              createdAt: DateTime.now(),
-              updatedAt: DateTime.now(),
-              v: 0,
-            ),
-          );
+    final List<CartItem> enrichedCartItems =
+        (cart?.cartItems.map<CartItem>((cartItem) {
+              final matched = allProducts.firstWhere(
+                (p) => p.id == cartItem.product.id,
+                orElse: () => models.Product(
+                  id: cartItem.product.id,
+                  name: cartItem.product.name,
+                  price: cartItem.product.price,
+                  category: models.Brand.empty(),
+                  brand: models.Brand.empty(),
+                  description: '',
+                  quantityInStock: 0,
+                  colors: [],
+                  sizes: [],
+                  isDiscounted: false,
+                  discountAmount: 0,
+                  isApproved: false,
+                  reviews: [],
+                  createdAt: DateTime.now(),
+                  updatedAt: DateTime.now(),
+                  v: 0,
+                ),
+              );
 
-          return CartItem(
-            id: cartItem.id,
-            product: matched,
-            quantity: cartItem.quantity,
-            color: cartItem.color,
-            size: cartItem.size,
-            price: cartItem.price,
-            total: cartItem.total,
-          );
-        }).toList() ??
-        [];
+              return CartItem(
+                id: cartItem.id,
+                product: matched,
+                quantity: cartItem.quantity,
+                color: cartItem.color,
+                size: cartItem.size,
+                price: cartItem.price,
+                total: cartItem.total,
+              );
+            }).toList()) ??
+            [];
+
+    // ✅ Update cart item count for the app bar
+    useEffect(() {
+      Future.microtask(() {
+        final int totalQuantity = enrichedCartItems.fold<int>(
+          0,
+          (sum, item) => sum + item.quantity,
+        );
+        cartController.updateItemCount(totalQuantity);
+      });
+      return null;
+    }, [enrichedCartItems]);
 
     final isLoading = hookResult.isLoading || productsHook.isLoading;
     final refetch = hookResult.refetch;
 
-    final controller = Get.put(LoginController());
+    final loginController = Get.put(LoginController());
     final box = GetStorage();
     final token = box.read('token');
+
     final subtotal =
         enrichedCartItems.fold(0.0, (sum, item) => sum + item.total);
     final discount = enrichedCartItems.fold(
-        0.0,
-        (sum, item) => item.product.isDiscounted
-            ? sum + item.product.discountAmount
-            : sum);
+      0.0,
+      (sum, item) => item.product.isDiscounted
+          ? sum + (item.product.discountAmount * item.quantity)
+          : sum,
+    );
 
     if (token == null) return const LoginRedirect();
 
@@ -89,13 +104,20 @@ class CartScreen extends HookWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 12.0),
-              child: Center(
-                child: ReusableText(
-                  text: 'Shopping Cart',
-                  align: TextAlign.center,
-                  style: appStyle(18, kDarkBlue, FontWeight.w600),
-                ),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              child: Row(
+                children: [
+                  if (fromAppBar)
+                    GestureDetector(
+                      onTap: () => Get.back(),
+                      child: const Icon(Icons.arrow_back_ios, color: kDarkBlue),
+                    ),
+                  if (fromAppBar) const SizedBox(width: 10),
+                  ReusableText(
+                    text: 'Shopping Cart',
+                    style: appStyle(18, kDarkBlue, FontWeight.w600),
+                  ),
+                ],
               ),
             ),
             if (isLoading)
@@ -164,8 +186,6 @@ class CartScreen extends HookWidget {
                         },
                       ),
                     ),
-
-                    // Cart Summary
                     Padding(
                       padding: EdgeInsets.symmetric(
                           horizontal: 20.w, vertical: 45.h),
@@ -180,8 +200,7 @@ class CartScreen extends HookWidget {
                                 style: appStyle(14, kGray, FontWeight.w400),
                               ),
                               ReusableText(
-                                text:
-                                    '\$${enrichedCartItems.fold(0.0, (sum, item) => sum + item.total).toStringAsFixed(2)}',
+                                text: '\$${subtotal.toStringAsFixed(2)}',
                                 style: appStyle(14, kGray, FontWeight.w400),
                               ),
                             ],
@@ -209,8 +228,7 @@ class CartScreen extends HookWidget {
                                 style: appStyle(14, kGray, FontWeight.w400),
                               ),
                               ReusableText(
-                                text:
-                                    '-\$${enrichedCartItems.fold(0.0, (sum, item) => item.product.isDiscounted ? sum + item.product.discountAmount : sum).toStringAsFixed(2)}',
+                                text: '-\$${discount.toStringAsFixed(2)}',
                                 style: appStyle(14, kGray, FontWeight.w400),
                               ),
                             ],
@@ -227,7 +245,7 @@ class CartScreen extends HookWidget {
                               ),
                               ReusableText(
                                 text:
-                                    '\$${(subtotal - discount).toStringAsFixed(2)} ',
+                                    '\$${(subtotal - discount).toStringAsFixed(2)}',
                                 style:
                                     appStyle(18, Kfoundation, FontWeight.w600),
                               ),

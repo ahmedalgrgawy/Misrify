@@ -43,13 +43,14 @@ class ProductWidget extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(left: 10.w, right: 5.w),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 4.w),
+          padding: EdgeInsets.symmetric(vertical: 2.w),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8.r),
             color: Colors.white,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               // Product Image
               Padding(
@@ -107,7 +108,7 @@ class ProductWidget extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 10.h),
+              SizedBox(height: 6.h),
 
               // Brand
               Padding(
@@ -118,7 +119,7 @@ class ProductWidget extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 10.h),
+              SizedBox(height: 6.h),
 
               // Price or discounted price
               Padding(

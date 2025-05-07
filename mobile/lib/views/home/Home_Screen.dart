@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart'; // ✅ import hooks
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/constants/constants.dart';
+import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/controllers/category_controller.dart';
 import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
 import 'package:graduation_project1/hooks/fetch_all_products.dart';
@@ -19,7 +20,6 @@ import 'package:graduation_project1/views/search/widgets/search_container.dart';
 import 'package:graduation_project1/views/products/widgets/product_list.dart';
 
 class HomeScreen extends HookWidget {
-  // ✅ changed from StatelessWidget to HookWidget
   static const String routeName = "Home_Screen";
 
   const HomeScreen({super.key});
@@ -28,9 +28,20 @@ class HomeScreen extends HookWidget {
   Widget build(BuildContext context) {
     final login = Get.put(LoginController());
     final controller = Get.put(CategoryController());
+    final cartController = Get.put(CartController());
     final TextEditingController searchController = TextEditingController();
 
-    // ✅ safe to call hooks here
+    // ✅ Reset category + refresh cart count on load
+    useEffect(() {
+      Future.microtask(() {
+        controller.updateCategory = '';
+        controller.updateTitle = '';
+        cartController
+            .refreshCartCount(); // Ensures cart icon shows correct count
+      });
+      return null;
+    }, []);
+
     final bestSellers = useFetchAllProducts();
     final newArrivals = useFetchNewArrivals();
     final specialOffers = useFetchDiscountedProducts();
@@ -44,14 +55,12 @@ class HomeScreen extends HookWidget {
         ),
         body: ListView(
           children: [
-            SearchContainer(
-              controller: searchController,
-            ),
+            SearchContainer(controller: searchController),
             const BannerSlider(),
             SectionHeading(
               title: 'Categories',
               onPress: () {
-                Get.to(() => const CategoriesScreen(),
+                Get.to(() => CategoriesScreen(),
                     duration: const Duration(milliseconds: 900),
                     transition: Transition.cupertino);
               },
@@ -97,14 +106,7 @@ class HomeScreen extends HookWidget {
                       ),
                     ],
                   )
-                : CustomButton(
-                    onTap: () {
-                      login.logout();
-                    },
-                    btnColor: kRed,
-                    text: 'Logout',
-                    btnWidth: 100,
-                  )),
+                : Container()),
           ],
         ),
       ),

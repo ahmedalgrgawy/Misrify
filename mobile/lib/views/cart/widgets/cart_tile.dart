@@ -42,8 +42,7 @@ class CartTile extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(12.r),
             child: Image.network(
-              // product.image.isNotEmpty
-              //     ? product.image
+              // Replace with actual product.image if available
               "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
               width: 80.w,
               height: 80.h,
@@ -73,53 +72,53 @@ class CartTile extends StatelessWidget {
                       text: "\$${item.total.toStringAsFixed(2)}",
                       style: appStyle(14, kDarkBlue, FontWeight.w600),
                     ),
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          RawMaterialButton(
-                            onPressed: () async {
-                              if (item.quantity > 1) {
-                                await controller.updateCartItemQuantity(
-                                  cartItemId: item.id,
-                                  operation: "minus",
-                                );
-                              } else {
-                                await controller.removeFromCart(item.id);
-                              }
-                              await refetch?.call();
-                            },
-                            fillColor: Colors.white,
-                            shape: const CircleBorder(),
-                            constraints: BoxConstraints.tightFor(
-                                width: 28.w, height: 28.h),
-                            child: const Icon(Icons.remove,
-                                color: Kfoundation, size: 18),
-                          ),
-                          SizedBox(width: 4.w),
-                          ReusableText(
-                            text: item.quantity.toString(),
-                            style: appStyle(14, Kfoundation, FontWeight.w600),
-                          ),
-                          SizedBox(width: 4.w),
-                          RawMaterialButton(
-                            onPressed: () async {
+                    Row(
+                      children: [
+                        RawMaterialButton(
+                          onPressed: () async {
+                            if (item.quantity > 1) {
                               await controller.updateCartItemQuantity(
                                 cartItemId: item.id,
-                                operation: "add",
+                                operation: "minus",
                               );
-                              await refetch?.call();
-                            },
-                            fillColor: Colors.white,
-                            shape: const CircleBorder(),
-                            constraints: BoxConstraints.tightFor(
-                                width: 28.w, height: 28.h),
-                            child: const Icon(Icons.add,
-                                color: Kfoundation, size: 18),
-                          ),
-                        ],
-                      ),
+                            } else {
+                              await controller.removeFromCart(item.id);
+                            }
+                            await controller
+                                .refreshCartCount(); // ✅ badge refresh
+                            await refetch?.call();
+                          },
+                          fillColor: Colors.white,
+                          shape: const CircleBorder(),
+                          constraints: BoxConstraints.tightFor(
+                              width: 28.w, height: 28.h),
+                          child: const Icon(Icons.remove,
+                              color: Kfoundation, size: 18),
+                        ),
+                        SizedBox(width: 4.w),
+                        ReusableText(
+                          text: item.quantity.toString(),
+                          style: appStyle(14, Kfoundation, FontWeight.w600),
+                        ),
+                        SizedBox(width: 4.w),
+                        RawMaterialButton(
+                          onPressed: () async {
+                            await controller.updateCartItemQuantity(
+                              cartItemId: item.id,
+                              operation: "add",
+                            );
+                            await controller
+                                .refreshCartCount(); // ✅ badge refresh
+                            await refetch?.call();
+                          },
+                          fillColor: Colors.white,
+                          shape: const CircleBorder(),
+                          constraints: BoxConstraints.tightFor(
+                              width: 28.w, height: 28.h),
+                          child: const Icon(Icons.add,
+                              color: Kfoundation, size: 18),
+                        ),
+                      ],
                     )
                   ],
                 ),

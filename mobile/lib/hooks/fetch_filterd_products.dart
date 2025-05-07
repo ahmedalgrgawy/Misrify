@@ -57,7 +57,6 @@ FetchHook useFetchFilteredProducts({
       }
     } catch (e) {
       debugPrint('❌ Exception: $e');
-      error.value = e is Exception ? e : Exception(e.toString());
     } finally {
       isLoading.value = false;
     }
@@ -67,6 +66,48 @@ FetchHook useFetchFilteredProducts({
     fetchData();
     return null;
   }, [brands, categories, sizes]);
+
+  return FetchHook(
+    data: products.value,
+    isLoading: isLoading.value,
+    error: error.value,
+    refetch: fetchData,
+  );
+}
+
+FetchHook useFetchProductsByCategory(String categoryName) {
+  final products = useState<List<Product>?>(null);
+  final isLoading = useState<bool>(false);
+  final error = useState<Exception?>(null);
+
+  Future<void> fetchData() async {
+    isLoading.value = true;
+    try {
+      final uri = Uri.parse('$appBaseUrl/user/products');
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final parsed = productsModelFromJson(response.body);
+        final filtered = parsed.products
+            .where((p) =>
+                p.category.name.toLowerCase().trim() ==
+                categoryName.toLowerCase().trim())
+            .toList();
+        products.value = filtered;
+      } else {
+        products.value = [];
+      }
+    } catch (e) {
+      error.value = e is Exception ? e : Exception(e.toString());
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  useEffect(() {
+    fetchData();
+    return null;
+  }, [categoryName]);
 
   return FetchHook(
     data: products.value,
