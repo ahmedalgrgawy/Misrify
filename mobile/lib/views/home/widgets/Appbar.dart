@@ -8,6 +8,8 @@ import 'package:get/get.dart';
 import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
+import 'package:graduation_project1/controllers/cart_controller.dart';
+import 'package:graduation_project1/views/cart/cart_screen.dart';
 import 'package:graduation_project1/views/shop/shop_screen.dart';
 import 'package:graduation_project1/views/wishlist/wishlist_screen.dart';
 
@@ -27,6 +29,8 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cartController = Get.put(CartController()); // inside build
+
     return Container(
       height: height,
       color: Kbackground,
@@ -57,16 +61,18 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
               SizedBox(
                 width: 7.w,
               ),
-              InkWell(
-                  onTap: () => Get.to(const ShopScreen()),
-                  child: const Badge(
-                    label: Text('1'),
-                    child: Icon(
-                      Icons.shopping_cart_outlined,
-                      color: kBlue,
-                      size: 30,
+              Obx(() => InkWell(
+                    onTap: () =>
+                        Get.to(() => const CartScreen(fromAppBar: true)),
+                    child: Badge(
+                      label: Text('${cartController.itemCount}'),
+                      child: Icon(
+                        Icons.shopping_cart_outlined,
+                        color: kBlue,
+                        size: 30,
+                      ),
                     ),
-                  )),
+                  ))
             ],
           )
         ],

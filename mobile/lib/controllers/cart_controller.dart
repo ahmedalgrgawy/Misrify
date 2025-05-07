@@ -10,11 +10,42 @@ import 'package:http/http.dart' as http;
 class CartController extends GetxController {
   final box = GetStorage();
   RxBool _isLoading = false.obs;
+  var itemCount = 0.obs;
 
   bool get isLoading => _isLoading.value;
   set setLoading(bool value) => _isLoading.value = value;
 
-  // ───────────────── REFRESH TOKEN ─────────────────
+  int get count => itemCount.value;
+  void updateItemCount(int count) {
+    itemCount.value = count;
+  }
+
+  Future<void> refreshCartCount() async {
+    final accessToken = box.read('token');
+    if (accessToken == null) return;
+
+    final url = Uri.parse('$appBaseUrl/user/getCart');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Cookie': 'accessToken=$accessToken',
+    };
+
+    try {
+      final response = await http.get(url, headers: headers);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> items = data['cart']['cartItems'];
+        final totalQuantity = items.fold<int>(
+          0,
+          (sum, item) => sum + (item['quantity'] as int? ?? 1),
+        );
+        itemCount.value = totalQuantity;
+      }
+    } catch (e) {
+      debugPrint('❌ Failed to refresh cart count: $e');
+    }
+  }
+
   Future<void> refreshTokenAndRetry({
     required String productId,
     required int quantity,
@@ -86,7 +117,6 @@ class CartController extends GetxController {
     Get.offAll(() => const LoginScreen());
   }
 
-  // ───────────────── ADD TO CART ─────────────────
   Future<void> addToCart({
     required String productId,
     required int quantity,
@@ -98,7 +128,6 @@ class CartController extends GetxController {
     final accessToken = box.read('token');
 
     if (accessToken == null) {
-      debugPrint('❌ Access token is null');
       Get.offAll(() => const LoginScreen());
       return;
     }
@@ -118,30 +147,22 @@ class CartController extends GetxController {
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-      debugPrint(
-          '📦 Add to cart response: ${response.statusCode} ${response.body}');
-
       if (response.statusCode == 200) {
         final resData = jsonDecode(response.body);
         Get.snackbar(
-          'Cart Updated',
-          resData['message'] ?? 'Product added to cart successfully',
+          'add to cart',
+          resData['message'] ?? 'Updated successfully',
           colorText: kLightWhite,
           backgroundColor: kLightBlue,
           icon: const Icon(Icons.check_circle_outline, color: kLightWhite),
         );
+        await refreshCartCount();
       } else if (response.statusCode == 401 && !isRetrying) {
         await refreshTokenAndRetry(
             productId: productId, quantity: quantity, color: color, size: size);
       } else {
         final error = apiErrorFromJson(response.body);
-        Get.snackbar(
-          'Error',
-          error.message,
-          colorText: kLightWhite,
-          backgroundColor: kRed,
-          icon: const Icon(Icons.error_outline, color: kLightWhite),
-        );
+        Get.snackbar('Error', error.message);
       }
     } catch (e) {
       debugPrint('🚨 Add to cart error: $e');
@@ -150,14 +171,12 @@ class CartController extends GetxController {
     }
   }
 
-  // ───────────────── REMOVE FROM CART ─────────────────
   Future<void> removeFromCart(String cartItemId,
       {bool isRetrying = false}) async {
     setLoading = true;
     final accessToken = box.read('token');
 
     if (accessToken == null) {
-      debugPrint('❌ Access token is null');
       Get.offAll(() => const LoginScreen());
       return;
     }
@@ -172,29 +191,21 @@ class CartController extends GetxController {
 
     try {
       final response = await http.delete(url, headers: headers, body: body);
-      debugPrint(
-          '🗑️ Remove from cart response: ${response.statusCode} ${response.body}');
-
       if (response.statusCode == 200) {
         final resData = jsonDecode(response.body);
         Get.snackbar(
-          'Cart Updated',
-          resData['message'] ?? 'Item removed from cart',
+          'removed from cart',
+          resData['message'] ?? 'Updated successfully',
           colorText: kLightWhite,
           backgroundColor: kLightBlue,
           icon: const Icon(Icons.check_circle_outline, color: kLightWhite),
         );
+        await refreshCartCount();
       } else if (response.statusCode == 401 && !isRetrying) {
         await refreshTokenAndRetryForRemove(cartItemId);
       } else {
         final error = apiErrorFromJson(response.body);
-        Get.snackbar(
-          'Error',
-          error.message,
-          colorText: kLightWhite,
-          backgroundColor: kRed,
-          icon: const Icon(Icons.error_outline, color: kLightWhite),
-        );
+        Get.snackbar('Error', error.message);
       }
     } catch (e) {
       debugPrint('🚨 Remove cart error: $e');
@@ -205,7 +216,7 @@ class CartController extends GetxController {
 
   Future<void> updateCartItemQuantity({
     required String cartItemId,
-    required String operation, // "add" or "remove"
+    required String operation,
   }) async {
     final token = GetStorage().read('token');
     final url = Uri.parse('$appBaseUrl/user/update-quantity');
@@ -222,6 +233,6 @@ class CartController extends GetxController {
       }),
     );
 
-    debugPrint("🛒 Quantity update response: ${response.body}");
+    await refreshCartCount();
   }
 }

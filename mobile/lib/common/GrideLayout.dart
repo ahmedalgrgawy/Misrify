@@ -16,7 +16,7 @@ class GrideLayout extends StatelessWidget {
     this.shrinkwrap = true,
     this.itemCount = 4,
     required this.itemBuilder,
-    this.mainAxis = 205,
+    this.mainAxis = 165,
     this.scrooldirection = Axis.horizontal,
     this.crossAxiscount = 1,
     this.crossAxisspacing = 0,
