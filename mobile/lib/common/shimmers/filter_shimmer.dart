@@ -7,20 +7,23 @@ class FilterShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.only(left: 12, top: 10),
-      height: 50.h,
+    return SizedBox(
+      height: 42.h, // slightly reduced to prevent overflow
       child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 6,
-          itemBuilder: (context, index) {
-            return Column(
-              children: [
-                ShimmerWidget(
-                    shimmerWidth: 70.w, shimmerHieght: 30.h, shimmerRadius: 12),
-              ],
-            );
-          }),
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.only(left: 12.w, right: 12.w),
+        itemCount: 6,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: EdgeInsets.only(right: 8.w),
+            child: ShimmerWidget(
+              shimmerWidth: 70.w,
+              shimmerHieght: 30.h,
+              shimmerRadius: 12,
+            ),
+          );
+        },
+      ),
     );
   }
 }
