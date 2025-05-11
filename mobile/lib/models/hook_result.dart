@@ -4,7 +4,7 @@ class FetchHook {
   final dynamic data;
   final bool isLoading;
   final Exception? error;
-  final VoidCallback? refetch;
+  final Future<void> Function()? refetch;
 
   FetchHook({
     required this.data,

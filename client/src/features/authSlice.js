@@ -15,10 +15,12 @@ export const signup = createAsyncThunk(
 );
 
 // Login User
-export const loginUser = createAsyncThunk("auth/loginUser", async (userData, { rejectWithValue }) => {
+export const loginUser = createAsyncThunk(
+  "auth/loginUser", 
+  async (userData, { rejectWithValue }) => {
   try {
-    await axiosInstance.post("/auth/login", userData);
-    return true;
+    const response = await axiosInstance.post("/auth/login", userData);
+    return { user: response.data?.user?._id };
   } catch (error) {
     return rejectWithValue(error.response?.data?.message || "Login failed");
   }
@@ -74,11 +76,12 @@ export const checkAuth = createAsyncThunk("auth/check-auth", async (_, { rejectW
 });
 
 // Logout 
-export const logoutUser = createAsyncThunk(
-  "auth/logout",
+export const logoutUser = createAsyncThunk( "auth/logout",
   async (_, { dispatch, rejectWithValue }) => {
     try {
       await axiosInstance.post("/auth/logout", {}, { withCredentials: true });
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       dispatch(logout());
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Logout failed");
@@ -135,6 +138,8 @@ const authSlice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.isAuthenticated = true;
+         localStorage.setItem('token',  JSON.stringify(action.payload.token));
+         localStorage.setItem('user', JSON.stringify(action.payload.user));
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;

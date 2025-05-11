@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:graduation_project1/constants/constants.dart';
@@ -87,7 +89,7 @@ FetchHook useFetchCategories() {
     return null;
   }, []);
 
-  void refetch() {
+  Future<void> refetch() async {
     isLoading.value = true;
     fetchData();
   }

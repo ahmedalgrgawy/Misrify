@@ -76,7 +76,10 @@ class Product {
             : Brand.empty(),
         description: json["description"] ?? '',
         quantityInStock: json["quantityInStock"] ?? 0,
-        price: (json["price"] != null ? json["price"].toDouble() : 0.0),
+        price: (json["price"] != null
+                ? double.tryParse(json["price"].toString())
+                : null) ??
+            0.0,
         colors: json["colors"] != null
             ? List<String>.from(json["colors"].map((x) => x.toString()))
             : [],
@@ -89,7 +92,7 @@ class Product {
         reviews: json["reviews"] != null
             ? List<String>.from(json["reviews"].map((x) => x.toString()))
             : [],
-        createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
+        createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime(2000),
         updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
         v: json["__v"] ?? 0,
       );
