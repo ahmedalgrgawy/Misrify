@@ -1,22 +1,21 @@
-import 'dart:async';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/models/api_error_model.dart';
-import 'package:graduation_project1/models/categories_model.dart';
+import 'package:graduation_project1/models/cart_response.dart';
 import 'package:graduation_project1/models/hook_result.dart';
-import 'package:http/http.dart' as http;
-import 'package:get_storage/get_storage.dart';
-import 'package:get/get.dart';
 import 'package:graduation_project1/views/auth/login_Screen.dart';
+import 'package:http/http.dart' as http;
 
-FetchHook useFetchCategories() {
-  final categoriesItems = useState<List<Category>?>(null);
+FetchHook useFetchcart() {
+  final box = GetStorage();
+  final cart = useState<Cart?>(null);
   final isLoading = useState<bool>(false);
   final error = useState<Exception?>(null);
   final apiError = useState<ApiError?>(null);
-  final box = GetStorage();
 
   late Future<void> Function({bool isRetrying}) fetchData;
 
@@ -24,7 +23,6 @@ FetchHook useFetchCategories() {
     final refreshToken = box.read('refreshToken');
     if (refreshToken == null) {
       Get.offAll(() => const LoginScreen());
-
       return;
     }
 
@@ -40,45 +38,53 @@ FetchHook useFetchCategories() {
     if (refreshResponse.statusCode == 200) {
       final newCookie = refreshResponse.headers['set-cookie'];
       if (newCookie != null) {
-        final parts = newCookie.split(',');
-        for (var part in parts) {
-          if (part.contains('accessToken=')) {
-            final token = part.trim().split(';')[0];
-            box.write('token', token);
-          }
+        final match = RegExp(r'accessToken=([^;]+)').firstMatch(newCookie);
+        if (match != null) {
+          final newToken = match.group(1);
+          box.write('token', newToken);
+          await fetchData(isRetrying: true);
+          return;
         }
-        box.read('token');
-        await fetchData(isRetrying: true);
       }
-    } else {
-      Get.offAll(() => const LoginScreen());
     }
+
+    Get.offAll(() => const LoginScreen());
   }
 
   fetchData = ({bool isRetrying = false}) async {
     isLoading.value = true;
 
     try {
-      Uri url = Uri.parse('$appBaseUrl/admin/Categories');
-      final token = box.read('token');
+      final accessToken = box.read('token');
+      final url = Uri.parse('$appBaseUrl/user/cart');
+
       final response = await http.get(
         url,
         headers: {
-          'Cookie': token ?? '',
+          'Cookie': 'accessToken=$accessToken',
           'Content-Type': 'application/json',
         },
       );
 
-      if (response.statusCode == 200) {
-        final parsed = categoriesModelFromJson(response.body);
-        categoriesItems.value = parsed.categories;
+      final decoded = jsonDecode(response.body);
+      debugPrint('Cart response: $decoded');
+      print(response.statusCode);
+
+      if (response.statusCode == 200 &&
+          decoded is Map<String, dynamic> &&
+          decoded['success'] == true) {
+        final parsedModel = CartResponse.fromJson(decoded);
+        cart.value = parsedModel.cart;
       } else if (response.statusCode == 401 && !isRetrying) {
         await refreshTokenAndRetry();
       } else {
-        apiError.value = apiErrorFromJson(response.body);
+        cart.value = null;
+        if (decoded is Map<String, dynamic> && decoded.containsKey('message')) {
+          apiError.value = ApiError.fromJson(decoded);
+        }
       }
     } catch (e) {
-      debugPrint("Exception: $e");
+      debugPrint('Cart fetch error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -89,13 +95,10 @@ FetchHook useFetchCategories() {
     return null;
   }, []);
 
-  Future<void> refetch() async {
-    isLoading.value = true;
-    fetchData();
-  }
+  Future<void> refetch() async => await fetchData();
 
   return FetchHook(
-    data: categoriesItems.value,
+    data: cart.value,
     isLoading: isLoading.value,
     error: error.value,
     refetch: refetch,

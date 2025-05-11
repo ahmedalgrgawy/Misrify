@@ -1,33 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:graduation_project1/common/GrideLayout.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:graduation_project1/models/products_model.dart';
-import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 
-class AllproductsList extends StatelessWidget {
+class AllProductsList extends StatelessWidget {
   final List<Product> products;
-  const AllproductsList({super.key, required this.products});
+  final bool scrollable;
+  final bool showEmptyMessage;
+
+  const AllProductsList({
+    super.key,
+    required this.products,
+    this.scrollable = false,
+    this.showEmptyMessage = true,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: GrideLayout(
-        mainAxisspacing: 20,
-        mainAxis: 275,
-        crossAxiscount: 2,
-        scrooldirection: Axis.vertical,
-        shrinkwrap: true,
-        physics: const NeverScrollableScrollPhysics(),
+    if (products.isEmpty && showEmptyMessage) {
+      return const Center(child: Text("No products found."));
+    }
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 12.w),
+      child: GridView.builder(
+        shrinkWrap: !scrollable,
+        physics: scrollable
+            ? const BouncingScrollPhysics()
+            : const NeverScrollableScrollPhysics(),
         itemCount: products.length,
-        itemBuilder: (context, i) {
-          final product = products[i];
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          mainAxisExtent: 260.h,
+          crossAxisSpacing: 10,
+          mainAxisSpacing: 10,
+        ),
+        itemBuilder: (context, index) {
+          final product = products[index];
           return ProductWidget(
-            onTap: () => Get.to(() => ProductPage()),
+            id: product.id,
+            title: product.name,
             brand: product.brand.name,
             price: product.price.toStringAsFixed(2),
-            title: product.name,
+            isDiscounted: product.isDiscounted,
+            discountAmount: product.discountAmount,
+            image:
+                "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
           );
         },
       ),
