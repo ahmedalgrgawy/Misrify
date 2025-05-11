@@ -17,6 +17,7 @@ import { createOrderSchema, editOrderSchema } from '../validators/checkoutValida
 import { submitContactForm } from "../controllers/contact.controllers.js";
 import { contactSchema } from "../validators/contactValidator.js";
 import { getUserAnalytics } from "../controllers/userAnalytics.controllers.js";
+import { getNotifications, markAsRead, deleteNotification, deleteAllNotification } from '../controllers/notification.controllers.js';
 
 const router = express.Router()
 
@@ -74,5 +75,9 @@ router.post("/contact", validate(contactSchema), catchAsync(submitContactForm));
 // Handling User Analytics
 router.get("/user-analytics/:userId", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getUserAnalytics));
 
-
+// Handling Notifications
+router.get("/notification", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getNotifications))
+router.put("/notification/:id", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(markAsRead))
+router.delete("/notification/:id", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(deleteNotification))
+router.delete("/notification", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(deleteAllNotification))
 export default router;
