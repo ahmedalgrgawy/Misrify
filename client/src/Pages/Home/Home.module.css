@@ -1,0 +1,100 @@
+.heroTitle{
+  font-family: "Work Sans", sans-serif;
+  color: #0E0E2C;
+font-weight: 700;
+font-size: 40px;
+line-height: 125%;
+letter-spacing: -2%;
+
+}
+
+.heroDescription{
+  font-family: "Work Sans", sans-serif;
+  color: #58595C;
+font-weight: 300;
+font-size: 24px;
+line-height: 150%;
+letter-spacing: 0%;
+}
+
+.btnMeeting{
+  font-family: "Roboto", sans-serif;
+font-weight: 400;
+font-size: 20px;
+line-height: 100%;
+letter-spacing: 0%;
+}
+.info h5{
+  font-family: "Work Sans", sans-serif;
+  color: var(--dark-blue);
+font-weight: 600;
+font-size: 40px;
+line-height: 100%;
+letter-spacing: 0%;
+}
+
+.info p {
+  font-family: "Inter", sans-serif;
+  color: #00000099;
+font-weight: 400;
+font-size: 16px;
+line-height: 22px;
+letter-spacing: 0%;
+}
+
+.categoriesTitle{
+  font-family: "Work Sans", sans-serif;
+font-weight: 700;
+font-size: 40px;
+line-height: 100%;
+letter-spacing: -2%;
+text-align: center;
+vertical-align: middle;
+color: #EFF2F6;
+}
+.categoryTitles{
+  font-family: "Work Sans", sans-serif;
+font-weight: 700;
+font-size: 40px;
+line-height: 100%;
+letter-spacing: -2%;
+vertical-align: middle;
+}
+
+.download h2{
+  font-family: "Work Sans", sans-serif;
+font-weight: 700;
+font-size: 40px;
+line-height: 100%;
+letter-spacing: -2%;
+}
+
+.download p{
+  font-family: "Inter", sans-serif;
+  color: #58595C;
+font-weight: 400;
+font-size: 16px;
+line-height: 24px;
+letter-spacing: 1%;
+}
+.ratings p:nth-of-type(1){
+  font-family: "Work Sans", sans-serif;
+  color: white;
+font-weight: 600;
+font-size: 24px;
+line-height: 100%;
+letter-spacing: 0%;
+text-transform: uppercase;
+margin-bottom: 19px;
+margin-top: 19px;
+}
+.ratings p:nth-of-type(2){
+  font-family: "Work Sans", sans-serif;
+  color: white;
+font-weight: 600;
+font-size: 20px;
+line-height: 20px;
+letter-spacing: 0%;
+text-transform: uppercase;
+margin-bottom: 19px;
+}

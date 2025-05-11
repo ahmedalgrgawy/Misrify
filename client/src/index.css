@@ -11,6 +11,8 @@
     --main-blue: #2B3D5B;
     --title-blue: #15253F;
     --dark-blue: #081120;
+    --bg-footer: #0b172a;
+
 }
 
 .input-field {
@@ -31,4 +33,11 @@
 
 .input-field:hover {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+@font-face {
+    font-family: 'Jaro';
+    src: url('./assets/fonts/Jaro/Jaro_24pt-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
 }

@@ -8,6 +8,7 @@ import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/category_controller.dart';
 import 'package:graduation_project1/models/categories_model.dart';
+import 'package:graduation_project1/views/categories/all_category_product_screen.dart';
 
 class CategoryWidget extends StatelessWidget {
   CategoryWidget({
@@ -28,6 +29,9 @@ class CategoryWidget extends StatelessWidget {
         } else {
           controller.updateCategory = category.id;
           controller.updateTitle = category.name;
+
+          // Navigate to category product screen
+          Get.to(() => const AllCategoryProductScreen());
         }
       },
       child: Obx(
