@@ -102,6 +102,7 @@ flutter:
     - assets/icons/
     - assets/onboarding/
     - assets/banners/
+    - assets/images/
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

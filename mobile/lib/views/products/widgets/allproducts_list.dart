@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:graduation_project1/models/products_model.dart';
+import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 
 class AllProductsList extends StatelessWidget {
@@ -38,6 +40,7 @@ class AllProductsList extends StatelessWidget {
         itemBuilder: (context, index) {
           final product = products[index];
           return ProductWidget(
+            onTap: () => Get.to(() => ProductDetailScreen()),
             id: product.id,
             title: product.name,
             brand: product.brand.name,
