@@ -1,0 +1,2 @@
+D:/Route/project/Graduation-Project/mobile/android/app/.cxx/Debug/3t1kbe72/x86/CMakeFiles/edit_cache.dir
+D:/Route/project/Graduation-Project/mobile/android/app/.cxx/Debug/3t1kbe72/x86/CMakeFiles/rebuild_cache.dir

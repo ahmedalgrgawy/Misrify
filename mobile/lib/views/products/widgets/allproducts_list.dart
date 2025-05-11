@@ -24,7 +24,7 @@ class AllproductsList extends StatelessWidget {
         itemBuilder: (context, i) {
           final product = products[i];
           return ProductWidget(
-            onTap: () => Get.to(() => ProductPage()),
+            onTap: () => Get.to(() => ProductDetailScreen()),
             brand: product.brand.name,
             price: product.price.toStringAsFixed(2),
             title: product.name,
