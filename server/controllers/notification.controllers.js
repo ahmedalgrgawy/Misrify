@@ -1,5 +1,5 @@
-import AppError from "../errors/AppError";
-import Notification from "../models/notification.model";
+import AppError from "../errors/AppError.js";
+import Notification from "../models/notification.model.js";
 
 export const getNotifications = async (req, res, next) => {
     const notifications = await Notification.find({
