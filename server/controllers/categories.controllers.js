@@ -1,5 +1,6 @@
 import AppError from "../errors/AppError.js";
 import Category from "../models/category.model.js";
+import Notification from "../models/notification.model.js";
 
 export const getAllCategories = async (req, res, next) => {
     const categories = await Category.find().exec();
