@@ -1,5 +1,6 @@
 import AppError from "../errors/AppError.js";
 import Brand from "../models/brand.model.js";
+import Notification from "../models/notification.model.js";
 
 export const getBrands = async (req, res, next) => {
     const Brands = await Brand.find()
@@ -28,6 +29,15 @@ export const createBrand = async (req, res, next) => {
 
     await brand.save();
 
+    await Notification.create({
+        title: "Brand Created",
+        message: `Brand ${name} has been created`,
+        receiver: ownerId,
+        sender: req.user._id,
+        type: "brand",
+        isRead: false,
+    })
+
     res.status(201).json({ success: true, message: "Brand Created Successfully" })
 }
 
@@ -50,6 +60,15 @@ export const editBrand = async (req, res, next) => {
 
     await brand.save();
 
+    await Notification.create({
+        title: "Brand Updated",
+        message: `Brand ${name} has been updated`,
+        receiver: brand.owner,
+        sender: req.user._id,
+        type: "brand",
+        isRead: false,
+    })
+    
     res.status(200).json({ success: true, message: "Brand updated successfully", brand })
 }
 
@@ -67,6 +86,15 @@ export const deleteBrand = async (req, res, next) => {
     }
 
     await brand.deleteOne();
+
+    await Notification.create({
+        title: "Brand Deleted",
+        message: `Brand ${brand.name} has been deleted`,
+        receiver: brand.owner,
+        sender: req.user._id,
+        type: "brand",
+        isRead: false,
+    })
 
     res.status(200).json({ success: true, message: "Brand deleted successfully" })
 }
