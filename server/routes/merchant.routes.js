@@ -5,7 +5,7 @@ import { createProduct, deleteProduct, editProduct, getMerchantProducts } from '
 import { validate } from '../services/validate.service.js';
 import { createProductSchema, editProductSchema } from '../validators/productValidator.js';
 import { createComment } from '../controllers/comment.controllers.js';
-import { getStockLevel, getProductsWithAvgRatings, getMerchantOrdersStats, getSalesGrowth} from '../controllers/merchantAnalytics.controller.js';
+import { getStockLevel, getProductsWithAvgRatings, getMerchantOrdersStats, getSalesGrowth} from '../controllers/merchantAnalytics.controllers.js';
 
 const router = express.Router()
 
