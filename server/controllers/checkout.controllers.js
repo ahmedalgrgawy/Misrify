@@ -9,6 +9,7 @@ import OrderItem from "../models/orderItem.model.js";
 import { CLIENT_FAILURE_URL, CLIENT_SUCCESS_URL, PAYMOB_API_KEY, PAYMOB_BASE_URL, PAYMOB_IFRAME_ID, PAYMOB_INTEGRATION_ID } from "../lib/paymob.js";
 import Payment from "../models/payment.model.js";
 import axios from "axios";
+import Notification from "../models/notification.model.js";
 
 
 export const getCoupons = async (req, res, next) => {
@@ -49,6 +50,14 @@ export const exchangePointsForCoupon = async (req, res, next) => {
     });
 
     await coupon.save();
+
+    await Notification.create({
+        title: "Coupon Created",
+        message: `Coupon ${coupon.code} has been created with a discount of ${discount}%`,
+        receiver: req.user._id,
+        type: "coupon",
+        isRead: false,
+    })
 
     return res.status(200).json({
         message: "Coupon Created Successfully",
@@ -165,9 +174,9 @@ export const placeOrder = async (req, res, next) => {
         coupon: appliedCoupon
     });
 
-     // Add the newly created order to the user's purchaseHistory
-     await User.findByIdAndUpdate(
-        req.user._id, 
+    // Add the newly created order to the user's purchaseHistory
+    await User.findByIdAndUpdate(
+        req.user._id,
         { $push: { purchaseHistory: order._id } }, // Push the order ID to purchaseHistory
         { new: true }
     );
@@ -181,6 +190,14 @@ export const placeOrder = async (req, res, next) => {
             }
         })
         .populate("coupon", "code discount");
+
+    await Notification.create({
+        title: "Order Created",
+        message: `Order with ${order.trackCode} has been created with a Price of ${order.totalPrice}`,
+        receiver: req.user._id,
+        type: "order",
+        isRead: false,
+    })
 
     res.status(201).json({
         success: true,

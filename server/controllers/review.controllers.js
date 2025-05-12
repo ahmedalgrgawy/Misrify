@@ -2,6 +2,7 @@ import AppError from "../errors/AppError.js";
 import Review from "../models/review.model.js";
 import Product from "../models/product.model.js";
 import Comment from "../models/comment.model.js";
+import Notification from "../models/notification.model.js";
 
 export const createReview = async (req, res, next) => {
     const { productId, rating, reviewText } = req.body;
@@ -24,6 +25,15 @@ export const createReview = async (req, res, next) => {
     product.reviews.push(review._id);
 
     await product.save();
+
+    await Notification.create({
+        title: "New Review",
+        message: `New review on your product`,
+        receiver: product.merchant,
+        sender: userId,
+        type: "product",
+        isRead: false,
+    })
 
     res.status(201).json({ success: true, message: "Review created successfully", review });
 

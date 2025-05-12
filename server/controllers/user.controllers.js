@@ -1,6 +1,7 @@
 import User from "../models/user.model.js"
 import AppError from "../errors/AppError.js";
 import cloudinary from "../lib/cloudinary.js";
+import Notification from "../models/notification.model.js";
 
 // Any User
 export const getProfile = async (req, res) => {
@@ -52,6 +53,15 @@ export const updateProfile = async (req, res, next) => {
 
     user.password = null;
 
+    await Notification.create({
+        title: "Profile Updated",
+        message: `Your profile has been updated`,
+        receiver: userId,
+        // sender: userId,
+        type: "profile",
+        isRead: false,
+    })
+
     return res.status(200).json({ success: true, message: "Profile updated successfully", user });
 
 }
@@ -90,6 +100,15 @@ export const createUser = async (req, res, next) => {
 
     await user.save();
 
+    await Notification.create({
+        title: "New User Created",
+        message: `New user ${name} has been created`,
+        receiver: user._id,
+        // sender: req.user._id,
+        type: "user",
+        isRead: false,
+    })
+
     res.status(201).json({ success: true, message: "User Created Successfully" })
 }
 
@@ -114,6 +133,15 @@ export const editUser = async (req, res, next) => {
     user.role = role || user.role;
 
     await user.save();
+
+    await Notification.create({
+        title: "User Updated",
+        message: `User ${name} has been updated`,
+        receiver: userId,
+        // sender: req.user._id,
+        type: "user",
+        isRead: false,
+    })
 
     res.status(200).json({
         success: true,
