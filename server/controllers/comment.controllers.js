@@ -1,5 +1,6 @@
 import AppError from "../errors/AppError.js";
 import Comment from "../models/comment.model.js";
+import Notification from "../models/notification.model.js";
 import Review from "../models/review.model.js";
 
 // This Function is for Admin Only
@@ -44,6 +45,15 @@ export const createComment = async (req, res, next) => {
     review.comments.push(newComment._id);
 
     await review.save()
+
+    await Notification.create({
+        title: "New Comment",
+        message: `New comment on your review`,
+        receiver: review.user,
+        sender: userId,
+        type: "product",
+        isRead: false,
+    })
 
     res.status(201).json({
         success: true,

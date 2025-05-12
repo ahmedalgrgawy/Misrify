@@ -7,8 +7,19 @@ export const submitContactForm = async (req, res, next) => {
     const newMessage = new Contact({ firstName, lastName, email, phone, message });
     await newMessage.save();
 
+    // Notify Admins
+    const admins = await User.find({ role: "admin" }).select("_id");
+
+    await Notification.create({
+        title: "New Contact Message",
+        message: `New message from ${firstName} ${lastName}`,
+        receiver: admins,
+        sender: req.user._id || null,
+        type: "contact",
+        isRead: false,
+    });
+
     res.status(201).json({ success: true, message: "Message sent successfully" });
-    
 };
 export const getAllMessages = async (req, res, next) => {
     const messages = await Contact.find().sort({ createdAt: -1 });
