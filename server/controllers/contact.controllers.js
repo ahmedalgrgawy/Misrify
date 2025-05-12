@@ -1,5 +1,6 @@
 import Contact from "../models/contact.model.js";
 import AppError from "../errors/AppError.js";
+import Notification from "../models/notification.model.js";
 
 export const submitContactForm = async (req, res, next) => {
     const { firstName, lastName, email, phone, message } = req.body;

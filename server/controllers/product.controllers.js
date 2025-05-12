@@ -5,6 +5,7 @@ import Product from "../models/product.model.js";
 import Category from "../models/category.model.js";
 import Review from "../models/review.model.js";
 import { isValidObjectId } from "../validators/validateCollegeEmail.js";
+import Notification from "../models/notification.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res, next) => {
