@@ -1,5 +1,6 @@
 import Team from "../models/team.model.js";
 import AppError from "../errors/AppError.js";
+import Notification from "../models/notification.model.js";
 
 
 export const createTeamMember = async (req, res, next) => {
@@ -13,6 +14,20 @@ export const createTeamMember = async (req, res, next) => {
     const teamMember = new Team({ name, email, linkedIn, github, instagram, profileUrl, jobTitle });
 
     await teamMember.save();
+
+    const adminsExpectLoggedInAdmin = await User.find({
+        role: "admin",
+        _id: { $ne: req.user._id }
+    }).select("_id");
+
+    await Notification.create({
+        title: "New Team Member",
+        message: `New team member ${name} has been added`,
+        receiver: adminsExpectLoggedInAdmin,
+        sender: req.user._id,
+        type: "team",
+        isRead: false,
+    });
 
     res.status(201).json({ success: true, message: "Team member created successfully", teamMember });
 };
