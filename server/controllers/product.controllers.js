@@ -64,6 +64,28 @@ export const approveOrRejectProduct = async (req, res, next) => {
 
     await ProductToApprove.save();
 
+    const merchant = await Brand.findById(ProductToApprove.brand).populate("owner");
+
+    if (ProductToApprove.isApproved) {
+        await Notification.create({
+            title: "Product Approved",
+            message: `Product ${ProductToApprove.name} has been approved`,
+            receiver: merchant,
+            // sender: req.user._id,
+            type: "product",
+            isRead: false,
+        });
+    } else {
+        await Notification.create({
+            title: "Product Rejected",
+            message: `Product ${ProductToApprove.name} has been rejected`,
+            receiver: merchant,
+            // sender: req.user._id,
+            type: "product",
+            isRead: false,
+        });
+    }
+
     res.status(200).json({ success: true, message: "Product Approved" })
 }
 
@@ -107,6 +129,30 @@ export const createProduct = async (req, res, next) => {
     })
 
     await product.save();
+
+    const admins = await Brand.find({ role: "admin" }).select("_id");
+
+    if (user.role === 'merchant') {
+
+        await Notification.create({
+            title: "New Product Created",
+            message: `Product ${name} has been Requested for approval`,
+            receiver: admins,
+            sender: user._id,
+            type: "product",
+            isRead: false,
+        })
+
+    } else {
+        await Notification.create({
+            title: "New Product Created",
+            message: `Product ${name} has been created by ${user.name}`,
+            receiver: admins,
+            sender: user._id,
+            type: "product",
+            isRead: false,
+        })
+    }
 
     res.status(201).json({ success: true, message: "Product Created Successfully", product })
 }
@@ -156,6 +202,16 @@ export const editProduct = async (req, res, next) => {
 
     await product.save();
 
+    if (user.role === 'admin') {
+        await Notification.create({
+            title: "Product Updated",
+            message: `Product ${name} has been updated by ${user.name}`,
+            receiver: product.brand.owner,
+            sender: user._id,
+            type: "product",
+            isRead: false,
+        })
+    }
     res.status(200).json({ success: true, message: "Product Updated Successfully", product })
 }
 
@@ -189,6 +245,15 @@ export const deleteProduct = async (req, res, next) => {
     })
 
     await product.deleteOne();
+
+    await Notification.create({
+        title: "Product Deleted",
+        message: `Product ${product.name} has been deleted by ${user.name}`,
+        receiver: product.brand.owner,
+        sender: user._id,
+        type: "product",
+        isRead: false,
+    })
 
     res.status(200).json({ success: true, message: "Product Deleted Successfully" })
 }
