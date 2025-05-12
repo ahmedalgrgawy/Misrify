@@ -9,9 +9,14 @@ const notificationSchema = new mongoose.Schema({
         }
     ],
     sender: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Brand",
-        required: [true, "Sender is required"],
+        type: [{
+            type: String,
+            enum: ["admin", "Misrify"]
+        }, {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User"
+        }],
+        default: "Misrify",
     },
     content: {
         type: String,
@@ -19,15 +24,15 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ["order", "product", "coupon"],
+        enum: ["order", "product", "coupon", "category", "brand", "user", "general"],
         required: [true, "Type is required"],
     },
     isRead: {
         type: Boolean,
         default: false
     }
-}, { timestamps: true })
+}, { timestamps: true });
 
 const Notification = mongoose.model("Notification", notificationSchema);
 
-export default Notification
+export default Notification;
