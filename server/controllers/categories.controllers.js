@@ -18,6 +18,20 @@ export const createCategory = async (req, res, next) => {
 
     await category.save();
 
+    const AdminsAndMerchants = await User.find({
+        role: { $in: ["admin", "merchant"] },
+        _id: { $ne: req.user._id }
+    });
+
+    await Notification.create({
+        title: "Category Created",
+        message: `Category ${name} has been created`,
+        receiver: AdminsAndMerchants,
+        sender: req.user._id,
+        type: "category",
+        isRead: false,
+    })
+
     res.status(201).json({ success: true, message: "Category Created Successfully" })
 }
 
@@ -40,6 +54,20 @@ export const editCategory = async (req, res, next) => {
 
     await category.save();
 
+    const AdminsAndMerchants = await User.find({
+        role: { $in: ["admin", "merchant"] },
+        _id: { $ne: req.user._id }
+    });
+
+    await Notification.create({
+        title: "Category Updated",
+        message: `Category ${name} has been updated`,
+        receiver: AdminsAndMerchants,
+        sender: req.user._id,
+        type: "category",
+        isRead: false,
+    })
+
     res.status(200).json({ success: true, message: "Category updated successfully", category })
 }
 
@@ -57,6 +85,20 @@ export const deleteCategory = async (req, res, next) => {
     }
 
     await category.deleteOne();
+
+    const AdminsAndMerchants = await User.find({
+        role: { $in: ["admin", "merchant"] },
+        _id: { $ne: req.user._id }
+    });
+
+    await Notification.create({
+        title: "Category Deleted",
+        message: `Category ${category.name} has been deleted`,
+        receiver: AdminsAndMerchants,
+        sender: req.user._id,
+        type: "category",
+        isRead: false,
+    })
 
     res.status(200).json({ success: true, message: "Category deleted successfully" })
 }
