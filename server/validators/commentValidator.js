@@ -11,8 +11,8 @@ export const createCommentSchema = Joi.object({
     reviewId: Joi.string()
         .required()
         .messages({
-            'string.empty': 'productId is required',
-            'any.required': 'productId is required',
+            'string.empty': 'reviewId is required',
+            'any.required': 'reviewId is required',
         }),
 
 })
