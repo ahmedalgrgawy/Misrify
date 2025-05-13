@@ -165,7 +165,7 @@ export const deleteUser = async (req, res, next) => {
         return next(new AppError("User Is Not Found", 404))
     }
 
-    await user.delete();
+    await user.deleteOne();
 
     res.status(200).json({
         success: true,
