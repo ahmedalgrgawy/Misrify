@@ -99,176 +99,179 @@ class CartScreen extends HookWidget {
     if (token == null) return const LoginRedirect();
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              child: Row(
-                children: [
-                  if (fromAppBar)
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: const Icon(Icons.arrow_back_ios, color: kDarkBlue),
-                    ),
-                  if (fromAppBar) const SizedBox(width: 10),
-                  ReusableText(
-                    text: 'Shopping Cart',
-                    style: appStyle(18, kDarkBlue, FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-            if (isLoading)
-              const Expanded(child: FoodsListShimmer())
-            else if (enrichedCartItems.isEmpty)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 35.0, vertical: 40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: height * .33,
-                        child: Image.asset(
-                          'assets/banners/cart.png',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                      ReusableText(
-                        text: 'Your Cart is Empty!',
-                        style: appStyle(20, kDarkBlue, FontWeight.w600),
-                        align: TextAlign.center,
-                      ),
-                      SizedBox(height: 20.h),
-                      ReusableText(
-                        text:
-                            'Tap add to Cart button to start adding your items',
-                        style: appStyle(12, kDarkBlue, FontWeight.w400),
-                        align: TextAlign.center,
-                      ),
-                      SizedBox(height: 20.h),
-                      CustomButton(
-                        onTap: () {
-                          Get.offAll(() => MainScreen());
-                        },
-                        btnColor: Colors.white,
-                        text: 'Add to Cart',
-                        textcolor: kDarkBlue,
-                        btnWidth: 300,
-                        btnHeight: 60,
-                        borderColor: kDarkBlue,
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              Expanded(
-                child: Column(
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                child: Row(
                   children: [
-                    Expanded(
-                      child: ListView.builder(
-                        key: ValueKey(enrichedCartItems.length),
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        itemCount: enrichedCartItems.length,
-                        itemBuilder: (context, i) {
-                          final item = enrichedCartItems[i];
-                          return CartTile(
-                            item: item,
-                            refetch: () async {
-                              if (refetch != null) await refetch();
-                            },
-                          );
-                        },
+                    if (fromAppBar)
+                      GestureDetector(
+                        onTap: () => Get.back(),
+                        child:
+                            const Icon(Icons.arrow_back_ios, color: kDarkBlue),
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.w, vertical: 45.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Subtotal :',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                              ReusableText(
-                                text: '\$${subtotal.toStringAsFixed(2)}',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Shipping Fee :',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                              ReusableText(
-                                text: '\$0.00',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Discount :',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                              ReusableText(
-                                text: '-\$${discount.toStringAsFixed(2)}',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          const Divider(height: 25, thickness: 1),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Total :',
-                                style:
-                                    appStyle(18, Kfoundation, FontWeight.w600),
-                              ),
-                              ReusableText(
-                                text:
-                                    '\$${(subtotal - discount).toStringAsFixed(2)}',
-                                style:
-                                    appStyle(18, Kfoundation, FontWeight.w600),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 12),
-                          CustomButton(
-                            onTap: () {
-                              // TODO: Add checkout logic
-                            },
-                            btnColor: kLightBlue,
-                            text: 'Checkout',
-                            textcolor: Colors.white,
-                            btnWidth: double.infinity,
-                            btnHeight: 55,
-                          ),
-                        ],
-                      ),
+                    if (fromAppBar) const SizedBox(width: 10),
+                    ReusableText(
+                      text: 'Shopping Cart',
+                      style: appStyle(18, kDarkBlue, FontWeight.w600),
                     ),
                   ],
                 ),
               ),
-          ],
+              if (isLoading)
+                const Expanded(child: FoodsListShimmer())
+              else if (enrichedCartItems.isEmpty)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 35.0, vertical: 40),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          height: height * .33,
+                          child: Image.asset(
+                            'assets/banners/cart.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        SizedBox(height: 20.h),
+                        ReusableText(
+                          text: 'Your Cart is Empty!',
+                          style: appStyle(20, kDarkBlue, FontWeight.w600),
+                          align: TextAlign.center,
+                        ),
+                        SizedBox(height: 20.h),
+                        ReusableText(
+                          text:
+                              'Tap add to Cart button to start adding your items',
+                          style: appStyle(12, kDarkBlue, FontWeight.w400),
+                          align: TextAlign.center,
+                        ),
+                        SizedBox(height: 20.h),
+                        CustomButton(
+                          onTap: () {
+                            Get.offAll(() => MainScreen());
+                          },
+                          btnColor: Colors.white,
+                          text: 'Add to Cart',
+                          textcolor: kDarkBlue,
+                          btnWidth: 300,
+                          btnHeight: 60,
+                          borderColor: kDarkBlue,
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                          key: ValueKey(enrichedCartItems.length),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                          itemCount: enrichedCartItems.length,
+                          itemBuilder: (context, i) {
+                            final item = enrichedCartItems[i];
+                            return CartTile(
+                              item: item,
+                              refetch: () async {
+                                if (refetch != null) await refetch();
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 20.w, vertical: 45.h),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ReusableText(
+                                  text: 'Subtotal :',
+                                  style: appStyle(14, kGray, FontWeight.w400),
+                                ),
+                                ReusableText(
+                                  text: '\$${subtotal.toStringAsFixed(2)}',
+                                  style: appStyle(14, kGray, FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ReusableText(
+                                  text: 'Shipping Fee :',
+                                  style: appStyle(14, kGray, FontWeight.w400),
+                                ),
+                                ReusableText(
+                                  text: '\$0.00',
+                                  style: appStyle(14, kGray, FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ReusableText(
+                                  text: 'Discount :',
+                                  style: appStyle(14, kGray, FontWeight.w400),
+                                ),
+                                ReusableText(
+                                  text: '-\$${discount.toStringAsFixed(2)}',
+                                  style: appStyle(14, kGray, FontWeight.w400),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            const Divider(height: 25, thickness: 1),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                ReusableText(
+                                  text: 'Total :',
+                                  style: appStyle(
+                                      18, Kfoundation, FontWeight.w600),
+                                ),
+                                ReusableText(
+                                  text:
+                                      '\$${(subtotal - discount).toStringAsFixed(2)}',
+                                  style: appStyle(
+                                      18, Kfoundation, FontWeight.w600),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            CustomButton(
+                              onTap: () {
+                                // TODO: Add checkout logic
+                              },
+                              btnColor: kLightBlue,
+                              text: 'Checkout',
+                              textcolor: Colors.white,
+                              btnWidth: double.infinity,
+                              btnHeight: 55,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );
