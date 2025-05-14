@@ -12,7 +12,7 @@ const commentSchema = new mongoose.Schema({
         ref: "User",
         required: [true, "User ID is required"],
     },
-    review: {
+    reviewId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Review",
         required: true,
