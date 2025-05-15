@@ -10,6 +10,7 @@ import 'package:graduation_project1/controllers/filter_controller.dart';
 import 'package:graduation_project1/data/product_sort.dart';
 import 'package:graduation_project1/hooks/fetch_filterd_products.dart';
 import 'package:graduation_project1/models/products_model.dart';
+import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/search/widgets/search_container.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 import 'package:graduation_project1/views/shop/widgets/filter_bottom_sheet.dart';
@@ -198,6 +199,10 @@ class ShopScreen extends HookWidget {
                         itemBuilder: (context, index) {
                           final product = displayedProducts.value[index];
                           return ProductWidget(
+                            onTap: () {
+                              Get.to(
+                                  () => ProductDetailScreen(product: product));
+                            },
                             id: product.id,
                             title: product.name,
                             brand: product.brand.name,

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:graduation_project1/common/GrideLayout.dart';
 import 'package:graduation_project1/controllers/search_products_controller.dart';
 import 'package:graduation_project1/models/products_model.dart';
+import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 
 class SearchResults extends StatelessWidget {
@@ -25,6 +26,9 @@ class SearchResults extends StatelessWidget {
         itemBuilder: (context, i) {
           final Product product = controller.searcResults![i];
           return ProductWidget(
+            onTap: () {
+              Get.to(() => ProductDetailScreen(product: product));
+            },
             id: product.id,
             title: product.name,
             brand: product.brand.name,

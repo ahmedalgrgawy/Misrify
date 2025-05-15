@@ -20,14 +20,17 @@ class RelatedItems extends StatelessWidget {
         scrooldirection: Axis.vertical,
         shrinkwrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: 4,
+        itemCount: products.length < 2 ? products.length : 2,
         itemBuilder: (context, i) {
           final product = products[i];
+
           return ProductWidget(
-            onTap: () => Get.to(() => ProductDetailScreen()),
+            onTap: () => Get.to(() => ProductDetailScreen(product: product)),
             brand: product.brand.name,
             price: product.price.toStringAsFixed(2),
             title: product.name,
+            isDiscounted: product.isDiscounted,
+            discountAmount: product.discountAmount,
             id: product.id,
           );
         },
