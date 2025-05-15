@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'wishlist_response.dart'; // Import this to use WishlistItem
 
 ProductsModel productsModelFromJson(String str) =>
     ProductsModel.fromJson(json.decode(str));
@@ -41,7 +42,7 @@ class Product {
   final bool isDiscounted;
   final int discountAmount;
   final bool isApproved;
-  final List<String> reviews;
+  final List<Review> reviews;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int v;
@@ -90,7 +91,22 @@ class Product {
         discountAmount: json["discountAmount"] ?? 0,
         isApproved: json["isApproved"] ?? false,
         reviews: json["reviews"] != null
-            ? List<String>.from(json["reviews"].map((x) => x.toString()))
+            ? List<Review>.from(json["reviews"].map((x) {
+                if (x is Map<String, dynamic>) {
+                  return Review.fromJson(x);
+                } else {
+                  return Review(
+                    id: x.toString(),
+                    user: '',
+                    rating: 0,
+                    reviewText: '',
+                    comments: [],
+                    createdAt: DateTime.now(),
+                    updatedAt: DateTime.now(),
+                    v: 0,
+                  );
+                }
+              }))
             : [],
         createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime(2000),
         updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
@@ -110,11 +126,47 @@ class Product {
         "isDiscounted": isDiscounted,
         "discountAmount": discountAmount,
         "isApproved": isApproved,
-        "reviews": List<dynamic>.from(reviews.map((x) => x)),
+        "reviews": List<dynamic>.from(reviews.map((x) => x.toJson())),
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
       };
+
+  /// ✅ Create a Product from a WishlistItem (for detail screen use)
+  factory Product.fromWishlistItem(WishlistItem item) => Product(
+        id: item.id,
+        name: item.name,
+        category: Brand(
+          id: '',
+          name: item.category,
+          owner: '',
+          description: '',
+          createdAt: DateTime.now(), // fallback value
+          updatedAt: DateTime.now(), // fallback value
+          v: 0,
+        ),
+        brand: Brand(
+          id: item.brand.id,
+          name: item.brand.name,
+          owner: '',
+          description: '',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          v: 0,
+        ),
+        description: item.description,
+        quantityInStock: item.quantityInStock,
+        price: item.price,
+        colors: item.colors,
+        sizes: item.sizes,
+        isDiscounted: item.isDiscounted,
+        discountAmount: item.discountAmount,
+        isApproved: item.isApproved,
+        reviews: [],
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+        v: item.v,
+      );
 }
 
 class Brand {
@@ -192,9 +244,17 @@ class Review {
         id: json["_id"] ?? '',
         user: json["user"] ?? '',
         rating: json["rating"] ?? 0,
-        reviewText: json["reviewText"] ?? '',
+        reviewText: json["reviewText"] ?? json["content"] ?? '',
         comments: json["comments"] != null
-            ? List<dynamic>.from(json["comments"].map((x) => x))
+            ? List<dynamic>.from(
+                json["comments"].map((x) {
+                  if (x is Map<String, dynamic>) {
+                    return x["text"] ?? x.toString(); // full object
+                  } else {
+                    return x.toString(); // just ID
+                  }
+                }),
+              )
             : [],
         createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
         updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
@@ -211,4 +271,26 @@ class Review {
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
       };
+
+  Review copyWith({
+    String? id,
+    String? user,
+    int? rating,
+    String? reviewText,
+    List<dynamic>? comments,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? v,
+  }) {
+    return Review(
+      id: id ?? this.id,
+      user: user ?? this.user,
+      rating: rating ?? this.rating,
+      reviewText: reviewText ?? this.reviewText,
+      comments: comments ?? this.comments,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      v: v ?? this.v,
+    );
+  }
 }

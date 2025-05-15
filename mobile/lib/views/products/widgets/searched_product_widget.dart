@@ -15,9 +15,7 @@ class SearchedProductWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Get.to(() => ProductDetailScreen(
-            // : food
-            ));
+        Get.to(() => ProductDetailScreen(product: product));
       },
       child: Padding(
         padding: EdgeInsets.only(left: 10.w, right: 5.w),

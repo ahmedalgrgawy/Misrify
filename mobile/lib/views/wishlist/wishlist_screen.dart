@@ -12,8 +12,8 @@ import 'package:graduation_project1/hooks/fetch_wishlist.dart';
 import 'package:graduation_project1/models/wishlist_response.dart';
 import 'package:graduation_project1/views/auth/login_redirect.dart';
 import 'package:graduation_project1/views/entrypoint.dart';
+import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/wishlist/widgets/wishlist_tile.dart';
-
 import '../../constants/constants.dart';
 
 class WishlistScreen extends HookWidget {
@@ -108,6 +108,11 @@ class WishlistScreen extends HookWidget {
                             final wishlist = wishlistProducts.value[i];
                             return WishlistTile(
                               wishlist: wishlist,
+                              ontap: () {
+                                Get.to(() => ProductDetailScreen(
+                                      product: wishlist.toProduct(),
+                                    ));
+                              },
                               refetch: () async {
                                 if (refetch != null) await refetch();
                                 wishlistProducts.value = hookResult.data ?? [];

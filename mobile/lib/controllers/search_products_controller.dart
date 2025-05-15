@@ -25,7 +25,7 @@ class SearchProductsController extends GetxController {
     try {
       final response =
           await http.get(Uri.parse('$appBaseUrl/user/search?query=$query'));
-
+      print(response.body);
       if (response.statusCode == 200) {
         final parsedModel = productsModelFromJson(response.body);
         searcResults = parsedModel.products ?? [];
