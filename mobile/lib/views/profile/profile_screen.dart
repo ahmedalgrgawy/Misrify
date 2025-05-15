@@ -24,6 +24,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ), // Replace with actual image URL
             ),
           ),
+          Container(
+            padding: const EdgeInsets.all(4.0),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.camera_alt, size: 20),
+          ),
           title = Text('Mohamed Seyam'),
           subtitle = Text('mh16989886@gmail.com'),
           Container(
