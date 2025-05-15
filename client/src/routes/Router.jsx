@@ -18,6 +18,7 @@ import Products from '../Components/Products/Products';
 import Categories from '../Components/Categories/Categories';
 import Merchants from '../Components/Merchants/Merchants';
 import Support from '../Components/Support/Support';
+import Profile from './../Pages/Profile/Profile';
 
 const router = createBrowserRouter([
   {
@@ -33,7 +34,8 @@ const router = createBrowserRouter([
       { path: '/check-gmail', element: <CheckGmail /> },
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/password-success', element: <PasswordSuccess /> },
-      { path: '/contact', element: <Contact /> }
+      { path: '/contact', element: <Contact /> },
+      { path: '/profile', element: <Profile /> }
     ],
   },
   {
