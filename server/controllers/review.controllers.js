@@ -26,14 +26,19 @@ export const createReview = async (req, res, next) => {
 
     await product.save();
 
-    await Notification.create({
-        title: "New Review",
-        message: `New review on your product`,
-        receiver: product.merchant,
-        sender: userId,
-        type: "product",
-        isRead: false,
-    })
+    if (!product.owner) {
+        console.warn(`⚠️ Product ${productId} has no owner. Skipping notification.`);
+      } else {
+        await Notification.create({
+          sender: req.user.id,
+          receiver: [product.owner],
+          type: 'product',
+          content: `New review added to product ${product.name}`,
+        });
+      }
+      
+      
+      
 
     res.status(201).json({ success: true, message: "Review created successfully", review });
 
