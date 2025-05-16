@@ -21,6 +21,8 @@ export const editProfile = createAsyncThunk(
   "profile/editProfile",
   async ( updatedData, { rejectWithValue }) => {
     try {
+      console.log(updatedData);
+      
       const response = await axiosInstance.put(
         `/user/update`,
         updatedData

@@ -14,12 +14,19 @@ import { getProfile, editProfile } from "../../features/profileSlice";
 const Profile = () => {
   const dispatch = useDispatch();
   const { profile } = useSelector((state) => state.Profile);
-  const [isDisabled, setIsDisabled] = useState({ name: true , email:true , phone:true , address:true , CPassword:true , NPassword:true });
+  const [isDisabled, setIsDisabled] = useState({
+    name: true,
+    email: true,
+    phone: true,
+    address: true,
+    CPassword: true,
+    NPassword: true,
+  });
+  const [picLink, setPicLink] = useState(true);
 
   useEffect(() => {
     dispatch(getProfile());
   }, [dispatch]);
-
 
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -49,13 +56,23 @@ const Profile = () => {
   });
 
   function postNewData(data) {
-    if (data.currentPassword == "" && data.newPassword == "")
-    {
-      const {currentPassword , newPassword , ...updatedData} = data;
-      dispatch(editProfile(updatedData));
-    }else{
-      dispatch(editProfile(data));
-    }
+
+if(data.currentPassword == "" && data.newPassword == ""){
+  if (data.imgUrl == "") {
+    const {currentPassword , imgUrl ,newPassword , ...updatedData} = data;
+    dispatch(editProfile(updatedData));
+  }else{
+    const { currentPassword, newPassword, ...updatedData } = data;
+    dispatch(editProfile(updatedData));
+  }
+}else{
+  if (data.imgUrl == "") {
+    const { imgUrl, ...updatedData } = data;
+    dispatch(editProfile(updatedData));
+  } else {
+    dispatch(editProfile(data));
+  }
+}
   }
 
   const updateData = useFormik({
@@ -67,6 +84,7 @@ const Profile = () => {
       currentPassword: "",
       newPassword: "",
       gender: profile.gender || "",
+      imgUrl: "",
     },
     validationSchema,
     onSubmit: postNewData,
@@ -83,17 +101,32 @@ const Profile = () => {
             className={` relative w-36 h-36 mb-4 rounded-full bg-cover bg-center`}
             style={{ backgroundImage: `url(${pic})` }}
           >
-            {/* <img 
-            className="w-36 h-36 rounded-full bg-cover bg-center"
-            src={pic}
-            alt="profile picture"
-          /> */}
-            <button>
-              <IoCameraOutline
-                style={{ backgroundClip: "" }}
-                className="absolute p-2 bottom-0 right-0 w-11 h-11 rounded-full text-white bg-[#15253FF5] backdrop-opacity-0 "
+            <div className="absolute bottom-0 right-0 w-11 h-11">
+              <button
+                type="button"
+                onClick={() => {
+                  picLink ? setPicLink(false) : setPicLink(true);
+                }}
+              >
+                <IoCameraOutline
+                  style={{ backgroundClip: "" }}
+                  className="absolute top-1/2 -translate-y-1/2 p-2 w-full h-full rounded-full text-white bg-[#15253FF5] "
+                />
+              </button>
+
+              <input
+                className={`${
+                  picLink ? "hidden" : ""
+                }  absolute w-32 -bottom-11 -right-24 md:bottom-auto md:-right-60 md:top-1/2 md:-translate-y-1/2 md:w-56 shadow-inner bg-[#F2F4F8] py-2 px-3 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                type="text"
+                name="imgUrl"
+                id="imgUrl"
+                placeholder="Picture Link"
+                value={updateData.values.imgUrl}
+                onChange={updateData.handleChange}
+                onBlur={updateData.handleBlur}
               />
-            </button>
+            </div>
           </div>
 
           <h2 className="font-inter mb-2 text-bg-second font-semibold text-2xl">
@@ -203,7 +236,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
-                    onClick={() => {setIsDisabled({ ...isDisabled, email: false })}}
+                    onClick={() => {
+                      setIsDisabled({ ...isDisabled, email: false });
+                    }}
                   >
                     <FaPencil />
                   </button>
@@ -242,7 +277,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
-                    onClick={() => {setIsDisabled({ ...isDisabled, phone: false })}}
+                    onClick={() => {
+                      setIsDisabled({ ...isDisabled, phone: false });
+                    }}
                   >
                     <FaPencil />
                   </button>
@@ -282,7 +319,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
-                    onClick={() => {setIsDisabled({ ...isDisabled, address: false })}}
+                    onClick={() => {
+                      setIsDisabled({ ...isDisabled, address: false });
+                    }}
                   >
                     <FaPencil />
                   </button>
@@ -321,7 +360,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
-                    onClick={() => {setIsDisabled({ ...isDisabled, CPassword: false });}}
+                    onClick={() => {
+                      setIsDisabled({ ...isDisabled, CPassword: false });
+                    }}
                   >
                     <FaPencil />
                   </button>
@@ -361,7 +402,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
-                    onClick={() => {setIsDisabled({ ...isDisabled, NPassword: false });}}
+                    onClick={() => {
+                      setIsDisabled({ ...isDisabled, NPassword: false });
+                    }}
                   >
                     <FaPencil />
                   </button>
