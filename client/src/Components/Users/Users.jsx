@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteUser, getAllUsers } from "../../features/userSlice";
+import { deleteUser, getAllUsers, editUser } from "../../features/userSlice";
 import { TailSpin } from 'react-loader-spinner';
 import { FaEdit, FaTrashAlt, FaSearch } from 'react-icons/fa';
 import { Link } from "react-router-dom";
@@ -11,17 +11,21 @@ const Users = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [userToEdit, setUserToEdit] = useState(null);
+    const [editData, setEditData] = useState({ name: "", phoneNumber: "", address: "", role: "" });
 
+    // Delete Funcs
     const handleDeleteClick = (userId) => {
         setUserToDelete(userId);
         setShowDeleteModal(true);
     };
-    // Handle the cancellation of the delete action
+
     const handleCancelDelete = () => {
         setShowDeleteModal(false);
         setUserToDelete(null);
     };
-    // Handle the confirmation of the delete action
+
     const handleConfirmDelete = () => {
         dispatch(deleteUser(userToDelete))
             .then(() => {
@@ -30,6 +34,31 @@ const Users = () => {
             })
             .catch((error) => {
                 console.error("Error deleting user:", error);
+            });
+    };
+
+    // Edit Functions
+    const handleEditClick = (user) => {
+        setUserToEdit(user._id);
+        setEditData({ name: user.name, phoneNumber: user.phoneNumber, address: user.address, role: user.role });
+        setShowEditModal(true);
+    };
+
+    const handleCancelEdit = () => {
+        setShowEditModal(false);
+        setUserToEdit(null);
+        setEditData({ name: "", phoneNumber: "", address: "", role: "" });
+    };
+
+    const handleConfirmEdit = () => {
+        dispatch(editUser({ userId: userToEdit, updatedData: editData }))
+            .then(() => {
+                setShowEditModal(false);
+                setUserToEdit(null);
+                setEditData({ name: "", phoneNumber: "", address: "", role: "" });
+            })
+            .catch((error) => {
+                console.error("Error editing user:", error);
             });
     };
 
@@ -106,7 +135,7 @@ const Users = () => {
                                     <td className="py-4 px-6 text-main-blue">{u.email}</td>
                                     <td className="py-4 px-6 text-main-blue">{u.gender}</td>
                                     <td className="py-4 px-6 text-center space-x-4 flex justify-center items-center">
-                                        <Link to={`/admin/edit-user/${u._id}`} className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110">
+                                        <Link onClick={() => handleEditClick(u)} className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110">
                                             <FaEdit />
                                         </Link>
                                         <button onClick={() => handleDeleteClick(u._id)} className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110">
@@ -122,13 +151,65 @@ const Users = () => {
                         )}
                     </tbody>
                 </table>
+
                 {showDeleteModal && (
                     <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
                         <div className="bg-white p-12 rounded-lg shadow-xl w-2xl">
-                            <h3 className="text-lg font-semibold text-main-blue mb-10">Are you sure you want to delete this user?</h3>
+                            <h3 className="text-lg font-semibold text-main-blue mb-10">
+                                Are you sure you want to delete this user?
+                            </h3>
                             <div className="flex justify-end gap-4">
-                                <button onClick={handleCancelDelete} className="bg-gray-200 px-4 py-2 rounded-md">Cancel</button>
-                                <button onClick={handleConfirmDelete} className="bg-red-600 text-white px-4 py-2 rounded-md">Delete</button>
+                                <button onClick={handleCancelDelete}
+                                    className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md">
+                                    Cancel
+                                </button>
+                                <button onClick={handleConfirmDelete}
+                                    className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-500 shadow-lg">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+                {showEditModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                        <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md">
+                            <h2 className="text-2xl font-semibold text-main-blue mb-6">Edit User</h2>
+                            <div className="flex flex-col gap-4">
+                                <input
+                                    type="text"
+                                    placeholder="Name"
+                                    value={editData.name}
+                                    onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+                                    className="border border-light-grey rounded-md text-dark-grey py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Phone Number"
+                                    value={editData.phoneNumber}
+                                    onChange={(e) => setEditData({ ...editData, phoneNumber: e.target.value })}
+                                    className="border border-light-grey rounded-md text-dark-grey py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="Address"
+                                    value={editData.address}
+                                    onChange={(e) => setEditData({ ...editData, address: e.target.value })}
+                                    className="border border-light-grey rounded-md text-dark-grey py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+                                />
+                                <select
+                                    value={editData.role}
+                                    onChange={(e) => setEditData({ ...editData, role: e.target.value })}
+                                    className="border border-light-grey rounded-md text-dark-grey py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+                                >
+                                    <option value="admin" className="bg-second text-dark-grey">Admin</option>
+                                    <option value="merchant" className="bg-second text-dark-grey">Merchant</option>
+                                    <option value="user" className="bg-second text-dark-grey">User</option>
+                                </select>
+                                <div className="flex justify-end gap-4 mt-4">
+                                    <button onClick={handleCancelEdit} className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md">Cancel</button>
+                                    <button onClick={handleConfirmEdit} className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg">Save</button>
+                                </div>
                             </div>
                         </div>
                     </div>

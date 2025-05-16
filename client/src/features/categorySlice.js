@@ -45,11 +45,7 @@ export const editCategory = createAsyncThunk(
   "categories/editCategory",
   async ({ categoryId, updatedData }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(
-        `admin/edit-category/${categoryId}`,
-        updatedData
-      );
-      //   need test
+      const response = await axiosInstance.put(`admin/edit-category/${categoryId}`,updatedData);
       return response.data.Category;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
