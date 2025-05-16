@@ -7,7 +7,7 @@ import { updateUserSchema } from '../validators/userValidator.js';
 import { getWishlist, toggleWishlist } from '../controllers/wishlist.controllers.js';
 import { getAllApprovedProducts, searchProducts, filterProducts } from '../controllers/product.controllers.js';
 import { createReview, updateReview, deleteReview } from "../controllers/review.controllers.js";
-import { createComment, updateComment, deleteCommentUser } from "../controllers/comment.controllers.js";
+import { createComment, updateComment, deleteCommentUser, getCommentById } from "../controllers/comment.controllers.js";
 import { createReviewSchema, updateReviewSchema } from '../validators/reviewValidator.js';
 import { createCommentSchema, updateCommentSchema } from '../validators/commentValidator.js';
 import { getCart, addToCart, removeFromCart, updateCartItemQuantity, clearCart } from "../controllers/cart.controllers.js";
@@ -17,6 +17,7 @@ import { createOrderSchema, editOrderSchema } from '../validators/checkoutValida
 import { submitContactForm } from "../controllers/contact.controllers.js";
 import { contactSchema } from "../validators/contactValidator.js";
 import { getUserAnalytics } from "../controllers/userAnalytics.controllers.js";
+
 import { getNotifications, markAsRead, deleteNotification, deleteAllNotification } from '../controllers/notification.controllers.js';
 
 const router = express.Router()
@@ -47,6 +48,10 @@ router.delete("/reviews/:reviewId", catchAsync(protectedRoute), catchAsync(custo
 router.post("/comments/create", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), validate(createCommentSchema), catchAsync(createComment));
 router.put("/comment/:commentId", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), validate(updateCommentSchema), catchAsync(updateComment));
 router.delete("/comment/:commentId", catchAsync(protectedRoute), catchAsync(userAndMerchantRoute), catchAsync(deleteCommentUser));
+
+//new
+router.get("/comments/:id", catchAsync(getCommentById)); // remove protectedRoute temporarily
+
 
 // Handling Cart (getCart, addTo, remove, update, clear)
 router.get("/cart", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(getCart));

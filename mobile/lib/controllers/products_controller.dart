@@ -1,15 +1,22 @@
+import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'package:graduation_project1/constants/constants.dart';
+import 'package:graduation_project1/models/products_model.dart';
 
 class ProductsController extends GetxController {
   RxInt currentPage = 0.obs;
+  RxInt count = 1.obs;
+  RxDouble _totalPrice = 0.0.obs;
+
+  double get additivePrice => _totalPrice.value;
+
   bool initialCheckValue = false;
-  //var additivesList = <AdditiveObs>[].obs;
 
   void changePage(int index) {
     currentPage.value = index;
   }
 
-  RxInt count = 1.obs;
   void increment() {
     count.value++;
   }
@@ -20,51 +27,28 @@ class ProductsController extends GetxController {
     }
   }
 
-  // void loadAdditives(List<Additive> additives) {
-  //   additivesList.clear();
-  //   for (var additiveInfo in additives) {
-  //     var additive = AdditiveObs(
-  //         id: additiveInfo.id,
-  //         title: additiveInfo.title,
-  //         price: additiveInfo.price,
-  //         checked: initialCheckValue);
-  //     if (additives.length == additivesList.length) {
-  //     } else {
-  //       additivesList.add(additive);
-  //     }
-  //   }
-  // }
-
-  // List<String> getCartAdditive() {
-  //   List<String> additives = [];
-  //   for (var additive in additivesList) {
-  //     if (additive.isChecked.value && !additives.contains(additive.title)) {
-  //       additives.add(additive.title);
-  //     } else if (!additive.isChecked.value &&
-  //         additives.contains(additive.title)) {
-  //       additives.remove(additive.title);
-  //     }
-  //   }
-  //   return additives;
-  // }
-
-  RxDouble _totalPrice = 0.0.obs;
-
-  double get additivePrice => _totalPrice.value;
-
   set setTotalPrice(double newPrice) {
     _totalPrice.value = newPrice;
   }
 
   double getTotalPrice() {
     double totalPrice = 0.0;
-    // for (var additive in additivesList) {
-    //   if (additive.isChecked.value) {
-    //     totalPrice += double.tryParse(additive.price) ?? 0.0;
-    //   }
-    // }
+    // Add logic for computing price if needed
     setTotalPrice = totalPrice;
-
     return totalPrice;
+  }
+
+  // ✅ Fetch single product by ID from backend
+  Future<Product> fetchSingleProduct(String productId) async {
+    final url = Uri.parse('$appBaseUrl/user/products/$productId');
+
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return Product.fromJson(data['product']); // Adjust if needed
+    } else {
+      throw Exception('Failed to load product');
+    }
   }
 }

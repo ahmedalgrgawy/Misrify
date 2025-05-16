@@ -1,5 +1,5 @@
-// Final version that handles brand as either ID or object
 import 'dart:convert';
+import 'package:graduation_project1/models/products_model.dart'; // ✅ Use Brand from here
 
 WishlistResponse wishlistResponseFromJson(String str) =>
     WishlistResponse.fromJson(json.decode(str));
@@ -71,7 +71,7 @@ class WishlistItem {
   final String id;
   final String name;
   final String category;
-  final Brand brand;
+  final Brand brand; // ✅ From products_model.dart
   final String description;
   final int quantityInStock;
   final double price;
@@ -110,7 +110,7 @@ class WishlistItem {
         category: json["category"],
         brand: json["brand"] is Map<String, dynamic>
             ? Brand.fromJson(json["brand"])
-            : Brand(id: json["brand"], name: "Unknown"),
+            : Brand.empty(), // fallback
         description: json["description"],
         quantityInStock: json["quantityInStock"],
         price: (json["price"] ?? 0).toDouble(),
@@ -143,21 +143,42 @@ class WishlistItem {
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
       };
-}
 
-class Brand {
-  final String id;
-  final String name;
-
-  Brand({required this.id, required this.name});
-
-  factory Brand.fromJson(Map<String, dynamic> json) => Brand(
-        id: json["_id"] ?? '',
-        name: json["name"] ?? 'Unknown',
-      );
-
-  Map<String, dynamic> toJson() => {
-        "_id": id,
-        "name": name,
-      };
+  /// ✅ Convert to Product model for detail screen
+  Product toProduct() {
+    return Product(
+      id: id,
+      name: name,
+      category: Brand(
+        id: category, // ✅ this is the actual category ID coming from backend
+        name: '', // You can leave name empty or fetch it separately if needed
+        owner: '',
+        description: '',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        v: 0,
+      ),
+      brand: Brand(
+        id: brand.id,
+        name: brand.name,
+        owner: brand.owner,
+        description: brand.description,
+        createdAt: brand.createdAt,
+        updatedAt: brand.updatedAt,
+        v: brand.v,
+      ),
+      description: description,
+      quantityInStock: quantityInStock,
+      price: price,
+      colors: colors,
+      sizes: sizes,
+      isDiscounted: isDiscounted,
+      discountAmount: discountAmount,
+      isApproved: isApproved,
+      reviews: [],
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      v: v,
+    );
+  }
 }

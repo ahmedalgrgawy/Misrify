@@ -38,9 +38,7 @@ class ProductList extends HookWidget {
                 final product = products[i];
                 return ProductWidget(
                   onTap: () {
-                    Get.to(() => ProductDetailScreen(
-                        //   product: product
-                        ));
+                    Get.to(() => ProductDetailScreen(product: product));
                   },
                   brand: product.brand.name,
                   price: product.price.toStringAsFixed(2),
