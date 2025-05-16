@@ -68,7 +68,6 @@ class CartScreen extends HookWidget {
             }).toList()) ??
             [];
 
-    // ✅ Update cart item count for the app bar
     useEffect(() {
       Future.microtask(() {
         final int totalQuantity = enrichedCartItems.fold<int>(
@@ -83,9 +82,8 @@ class CartScreen extends HookWidget {
     final isLoading = hookResult.isLoading || productsHook.isLoading;
     final refetch = hookResult.refetch;
 
-    final loginController = Get.put(LoginController());
-    final box = GetStorage();
-    final token = box.read('token');
+    final token = GetStorage().read('token');
+    if (token == null) return const LoginRedirect();
 
     final subtotal =
         enrichedCartItems.fold(0.0, (sum, item) => sum + item.total);
@@ -95,8 +93,6 @@ class CartScreen extends HookWidget {
           ? sum + (item.product.discountAmount * item.quantity)
           : sum,
     );
-
-    if (token == null) return const LoginRedirect();
 
     return Scaffold(
       body: SafeArea(
@@ -131,7 +127,7 @@ class CartScreen extends HookWidget {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       SizedBox(
-                        height: height * .33,
+                        height: MediaQuery.of(context).size.height * .33,
                         child: Image.asset(
                           'assets/banners/cart.png',
                           fit: BoxFit.contain,
@@ -152,9 +148,7 @@ class CartScreen extends HookWidget {
                       ),
                       SizedBox(height: 20.h),
                       CustomButton(
-                        onTap: () {
-                          Get.offAll(() => MainScreen());
-                        },
+                        onTap: () => Get.offAll(() => MainScreen()),
                         btnColor: Colors.white,
                         text: 'Add to Cart',
                         textcolor: kDarkBlue,
@@ -179,9 +173,7 @@ class CartScreen extends HookWidget {
                           final item = enrichedCartItems[i];
                           return CartTile(
                             item: item,
-                            refetch: () async {
-                              if (refetch != null) await refetch();
-                            },
+                            refetch: () async => await refetch!(),
                           );
                         },
                       ),
@@ -192,64 +184,16 @@ class CartScreen extends HookWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Subtotal :',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                              ReusableText(
-                                text: '\$${subtotal.toStringAsFixed(2)}',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Shipping Fee :',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                              ReusableText(
-                                text: '\$0.00',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Discount :',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                              ReusableText(
-                                text: '-\$${discount.toStringAsFixed(2)}',
-                                style: appStyle(14, kGray, FontWeight.w400),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
+                          _buildPriceRow(
+                              'Subtotal :', '\$${subtotal.toStringAsFixed(2)}'),
+                          _buildPriceRow('Shipping Fee :', '\$0.00'),
+                          _buildPriceRow('Discount :',
+                              '-\$${discount.toStringAsFixed(2)}'),
                           const Divider(height: 25, thickness: 1),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              ReusableText(
-                                text: 'Total :',
-                                style:
-                                    appStyle(18, Kfoundation, FontWeight.w600),
-                              ),
-                              ReusableText(
-                                text:
-                                    '\$${(subtotal - discount).toStringAsFixed(2)}',
-                                style:
-                                    appStyle(18, Kfoundation, FontWeight.w600),
-                              ),
-                            ],
+                          _buildPriceRow(
+                            'Total :',
+                            '\$${(subtotal - discount).toStringAsFixed(2)}',
+                            bold: true,
                           ),
                           const SizedBox(height: 12),
                           CustomButton(
@@ -271,6 +215,30 @@ class CartScreen extends HookWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildPriceRow(String label, String value, {bool bold = false}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        ReusableText(
+          text: label,
+          style: appStyle(
+            bold ? 18 : 14,
+            bold ? Kfoundation : kGray,
+            bold ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+        ReusableText(
+          text: value,
+          style: appStyle(
+            bold ? 18 : 14,
+            bold ? Kfoundation : kGray,
+            bold ? FontWeight.w600 : FontWeight.w400,
+          ),
+        ),
+      ],
     );
   }
 }

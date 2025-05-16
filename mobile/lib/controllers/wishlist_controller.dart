@@ -9,7 +9,6 @@ import 'package:http/http.dart' as http;
 
 class WishlistController extends GetxController {
   final box = GetStorage();
-
   RxBool _isLoading = false.obs;
   RxSet<String> wishlistIds = <String>{}.obs;
 
@@ -25,6 +24,13 @@ class WishlistController extends GetxController {
     if (storedIds != null) {
       wishlistIds.addAll(List<String>.from(storedIds));
     }
+  }
+
+  /// ✅ Add this method
+  void setWishlistIdsFromServer(List<String> ids) {
+    wishlistIds.value = ids.toSet();
+    box.write('wishlistIds', wishlistIds.toList());
+    wishlistIds.refresh();
   }
 
   void _updateLocalWishlist(String productId) {
