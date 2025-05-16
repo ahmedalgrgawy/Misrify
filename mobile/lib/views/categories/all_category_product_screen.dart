@@ -9,6 +9,7 @@ import 'package:graduation_project1/controllers/category_controller.dart';
 import 'package:graduation_project1/hooks/fetch_filterd_products.dart';
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/data/product_sort.dart';
+import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 
 class AllCategoryProductScreen extends HookWidget {
@@ -109,6 +110,10 @@ class AllCategoryProductScreen extends HookWidget {
                           final product = displayedProducts.value[index];
                           return ProductWidget(
                             id: product.id,
+                            onTap: () {
+                              Get.to(
+                                  () => ProductDetailScreen(product: product));
+                            },
                             title: product.name,
                             brand: product.brand.name,
                             price: product.price.toStringAsFixed(2),

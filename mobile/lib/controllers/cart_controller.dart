@@ -49,8 +49,8 @@ class CartController extends GetxController {
   Future<void> refreshTokenAndRetry({
     required String productId,
     required int quantity,
-    required String color,
-    required String size,
+    String? color,
+    String? size,
   }) async {
     final refreshToken = box.read('refreshToken');
     if (refreshToken == null) {
@@ -87,70 +87,43 @@ class CartController extends GetxController {
     Get.offAll(() => const LoginScreen());
   }
 
-  Future<void> refreshTokenAndRetryForRemove(String cartItemId) async {
-    final refreshToken = box.read('refreshToken');
-    if (refreshToken == null) {
-      Get.offAll(() => const LoginScreen());
-      return;
-    }
-
-    final refreshUrl = Uri.parse('$appBaseUrl/auth/refresh-token');
-    final refreshResponse = await http.post(
-      refreshUrl,
-      headers: {
-        'Cookie': refreshToken,
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (refreshResponse.statusCode == 200) {
-      final newCookie = refreshResponse.headers['set-cookie'];
-      final match = RegExp(r'accessToken=([^;]+)').firstMatch(newCookie ?? '');
-      if (match != null) {
-        final newToken = match.group(1);
-        box.write('token', newToken);
-        await removeFromCart(cartItemId, isRetrying: true);
-        return;
-      }
-    }
-
-    Get.offAll(() => const LoginScreen());
-  }
-
   Future<void> addToCart({
     required String productId,
     required int quantity,
-    required String color,
-    required String size,
+    String? color,
+    String? size,
     bool isRetrying = false,
   }) async {
     setLoading = true;
-    final accessToken = box.read('token');
+    final token = box.read('token');
 
-    if (accessToken == null) {
+    if (token == null) {
       Get.offAll(() => const LoginScreen());
       return;
     }
 
-    final url = Uri.parse('$appBaseUrl/user/addToCart');
-    final headers = {
-      'Content-Type': 'application/json',
-      'Cookie': 'accessToken=$accessToken',
-    };
-
-    final body = jsonEncode({
+    // If no color or size selected, set to fallback values
+    final body = {
       'productId': productId,
       'quantity': quantity,
-      'color': color,
-      'size': size,
-    });
+      'color': (color != null && color.trim().isNotEmpty) ? color : 'default',
+      'size': (size != null && size.trim().isNotEmpty) ? size : 'default',
+    };
 
     try {
-      final response = await http.post(url, headers: headers, body: body);
+      final response = await http.post(
+        Uri.parse('$appBaseUrl/user/addToCart'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Cookie': 'accessToken=$token',
+        },
+        body: jsonEncode(body),
+      );
+
       if (response.statusCode == 200) {
         final resData = jsonDecode(response.body);
         Get.snackbar(
-          'add to cart',
+          'Added to cart',
           resData['message'] ?? 'Updated successfully',
           colorText: kLightWhite,
           backgroundColor: kLightBlue,
@@ -159,10 +132,20 @@ class CartController extends GetxController {
         await refreshCartCount();
       } else if (response.statusCode == 401 && !isRetrying) {
         await refreshTokenAndRetry(
-            productId: productId, quantity: quantity, color: color, size: size);
+          productId: productId,
+          quantity: quantity,
+          color: color,
+          size: size,
+        );
       } else {
         final error = apiErrorFromJson(response.body);
-        Get.snackbar('Error', error.message);
+        debugPrint('❌ API Error: ${response.body}');
+        Get.snackbar(
+          'Error',
+          error.message,
+          colorText: kLightWhite,
+          backgroundColor: kLightBlue,
+        );
       }
     } catch (e) {
       debugPrint('🚨 Add to cart error: $e');
@@ -194,7 +177,7 @@ class CartController extends GetxController {
       if (response.statusCode == 200) {
         final resData = jsonDecode(response.body);
         Get.snackbar(
-          'removed from cart',
+          'Removed from cart',
           resData['message'] ?? 'Updated successfully',
           colorText: kLightWhite,
           backgroundColor: kLightBlue,
@@ -212,6 +195,36 @@ class CartController extends GetxController {
     } finally {
       setLoading = false;
     }
+  }
+
+  Future<void> refreshTokenAndRetryForRemove(String cartItemId) async {
+    final refreshToken = box.read('refreshToken');
+    if (refreshToken == null) {
+      Get.offAll(() => const LoginScreen());
+      return;
+    }
+
+    final refreshUrl = Uri.parse('$appBaseUrl/auth/refresh-token');
+    final refreshResponse = await http.post(
+      refreshUrl,
+      headers: {
+        'Cookie': refreshToken,
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (refreshResponse.statusCode == 200) {
+      final newCookie = refreshResponse.headers['set-cookie'];
+      final match = RegExp(r'accessToken=([^;]+)').firstMatch(newCookie ?? '');
+      if (match != null) {
+        final newToken = match.group(1);
+        box.write('token', newToken);
+        await removeFromCart(cartItemId, isRetrying: true);
+        return;
+      }
+    }
+
+    Get.offAll(() => const LoginScreen());
   }
 
   Future<void> updateCartItemQuantity({

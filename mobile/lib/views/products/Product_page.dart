@@ -1,34 +1,60 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/common/app_style.dart';
+import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/constants/uidata.dart';
-import 'package:graduation_project1/hooks/fetch_all_products.dart';
+import 'package:graduation_project1/controllers/cart_controller.dart';
+import 'package:graduation_project1/controllers/reviews_controller.dart';
+import 'package:graduation_project1/hooks/fetch_filterd_products.dart';
+import 'package:graduation_project1/models/products_model.dart';
+import 'package:graduation_project1/views/home/widgets/SectionHeading.dart';
+import 'package:graduation_project1/views/products/related_items_screen.dart';
+import 'package:graduation_project1/views/products/widgets/color_box.dart';
 import 'package:graduation_project1/views/products/widgets/delivery_section.dart';
-import 'package:graduation_project1/views/products/widgets/rating/rating_section.dart';
+import 'package:graduation_project1/views/products/widgets/rating and reviews/review_container.dart';
+import 'package:graduation_project1/views/products/widgets/rating and reviews/review_section.dart';
 import 'package:graduation_project1/views/products/widgets/related_items.dart';
-import 'package:graduation_project1/views/products/widgets/user_reviews.dart';
+import 'package:graduation_project1/views/products/widgets/size_box.dart';
 
 class ProductDetailScreen extends HookWidget {
-  ProductDetailScreen({Key? key}) : super(key: key);
-  static const String routeName = "Home_Screen";
+  final Product product;
+
+  ProductDetailScreen({Key? key, required this.product}) : super(key: key);
+
+  double get averageRating {
+    if (product.reviews.isEmpty) return 0.0;
+    final total = product.reviews.fold(0, (sum, r) => sum + r.rating);
+    return total / product.reviews.length;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final hookResult = useFetchAllProducts();
-    final products = hookResult.data;
-    final isLoading = hookResult.isLoading;
-
+    final cartController = Get.put(CartController());
+    final reviewController = Get.put(ReviewController());
+    final selectedColor = useState('');
     final selectedSize = useState('');
     final selectedIndex = useState(0);
-    final isFavorite = useState(false);
+    final originalPrice = product.price;
+    final discountAmount = product.discountAmount;
+    final discountedPrice =
+        (originalPrice - discountAmount).clamp(0, originalPrice);
+
     final mainImage = useState(
+      //  product.image
       'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=2069&auto=format&fit=crop',
-    );
+    ); // Replace with actual main image
+    final reviewsKey = GlobalKey<ReviewsSectionState>();
+    final hookResult = useFetchProductsByCategory(product.category.id);
+    final selectedQuantity = useState<int>(1);
+
+    final products = hookResult.data;
+    final isLoading = hookResult.isLoading;
+    final box = GetStorage();
+    final userIdFromTokenOrStorage = box.read('userId') ?? "You";
 
     return Scaffold(
       appBar: AppBar(
@@ -42,216 +68,278 @@ class ProductDetailScreen extends HookWidget {
             style: appStyle(14, KTextColor, FontWeight.bold),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.favorite,
-                color: isFavorite.value ? Colors.red : null),
-            onPressed: () => isFavorite.value = !isFavorite.value,
-          ),
-        ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+        child: CustomButton(
+          onTap: () async {
+            // ✅ Validate only if the product has sizes
+            if (product.sizes.isNotEmpty && selectedSize.value.isEmpty) {
+              Get.snackbar(
+                'Missing Selection',
+                'Please select a size before adding to cart.',
+                colorText: Colors.black,
+                backgroundColor: Colors.redAccent,
+                icon: const Icon(Icons.warning, color: Colors.white),
+              );
+              return;
+            }
+
+            // ✅ Validate only if the product has colors
+            if (product.colors.isNotEmpty && selectedColor.value.isEmpty) {
+              Get.snackbar(
+                'Missing Selection',
+                'Please select a color before adding to cart.',
+                colorText: Colors.black,
+                backgroundColor: Colors.redAccent,
+                icon: const Icon(Icons.warning, color: Colors.white),
+              );
+              return;
+            }
+
+            await cartController.addToCart(
+              productId: product.id,
+              quantity: selectedQuantity.value,
+              color: product.colors.isEmpty ? null : selectedColor.value,
+              size: product.sizes.isEmpty ? null : selectedSize.value,
+            );
+          },
+          btnColor: kLightBlue,
+          text: 'Add To Cart',
+          textcolor: Colors.white,
+          btnWidth: double.infinity,
+          btnHeight: 48,
+        ),
       ),
       body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Main Image
-            SizedBox(
-              height: 300,
-              width: double.infinity,
-              child: Image.network(mainImage.value, fit: BoxFit.cover),
-            ),
-            const SizedBox(height: 20),
+        child: Padding(
+          padding: EdgeInsets.all(16.w),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(mainImage.value,
+                  height: 300, width: double.infinity, fit: BoxFit.cover),
+              const SizedBox(height: 20),
+              ReusableText(
+                  text: product.brand.name,
+                  style: appStyle(12, kGray, FontWeight.w400)),
+              const SizedBox(height: 4),
+              ReusableText(
+                  text: product.name,
+                  style: appStyle(16, KTextColor, FontWeight.w600)),
+              const SizedBox(height: 8),
 
-            // Thumbnails
-            SizedBox(
-              height: 100,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: productimage.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      mainImage.value = productimage[index];
-                      selectedIndex.value = index;
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          productimage[index],
-                          fit: BoxFit.cover,
-                          width: 80,
-                        ),
-                      ),
+// ✅ Rating, Reviews, Stock
+              Row(
+                children: [
+                  // ⭐ Star Rating
+                  Row(
+                    children: List.generate(5, (index) {
+                      if (index < averageRating.floor()) {
+                        return const Icon(Icons.star,
+                            color: Colors.amber, size: 18);
+                      } else if (index < averageRating &&
+                          averageRating - index >= 0.5) {
+                        return const Icon(Icons.star_half,
+                            color: Colors.amber, size: 18);
+                      } else {
+                        return const Icon(Icons.star_border,
+                            color: Colors.amber, size: 18);
+                      }
+                    }),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    averageRating.toStringAsFixed(1),
+                    style: appStyle(13, KTextColor, FontWeight.w500),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    '(${product.reviews.length} Reviews)',
+                    style: appStyle(13, kGray, FontWeight.w400),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    product.quantityInStock > 0 ? 'In Stock' : 'Out of Stock',
+                    style: appStyle(
+                      13,
+                      product.quantityInStock > 0 ? Colors.green : Colors.red,
+                      FontWeight.w500,
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
-            ),
+              const SizedBox(height: 8),
 
-            // Product Info
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+// ✅ Price Section
+              product.isDiscounted && product.discountAmount > 0
+                  ? Row(
+                      children: [
+                        ReusableText(
+                          text:
+                              "\$${(product.price - product.discountAmount).clamp(0, product.price).toStringAsFixed(2)}",
+                          style: appStyle(22, kDarkBlue, FontWeight.w600),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "\$${product.price.toStringAsFixed(2)}",
+                          style: appStyle(16, kGray, FontWeight.w400).copyWith(
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.red[50],
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            "-${((product.discountAmount / product.price) * 100).round()}% OFF",
+                            style: appStyle(12, Colors.red, FontWeight.w600),
+                          ),
+                        ),
+                      ],
+                    )
+                  : ReusableText(
+                      text: "\$${product.price.toStringAsFixed(2)}",
+                      style: appStyle(20, KTextColor, FontWeight.w700),
+                    ),
+
+              const SizedBox(height: 8),
+              if (product.sizes.isNotEmpty) ...[
+                ReusableText(
+                    text: 'Size',
+                    style: appStyle(16, KTextColor, FontWeight.w500)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: product.sizes.map((size) {
+                    return SizeBox(
+                      size: size,
+                      selectedSize: selectedSize.value,
+                      onTap: () => selectedSize.value = size,
+                    );
+                  }).toList(),
+                ),
+              ],
+              if (product.colors.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                ReusableText(
+                    text: 'Colors',
+                    style: appStyle(16, KTextColor, FontWeight.w500)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  children: product.colors.map((colorName) {
+                    return ColorBox(
+                      colorName: colorName,
+                      selectedColor: selectedColor.value,
+                      onTap: () => selectedColor.value = colorName,
+                    );
+                  }).toList(),
+                ),
+              ],
+              const SizedBox(height: 6),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   ReusableText(
-                    text: 'Calvin Klein',
-                    style: appStyle(16, kGray, FontWeight.w500),
-                  ),
-                  const SizedBox(height: 4),
-                  ReusableText(
-                    text: 'Premium White T-Shirt with OUTFIT Logo',
+                    text: 'Quantity',
                     style: appStyle(16, KTextColor, FontWeight.w500),
                   ),
-                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Row(
-                        children: List.generate(5, (index) {
-                          return Icon(
-                            CupertinoIcons.star_fill,
-                            size: 18,
-                            color: index < 4 ? Colors.amber : kLightGray,
-                          );
-                        }),
+                      RawMaterialButton(
+                        onPressed: () {
+                          if (selectedQuantity.value > 1) {
+                            selectedQuantity.value -= 1;
+                          }
+                        },
+                        fillColor: Colors.white,
+                        shape: const CircleBorder(),
+                        constraints:
+                            BoxConstraints.tightFor(width: 32.w, height: 32.h),
+                        elevation: 1,
+                        child: const Icon(Icons.remove,
+                            size: 20, color: Kfoundation),
                       ),
-                      const SizedBox(width: 4),
+                      SizedBox(width: 8.w),
                       ReusableText(
-                        text: '(150 Reviews)',
-                        style: appStyle(12, kGray, FontWeight.w400),
+                        text: selectedQuantity.value.toString(),
+                        style: appStyle(16, KTextColor, FontWeight.w600),
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.green[50],
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: ReusableText(
-                          text: 'In stock',
-                          style: appStyle(12, Colors.green, FontWeight.w400),
-                        ),
+                      SizedBox(width: 8.w),
+                      RawMaterialButton(
+                        onPressed: () {
+                          selectedQuantity.value += 1;
+                        },
+                        fillColor: Colors.white,
+                        shape: const CircleBorder(),
+                        constraints:
+                            BoxConstraints.tightFor(width: 32.w, height: 32.h),
+                        elevation: 1,
+                        child:
+                            const Icon(Icons.add, size: 20, color: Kfoundation),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  ReusableText(
-                    text: '\$99.00',
-                    style: appStyle(24, KTextColor, FontWeight.w500),
-                  ),
-                  const SizedBox(height: 16),
-                  ReusableText(
-                    text: 'Size',
-                    style: appStyle(16, KTextColor, FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: ['S', 'M', 'L', 'XL', 'XXL'].map((size) {
-                      return GestureDetector(
-                        onTap: () => selectedSize.value = size,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
-                            color: selectedSize.value == size
-                                ? Colors.black
-                                : Colors.transparent,
-                            border: Border.all(
-                              color: selectedSize.value == size
-                                  ? Colors.black
-                                  : Colors.grey,
-                            ),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Center(
-                            child: Text(
-                              size,
-                              style: TextStyle(
-                                color: selectedSize.value == size
-                                    ? Colors.white
-                                    : Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 16),
-                  ReusableText(
-                    text: 'Description',
-                    style: appStyle(14, KTextColor, FontWeight.w600),
-                  ),
-                  const SizedBox(height: 8),
-                  ReusableText(
-                    text:
-                        'Premium quality cotton t-shirt with embroidered logo. Comfortable fit and durable material. Perfect for everyday wear.',
-                    style: appStyle(14, kGray, FontWeight.w400),
-                    maxlines: 3,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo[900],
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Add to cart',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(width: 8),
-                          Icon(Icons.arrow_forward),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  DeliverySection(),
-                  const SizedBox(height: 24),
-                  ReusableText(
-                    text: 'Product Ratings and Reviews',
-                    style: appStyle(14, KTextColor, FontWeight.w600),
-                  ),
-                  const SizedBox(height: 10),
-                  RatingSection(),
-                  const SizedBox(height: 16),
-                  const Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [UserReviews(), UserReviews(), UserReviews()],
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(bottom: 12.h),
-                    child: ReusableText(
-                      text: 'Related Item',
-                      style: appStyle(20, KTextColor, FontWeight.w600),
-                    ),
-                  ),
-                  if (isLoading || products == null)
-                    const CircularProgressIndicator()
-                  else
-                    RelatedItems(products: products!)
                 ],
               ),
-            ),
-          ],
+              const SizedBox(height: 10),
+              ReusableText(
+                  text: 'Description',
+                  style: appStyle(14, KTextColor, FontWeight.w600)),
+              const SizedBox(height: 8),
+              ReusableText(
+                  text: product.description,
+                  style: appStyle(14, kGray, FontWeight.w400),
+                  maxlines: 3),
+              const SizedBox(height: 24),
+              DeliverySection(),
+              const SizedBox(height: 15),
+              ReviewInputContainer(
+                productId: product.id,
+                onReviewSubmitted: (review) {
+                  final updatedReview =
+                      review.copyWith(user: userIdFromTokenOrStorage);
+                  reviewsKey.currentState?.addNewReview(updatedReview);
+                  product.reviews.insert(0, updatedReview);
+                },
+              ),
+              const SizedBox(height: 20),
+              ReviewsSection(
+                key: reviewsKey,
+                productid: product.id,
+                reviews: product.reviews,
+                currentUserId: userIdFromTokenOrStorage,
+                onDelete: (review) async {
+                  await reviewController.deleteReview(review.id);
+                  reviewsKey.currentState?.removeReview(review);
+                  product.reviews.removeWhere((r) => r.id == review.id);
+                },
+              ),
+              if (!isLoading &&
+                  products != null &&
+                  products!.where((p) => p.id != product.id).isNotEmpty) ...[
+                Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: SectionHeading(
+                    title: 'Related Items',
+                    padd: EdgeInsets.zero,
+                    onPress: () => Get.to(() =>
+                        RelatedItemsScreen(categoryId: product.category.id)),
+                  ),
+                ),
+                RelatedItems(
+                    products:
+                        products!.where((p) => p.id != product.id).toList()),
+              ] else if (isLoading)
+                const Center(child: CircularProgressIndicator()),
+            ],
+          ),
         ),
       ),
     );

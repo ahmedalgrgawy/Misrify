@@ -75,7 +75,7 @@ FetchHook useFetchFilteredProducts({
   );
 }
 
-FetchHook useFetchProductsByCategory(String categoryName) {
+FetchHook useFetchProductsByCategory(String categoryId) {
   final products = useState<List<Product>?>(null);
   final isLoading = useState<bool>(false);
   final error = useState<Exception?>(null);
@@ -88,11 +88,15 @@ FetchHook useFetchProductsByCategory(String categoryName) {
 
       if (response.statusCode == 200) {
         final parsed = productsModelFromJson(response.body);
-        final filtered = parsed.products
-            .where((p) =>
-                p.category.name.toLowerCase().trim() ==
-                categoryName.toLowerCase().trim())
-            .toList();
+
+        final filtered = parsed.products.where((p) {
+          final productCategoryId = p.category.id;
+          debugPrint("Product Category ID: $productCategoryId vs $categoryId");
+          return productCategoryId == categoryId;
+        }).toList();
+
+        debugPrint(
+            "✅ Found ${filtered.length} related products for $categoryId");
         products.value = filtered;
       } else {
         products.value = [];
@@ -107,7 +111,7 @@ FetchHook useFetchProductsByCategory(String categoryName) {
   useEffect(() {
     fetchData();
     return null;
-  }, [categoryName]);
+  }, [categoryId]);
 
   return FetchHook(
     data: products.value,

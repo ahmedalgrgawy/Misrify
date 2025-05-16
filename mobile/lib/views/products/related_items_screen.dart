@@ -6,46 +6,45 @@ import 'package:get/get.dart';
 import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/hooks/fetch_all_products.dart';
-import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/data/product_sort.dart';
+import 'package:graduation_project1/hooks/fetch_all_products.dart';
+import 'package:graduation_project1/hooks/fetch_filterd_products.dart';
+import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/products/Product_page.dart';
 import 'package:graduation_project1/views/products/widgets/product_widget.dart';
 
-class AllbestSeller extends HookWidget {
-  const AllbestSeller({super.key});
+class RelatedItemsScreen extends HookWidget {
+  final String categoryId;
+
+  const RelatedItemsScreen({super.key, required this.categoryId});
 
   @override
   Widget build(BuildContext context) {
-    final hookResult = useFetchAllProducts();
-    final products = hookResult.data;
-    final isLoading = hookResult.isLoading;
+    final hookResult = useFetchProductsByCategory(categoryId);
 
     final originalProducts = useState<List<Product>>([]);
     final displayedProducts = useState<List<Product>>([]);
 
-    useEffect(
-      () {
-        if (!isLoading && products != null) {
-          originalProducts.value = [...products];
-          displayedProducts.value = [...products];
-        }
-        return null;
-      },
-    );
+    useEffect(() {
+      if (!hookResult.isLoading && hookResult.data != null) {
+        originalProducts.value = [...hookResult.data!];
+        displayedProducts.value = [...hookResult.data!];
+      }
+      return null;
+    });
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Kbackground,
         title: ReusableText(
-          text: "Best Seller",
+          text: "Related Items",
           style: appStyle(16, kDarkBlue, FontWeight.w500),
         ),
       ),
-      body: isLoading
+      body: hookResult.isLoading
           ? const Center(child: CircularProgressIndicator())
           : (displayedProducts.value.isEmpty)
-              ? const Center(child: Text("No best sellers found."))
+              ? const Center(child: Text("No new arrivals found."))
               : Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
                   child: GridView.builder(
@@ -71,7 +70,7 @@ class AllbestSeller extends HookWidget {
                         isDiscounted: product.isDiscounted,
                         discountAmount: product.discountAmount,
                         image:
-                            "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                            "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
                       );
                     },
                   ),
