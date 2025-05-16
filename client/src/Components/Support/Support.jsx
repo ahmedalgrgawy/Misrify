@@ -81,7 +81,7 @@ const Support = () => {
                     </p>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
-                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                    <div className="bg-white flex flex-col items-center justify-center p-7 rounded-lg">
                         <FaStore className="text-main-blue text-3xl mb-4" />
                         <h3 className="text-xl font-semibold mb-2 text-main-blue">What do we do?</h3>
                         <p className="text-dark-grey text-center text-sm">
@@ -239,6 +239,7 @@ const Support = () => {
                     </form>
                 </div>
             </div>
+
             <ToastContainer position="bottom-right" />
         </>
     );
