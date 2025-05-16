@@ -10,6 +10,7 @@ import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/views/cart/cart_screen.dart';
+import 'package:graduation_project1/views/profile/profile_screen.dart';
 import 'package:graduation_project1/views/shop/shop_screen.dart';
 import 'package:graduation_project1/views/wishlist/wishlist_screen.dart';
 
@@ -38,10 +39,15 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          CircleAvatar(
-            backgroundColor: Colors.white,
-            child: const Icon(Icons.person),
-            radius: 15.r,
+          GestureDetector(
+            onTap: () {
+              Get.to(ProfileScreen());
+            },
+            child: CircleAvatar(
+              backgroundColor: Colors.white,
+              child: const Icon(Icons.person),
+              radius: 15.r,
+            ),
           ),
           ReusableText(
               text: title, style: appStyle(20, kDarkBlue, FontWeight.w700)),
