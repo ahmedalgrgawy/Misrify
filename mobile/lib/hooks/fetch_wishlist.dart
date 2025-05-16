@@ -4,6 +4,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';
+import 'package:graduation_project1/controllers/wishlist_controller.dart';
 import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/models/hook_result.dart';
 import 'package:graduation_project1/models/wishlist_response.dart';
@@ -68,7 +69,6 @@ FetchHook useFetchwishlist() {
       );
 
       final decoded = jsonDecode(response.body);
-      print('Wishlist response: $decoded');
 
       if (response.statusCode == 200 &&
           decoded is Map<String, dynamic> &&
@@ -76,6 +76,13 @@ FetchHook useFetchwishlist() {
         if (decoded['wishlist'] is Map<String, dynamic>) {
           final parsedModel = WishlistResponse.fromJson(decoded);
           wishlist.value = List.from(parsedModel.wishlist.wishlistItems);
+
+// ✅ sync wishlist IDs to controller
+          final controller = Get.put(WishlistController());
+          final ids = parsedModel.wishlist.wishlistItems
+              .map((item) => item.id)
+              .toList();
+          controller.setWishlistIdsFromServer(ids);
         } else {
           wishlist.value =
               []; // fallback if it's a list (backend inconsistency)
