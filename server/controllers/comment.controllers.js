@@ -39,23 +39,21 @@ export const createComment = async (req, res, next) => {
     const newComment = await Comment.create({
         text,
         user: userId,
-        reviewId: reviewId, // ✅ MATCHES YOUR SCHEMA
-      });
-      
+        reviewId: reviewId,
+    });
+
 
     review.comments.push(newComment._id);
 
     await review.save()
 
     await Notification.create({
-        title: "New Comment",
-        content: `New comment on your review`, // ✅ correct key name
-        receiver: review.user,
-        sender: userId,
+        receivers: [review.user], // Changed to receivers array
+        sender: "Misrify Store", // Updated to Misrify Store
+        content: `New comment on your review`, // Already using content
         type: "product",
         isRead: false,
-      });
-      
+    });
 
     res.status(201).json({
         success: true,
@@ -122,17 +120,16 @@ export const deleteCommentUser = async (req, res, next) => {
 //new
 export const getCommentById = async (req, res, next) => {
     const { id } = req.params;
-  
+
     try {
-      const comment = await Comment.findById(id).populate("user", "name");
-  
-      if (!comment) {
-        return res.status(404).json({ success: false, message: "Comment not found" });
-      }
-  
-      res.status(200).json({ success: true, comment });
+        const comment = await Comment.findById(id).populate("user", "name");
+
+        if (!comment) {
+            return res.status(404).json({ success: false, message: "Comment not found" });
+        }
+
+        res.status(200).json({ success: true, comment });
     } catch (err) {
-      return next(new AppError("Server Error", 500));
+        return next(new AppError("Server Error", 500));
     }
-  };
-  
+};

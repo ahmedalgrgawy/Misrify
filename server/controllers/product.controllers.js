@@ -6,6 +6,7 @@ import Category from "../models/category.model.js";
 import Review from "../models/review.model.js";
 import { isValidObjectId } from "../validators/validateCollegeEmail.js";
 import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res, next) => {
@@ -46,7 +47,7 @@ export const approveOrRejectProduct = async (req, res, next) => {
         return next(new AppError("Product Id is Required", 400))
     }
 
-    const ProductToApprove = await Product.findById(id);
+    const ProductToApprove = await Product.findById(id).populate("category").populate("brand");
 
     if (!ProductToApprove) {
         return next(new AppError("Product Not Found", 404))
@@ -65,26 +66,26 @@ export const approveOrRejectProduct = async (req, res, next) => {
 
     await ProductToApprove.save();
 
-    const merchant = await Brand.findById(ProductToApprove.brand).populate("owner");
+    if (ProductToApprove.brand !== null) {
+        // const merchant = await User.findById(ProductToApprove.brand.owner);
 
-    if (ProductToApprove.isApproved) {
-        await Notification.create({
-            title: "Product Approved",
-            message: `Product ${ProductToApprove.name} has been approved`,
-            receiver: merchant,
-            // sender: req.user._id,
-            type: "product",
-            isRead: false,
-        });
-    } else {
-        await Notification.create({
-            title: "Product Rejected",
-            message: `Product ${ProductToApprove.name} has been rejected`,
-            receiver: merchant,
-            // sender: req.user._id,
-            type: "product",
-            isRead: false,
-        });
+        if (ProductToApprove.isApproved) {
+            await Notification.create({
+                receivers: [ProductToApprove.brand.owner._id], // Changed to receivers array
+                sender: "Misrify Store", // Updated to Misrify Store
+                content: `Product ${ProductToApprove.name} has been approved`, // Changed to content
+                type: "product",
+                isRead: false,
+            });
+        } else {
+            await Notification.create({
+                receivers: [ProductToApprove.brand.owner._id], // Changed to receivers array
+                sender: "Misrify Store", // Updated to Misrify Store
+                content: `Product ${ProductToApprove.name} has been rejected`, // Changed to content
+                type: "product",
+                isRead: false,
+            });
+        }
     }
 
     res.status(200).json({ success: true, message: "Product Approved" })
@@ -131,25 +132,24 @@ export const createProduct = async (req, res, next) => {
 
     await product.save();
 
-    const admins = await Brand.find({ role: "admin" }).select("_id");
+    const admins = await User.find({ role: "admin" }).select("_id");
+    const brandMerchant = await Brand.findById(brandId).populate("owner");
 
     if (user.role === 'merchant') {
 
         await Notification.create({
-            title: "New Product Created",
-            message: `Product ${name} has been Requested for approval`,
-            receiver: admins,
-            sender: user._id,
+            receivers: admins.map(admin => admin._id), // Changed to receivers array
+            sender: user.id, // Updated to Misrify Store
+            content: `Product ${name} has been requested for approval by ${user.name}`, // Changed to content
             type: "product",
             isRead: false,
         })
 
     } else {
         await Notification.create({
-            title: "New Product Created",
-            message: `Product ${name} has been created by ${user.name}`,
-            receiver: admins,
-            sender: user._id,
+            receivers: [brandMerchant.owner._id], // Changed to receivers array
+            sender: "Misrify Store", // Updated to Misrify Store
+            content: `Product ${name} has been created by Misrify Store for your brand named ${brandMerchant.name}`, // Changed to content
             type: "product",
             isRead: false,
         })
@@ -165,7 +165,7 @@ export const editProduct = async (req, res, next) => {
 
     const user = req.user
 
-    if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
+    // if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
 
     const product = await Product.findById(id).populate("category").populate("brand");
 
@@ -204,11 +204,13 @@ export const editProduct = async (req, res, next) => {
     await product.save();
 
     if (user.role === 'admin') {
+
+        const brandMerchant = await Brand.findById(brandId).populate("owner");
+
         await Notification.create({
-            title: "Product Updated",
-            message: `Product ${name} has been updated by ${user.name}`,
-            receiver: product.brand.owner,
-            sender: user._id,
+            receivers: [brandMerchant.owner._id], // Changed to receivers array
+            sender: "Misrify Store", // Updated to Misrify Store
+            content: `Product ${name} has been updated by Misrify Store`, // Changed to content
             type: "product",
             isRead: false,
         })
@@ -247,11 +249,12 @@ export const deleteProduct = async (req, res, next) => {
 
     await product.deleteOne();
 
+    const brandMerchant = await Brand.findById(product.brand).populate("owner");
+
     await Notification.create({
-        title: "Product Deleted",
-        message: `Product ${product.name} has been deleted by ${user.name}`,
-        receiver: product.brand.owner,
-        sender: user._id,
+        receivers: [brandMerchant.owner._id], // Changed to receivers array
+        sender: "Misrify Store", // Updated to Misrify Store
+        content: `Product ${product.name} has been deleted by ${user.name}`, // Changed to content
         type: "product",
         isRead: false,
     })
