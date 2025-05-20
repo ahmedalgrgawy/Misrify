@@ -1,6 +1,7 @@
 import Contact from "../models/contact.model.js";
 import AppError from "../errors/AppError.js";
 import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 
 export const submitContactForm = async (req, res, next) => {
     const { firstName, lastName, email, phone, message } = req.body;
@@ -12,11 +13,10 @@ export const submitContactForm = async (req, res, next) => {
     const admins = await User.find({ role: "admin" }).select("_id");
 
     await Notification.create({
-        title: "New Contact Message",
-        message: `New message from ${firstName} ${lastName}`,
-        receiver: admins,
-        sender: req.user._id || null,
-        type: "contact",
+        receivers: admins.map(admin => admin._id),
+        sender: "Misrify Store",
+        content: `New message from ${firstName} ${lastName}`,
+        type: "general", // Now valid with updated schema
         isRead: false,
     });
 
