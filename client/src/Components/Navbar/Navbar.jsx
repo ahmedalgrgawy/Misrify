@@ -8,11 +8,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import logo from '../../assets/logo.png';
 import { logoutUser } from '../../features/authSlice';
 
+// eslint-disable-next-line react/display-name
 const Navbar = memo(() => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [isMenuOpen, setMenuOpen] = useState(false);
-    const { isAuthenticated } = useSelector(state => state.auth);
+    const { isAuthenticated, user } = useSelector(state => state.auth);
     const handleToggle = () => setMenuOpen(!isMenuOpen);
     const handleClose = () => setMenuOpen(false);
 
@@ -21,7 +22,7 @@ const Navbar = memo(() => {
         navigate('/login');
     };
 
-    const menuItems = isAuthenticated
+    const menuItems = (isAuthenticated && user.role !== "user")
         ? [
             { name: 'Home', path: '/' },
             { name: 'About', path: '/aboutus' },
