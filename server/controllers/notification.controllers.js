@@ -3,13 +3,19 @@ import Notification from "../models/notification.model.js";
 
 export const getNotifications = async (req, res, next) => {
     const notifications = await Notification.find({
-        receiver: {
-            $in: req.user._id
+        receivers: {
+            $in: [req.user._id] // Updated to receivers
         },
-        isRead: false
-    }).populate("sender", "name role").sort({ createdAt: -1 });
+        // isRead: false
+    })
+        .populate({
+            path: "sender",
+            select: "name role",
+            match: { $or: [{ name: { $exists: true } }, { _id: { $exists: true } }] } // Handle both String and ObjectId
+        })
+        .sort({ createdAt: -1 });
 
-    if (!notifications) {
+    if (!notifications || notifications.length === 0) {
         return next(new AppError("No Notifications Found", 404))
     }
 
@@ -17,27 +23,33 @@ export const getNotifications = async (req, res, next) => {
         message: "success",
         notifications
     })
-
 }
 
 export const markAsRead = async (req, res, next) => {
     const { id } = req.params;
 
-    const notification = await Notification.findByIdAndUpdate(id, { isRead: true }, { new: true });
+    const notification = await Notification.findOneAndUpdate(
+        { _id: id, receivers: { $in: [req.user._id] } }, // Updated to receivers
+        { isRead: true },
+        { new: true }
+    );
 
     if (!notification) {
         return next(new AppError("Notification not found", 404))
     }
 
     res.status(200).json({
-        message: "Make as read successfully",
+        message: "Marked as read successfully",
     })
 }
 
 export const deleteNotification = async (req, res, next) => {
     const { id } = req.params;
 
-    const notification = await Notification.findByIdAndDelete(id);
+    const notification = await Notification.findOneAndDelete({
+        _id: id,
+        receivers: { $in: [req.user._id] } // Updated to receivers
+    });
 
     if (!notification) {
         return next(new AppError("Notification not found", 404))
@@ -48,14 +60,12 @@ export const deleteNotification = async (req, res, next) => {
     })
 }
 
-export const deleteAllNotification = async (req, res) => {
+export const deleteAllNotifications = async (req, res, next) => {
     const notifications = await Notification.deleteMany({
-        receiver: {
-            $in: req.user._id
-        }
-    })
+        receivers: { $in: [req.user._id] } // Updated to receivers
+    });
 
-    if (!notifications) {
+    if (notifications.deletedCount === 0) {
         return next(new AppError("No Notifications Found", 404))
     }
 
