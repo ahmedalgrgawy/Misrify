@@ -89,9 +89,9 @@ const Products = () => {
   const handleConfirmDelete = async () => {
     try {
       if (userRole === "merchant") {
-        await dispatch(deleteMerchantProduct({ productId: productToDelete }));
+        await dispatch(deleteMerchantProduct(productToDelete));
       } else {
-        await dispatch(deleteProduct({ productId: productToDelete }));
+        await dispatch(deleteProduct(productToDelete));
       }
       setSuccess("Product deleted successfully");
       if (userRole === "merchant") {

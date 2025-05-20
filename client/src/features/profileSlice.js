@@ -21,14 +21,10 @@ export const editProfile = createAsyncThunk(
   "profile/editProfile",
   async ( updatedData, { rejectWithValue }) => {
     try {
-      console.log(updatedData);
-      
       const response = await axiosInstance.put(
         `/user/update`,
         updatedData
       );
-      console.log(response);
-      
       return response; //error back from backend
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
