@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { checkAuth } from "./features/authSlice";
 import { TailSpin } from 'react-loader-spinner';
+import { injectStore } from "./utils/axiosInstance";
+import { store } from './app/store'
 
 function App() {
   const dispatch = useDispatch();
   const { isAuthenticated, hasCheckedAuth } = useSelector(state => state.auth);
   const [loading, setLoading] = useState(false);
-
+  injectStore(store);
   useEffect(() => {
     const authenticate = async () => {
       const token = localStorage.getItem('token');

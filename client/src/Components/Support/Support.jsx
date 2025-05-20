@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { FaEnvelope, FaPhone } from 'react-icons/fa';
+import { FaEnvelope, FaPhone, FaStore, FaBoxOpen, FaTruck, FaUndo, FaCommentDots, FaCreditCard, FaRobot } from 'react-icons/fa';
+import { PiStudentFill } from "react-icons/pi";
 import axiosInstance from '../../utils/axiosInstance';
 
 const Support = () => {
@@ -14,29 +15,6 @@ const Support = () => {
     });
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const faqs = [
-        {
-            question: "What services do you offer?",
-            answer: "We provide a range of services including [brief overview of services]."
-        },
-        {
-            question: "How can I contact customer support?",
-            answer: "You can reach our customer support team through the contact form on this page, or by emailing us at [support email]."
-        },
-        {
-            question: "What are your support hours?",
-            answer: "Our support team is available from [insert hours, e.g., 9 AM to 5 PM, Monday to Friday]."
-        },
-        {
-            question: "How long does it take to receive a response?",
-            answer: "We aim to respond to all inquiries within [insert timeframe, e.g., 24-48 hours]."
-        },
-        {
-            question: "Can I change my account information?",
-            answer: "Yes, you can update your account information by logging into your account and navigating to the settings section."
-        }
-    ];
 
     const validateForm = () => {
         const newErrors = {};
@@ -94,13 +72,85 @@ const Support = () => {
 
     return (
         <>
-            <div className="flex flex-col md:flex-row md:justify-center md:items-start gap-10 max-w-7xl mx-auto">
+            <div className="max-w-4xl mx-auto py-10">
+                <div className='flex flex-col items-center justify-center mb-4'>
+                    <h2 className="text-3xl font-bold text-main-blue text-center mb-4">Access Our Help & Support Center</h2>
+                    <p className='text-dark-grey text-sm text-center mb-4'>
+                        Got a question? You're in the right place! Check out our FAQs for speedy answers. Still need help?
+                        We're just a message away
+                    </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6 mb-10">
+                    <div className="bg-white flex flex-col items-center justify-center p-7 rounded-lg">
+                        <FaStore className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">What do we do?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            Misrify aims to connect Egyptian brands and stores with consumers, promoting local products
+                            and supporting economic growth.
+                        </p>
+                    </div>
+                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                        <FaBoxOpen className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">What products are available?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            You can find a variety of gyptian brands and stores, showcasing a wide range
+                            of categories from traditional crafts to modern goods.
+                        </p>
+                    </div>
+                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                        <FaTruck className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">How can I track my order?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            Once your order is confirmed, you will receive tracking information via email,
+                            allowing you to monitor its status.
+                        </p>
+                    </div>
+                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                        <FaUndo className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">What is the return policy?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            Customers can return products within a specified period if unsatisfied, provided items are in original condition.
+                        </p>
+                    </div>
+                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                        <FaCommentDots className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">How do I leave a review for a product?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            After purchasing a product, you can leave a review on the product page by rating it and providing your feedback.
+                        </p>
+                    </div>
+                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                        <FaCreditCard className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">What payment methods do you accept?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            The marketplace supports a variety of payment options, including credit/debit cards and digital wallets.
+                        </p>
+                    </div>
+                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                        <PiStudentFill className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">What are student special codes?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            Student special codes allow you to earn points for discounts and promotions on the platform.
+                            Use your university email to access these benefits!
+                        </p>
+                    </div>
+                    <div className="bg-white flex flex-col items-center justify-center p-8 rounded-lg">
+                        <FaRobot className="text-main-blue text-3xl mb-4" />
+                        <h3 className="text-xl font-semibold mb-2 text-main-blue">What is Misrify Bot?</h3>
+                        <p className="text-dark-grey text-center text-sm">
+                            It's AI system analyzes your previous purchases and items in your cart to suggest products that you may be interested in,
+                            enhancing your shopping experience.
+                        </p>
+                    </div>
+                </div>
+
                 {/* Contact Form */}
-                <div className="w-full md:w-3/4 bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300">
-                    <h3 className="text-2xl font-bold mb-4 text-title-blue text-center md:text-left">Get In Touch</h3>
-                    <p className="text-dark-grey mb-6 text-center md:text-left">You can reach us anytime you want</p>
+                <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-300 mx-auto">
+                    <h3 className="text-3xl font-bold mb-4 text-main-blue text-center">Get In Touch</h3>
+                    <p className="text-dark-grey mb-6 text-center">You can reach us anytime you want</p>
                     <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            {/* Form Fields */}
                             <div>
                                 <label htmlFor="firstName" className="block text-main-blue font-semibold mb-2">First Name</label>
                                 <input
@@ -109,7 +159,7 @@ const Support = () => {
                                     name="firstName"
                                     value={formData.firstName}
                                     onChange={handleChange}
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.firstName ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none hover:shadow ${errors.firstName ? 'border-red-500' : ''}`}
                                 />
                                 {errors.firstName && <p className="text-red-500 text-xs">{errors.firstName}</p>}
                             </div>
@@ -121,7 +171,7 @@ const Support = () => {
                                     name="lastName"
                                     value={formData.lastName}
                                     onChange={handleChange}
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.lastName ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none hover:shadow ${errors.lastName ? 'border-red-500' : ''}`}
                                 />
                                 {errors.lastName && <p className="text-red-500 text-xs">{errors.lastName}</p>}
                             </div>
@@ -138,7 +188,7 @@ const Support = () => {
                                     value={formData.email}
                                     onChange={handleChange}
                                     placeholder="Your Email"
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.email ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none hover:shadow ${errors.email ? 'border-red-500' : ''}`}
                                 />
                             </div>
                             {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
@@ -154,7 +204,7 @@ const Support = () => {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.phone ? 'border-red-500' : ''}`}
+                                    className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none hover:shadow ${errors.phone ? 'border-red-500' : ''}`}
                                 />
                             </div>
                             {errors.phone && <p className="text-red-500 text-xs">{errors.phone}</p>}
@@ -168,9 +218,8 @@ const Support = () => {
                                 value={formData.message}
                                 onChange={handleChange}
                                 rows="5"
-                                className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow resize-none ${errors.message ? 'border-red-500' : ''}`}
+                                className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none hover:shadow ${errors.message ? 'border-red-500' : ''}`}
                                 placeholder="Type Here..."
-                                style={{ height: '100px' }}
                             ></textarea>
                             {errors.message && <p className="text-red-500 text-xs">{errors.message}</p>}
                         </div>
@@ -190,19 +239,6 @@ const Support = () => {
                     </form>
                 </div>
             </div>
-
-            {/* FAQ Section (Inline, Not Extracted) */}
-            <section className="w-full md:w-3/4 bg-white rounded-lg shadow-md p-6 mt-10 hover:shadow-lg transition-shadow duration-300 mx-auto">
-                <h3 className="text-2xl font-bold mb-6 text-title-blue text-center">Frequently Asked Questions</h3>
-                <div className="space-y-6">
-                    {faqs.map((faq, index) => (
-                        <div key={index}>
-                            <h4 className="font-semibold text-main-blue">{index + 1}. {faq.question}</h4>
-                            <p className="text-dark-grey mt-1">{faq.answer}</p>
-                        </div>
-                    ))}
-                </div>
-            </section>
 
             <ToastContainer position="bottom-right" />
         </>

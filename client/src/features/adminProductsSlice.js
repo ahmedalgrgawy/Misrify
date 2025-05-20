@@ -2,14 +2,24 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axiosInstance from "../utils/axiosInstance";
 
 // Get All approved Products
-export const getAllProducts = createAsyncThunk(
-  "products/getAllProducts",
+export const getAllProducts = createAsyncThunk("products/getAllProducts",
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/admin/products");
       return response.data.Products;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
+// Admin Create Product
+export const createProduct = createAsyncThunk( "products/createProduct",
+  async (productData, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.post(`/admin/create-product`, productData);
+      return res.data.Product;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message);
     }
   }
 );
@@ -36,7 +46,6 @@ export const editProduct = createAsyncThunk(
         `admin/edit-product/${productId}`,
         updatedData
       );
-      //   need test
       return response.data.Product;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
@@ -89,7 +98,6 @@ const productsSlice = createSlice({
       })
       .addCase(editProduct.fulfilled, (state, action) => {
         state.loading = false;
-        // Update the Product in the state
         const updatedProduct = action.payload;
         state.products = state.products.map((product) =>
           product._id === updatedProduct._id ? updatedProduct : product
@@ -98,7 +106,11 @@ const productsSlice = createSlice({
       .addCase(editProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      //Create Product
+      .addCase(createProduct.fulfilled, (state, action) => {
+        state.products.push(action.payload);
+        });
   },
 });
 

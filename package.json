@@ -32,6 +32,8 @@
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.3",
     "nodemailer": "^6.9.16",
+    "react-easy-crop": "^5.4.1",
+    "react-image-file-resizer": "^0.4.8",
     "stripe": "^17.4.0",
     "uuid": "^11.1.0"
   },
