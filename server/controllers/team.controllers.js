@@ -1,6 +1,7 @@
 import Team from "../models/team.model.js";
 import AppError from "../errors/AppError.js";
 import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 
 
 export const createTeamMember = async (req, res, next) => {
@@ -21,11 +22,10 @@ export const createTeamMember = async (req, res, next) => {
     }).select("_id");
 
     await Notification.create({
-        title: "New Team Member",
-        message: `New team member ${name} has been added`,
-        receiver: adminsExpectLoggedInAdmin,
-        sender: req.user._id,
-        type: "team",
+        receivers: adminsExpectLoggedInAdmin.map(admin => admin._id), // Changed to receivers array
+        sender: "Misrify Store", // Updated to Misrify Store
+        content: `New team member ${name} has been added`, // Changed to content
+        type: "general", // Now valid with updated schema
         isRead: false,
     });
 

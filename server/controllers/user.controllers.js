@@ -54,11 +54,10 @@ export const updateProfile = async (req, res, next) => {
     user.password = null;
 
     await Notification.create({
-        title: "Profile Updated",
-        message: `Your profile has been updated`,
-        receiver: userId,
-        // sender: userId,
-        type: "profile",
+        receivers: [userId], // Changed to receivers array
+        sender: "Misrify Store", // Updated to Misrify Store
+        content: `Your profile has been updated`, // Changed to content
+        type: "profile", // Now valid with updated schema
         isRead: false,
     })
 
@@ -100,11 +99,15 @@ export const createUser = async (req, res, next) => {
 
     await user.save();
 
+    const adminsExpectLoggedInAdmin = await User.find({
+        role: "admin",
+        _id: { $ne: req.user._id }
+    }).select("_id");
+
     await Notification.create({
-        title: "New User Created",
-        message: `New user ${name} has been created`,
-        receiver: user._id,
-        // sender: req.user._id,
+        receivers: adminsExpectLoggedInAdmin.map(admin => admin._id), // Changed to receivers array
+        sender: "Misrify Store", // Updated to Misrify Store
+        content: `New user ${name} has been created`, // Changed to content
         type: "user",
         isRead: false,
     })
@@ -135,10 +138,9 @@ export const editUser = async (req, res, next) => {
     await user.save();
 
     await Notification.create({
-        title: "User Updated",
-        message: `User ${name} has been updated`,
-        receiver: userId,
-        // sender: req.user._id,
+        receivers: [userId], // Changed to receivers array
+        sender: "Misrify Store", // Updated to Misrify Store
+        content: `Your Account has been updated by Admins`, // Changed to content
         type: "user",
         isRead: false,
     })

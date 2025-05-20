@@ -52,9 +52,9 @@ export const exchangePointsForCoupon = async (req, res, next) => {
     await coupon.save();
 
     await Notification.create({
-        title: "Coupon Created",
-        message: `Coupon ${coupon.code} has been created with a discount of ${discount}%`,
-        receiver: req.user._id,
+        receivers: [req.user._id], // Changed to receivers array
+        sender: "Misrify Store",
+        content: `Coupon ${coupon.code} has been created with a discount of ${discount}%`, // Changed from message to content
         type: "coupon",
         isRead: false,
     })
@@ -192,9 +192,9 @@ export const placeOrder = async (req, res, next) => {
         .populate("coupon", "code discount");
 
     await Notification.create({
-        title: "Order Created",
-        message: `Order with ${order.trackCode} has been created with a Price of ${order.totalPrice}`,
-        receiver: req.user._id,
+        receivers: [req.user._id], // Changed to receivers array
+        sender: "Misrify Store",
+        content: `Order with ${order.trackCode} has been created with a Price of ${order.totalPrice}`, // Changed from message to content
         type: "order",
         isRead: false,
     })

@@ -1,6 +1,7 @@
 import AppError from "../errors/AppError.js";
 import Brand from "../models/brand.model.js";
 import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 
 export const getBrands = async (req, res, next) => {
     const Brands = await Brand.find()
@@ -30,13 +31,12 @@ export const createBrand = async (req, res, next) => {
     await brand.save();
 
     await Notification.create({
-        title: "Brand Created",
-        message: `Brand ${name} has been created`,
-        receiver: ownerId,
-        sender: req.user._id,
+        receivers: [ownerId], // Changed from receiver to receivers array
+        sender: "Misrify Store", // Set sender to "Misrify Store"
+        content: `Brand ${name} has been created`, // Changed from message to content
         type: "brand",
         isRead: false,
-    })
+    });
 
     res.status(201).json({ success: true, message: "Brand Created Successfully" })
 }
@@ -55,6 +55,8 @@ export const editBrand = async (req, res, next) => {
         return next(new AppError("Brand not found", 404))
     }
 
+    const owner = await User.findById(brand.owner);
+
     brand.name = name || brand.name;
     brand.description = description || brand.description;
 
@@ -63,12 +65,13 @@ export const editBrand = async (req, res, next) => {
     await Notification.create({
         title: "Brand Updated",
         message: `Brand ${name} has been updated`,
-        receiver: brand.owner,
-        sender: req.user._id,
+        receivers: [owner._id], // Changed from receiver to receivers array
+        sender: "Misrify Store", // Set sender to "Misrify Store"
+        content: `Brand ${name} has been updated`, // Changed from message to content
         type: "brand",
         isRead: false,
     })
-    
+
     res.status(200).json({ success: true, message: "Brand updated successfully", brand })
 }
 
@@ -85,13 +88,16 @@ export const deleteBrand = async (req, res, next) => {
         return next(new AppError("Brand not found", 404))
     }
 
+    const owner = await User.findById(brand.owner);
+
     await brand.deleteOne();
 
     await Notification.create({
         title: "Brand Deleted",
         message: `Brand ${brand.name} has been deleted`,
-        receiver: brand.owner,
-        sender: req.user._id,
+        receivers: [owner._id], // Changed from receiver to receivers array
+        sender: "Misrify Store", // Set sender to "Misrify Store"
+        content: `Brand ${brand.name} has been deleted`, // Changed from message to content
         type: "brand",
         isRead: false,
     })

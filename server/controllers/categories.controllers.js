@@ -1,6 +1,7 @@
 import AppError from "../errors/AppError.js";
 import Category from "../models/category.model.js";
 import Notification from "../models/notification.model.js";
+import User from "../models/user.model.js";
 
 export const getAllCategories = async (req, res, next) => {
     const categories = await Category.find().exec();
@@ -25,10 +26,9 @@ export const createCategory = async (req, res, next) => {
     });
 
     await Notification.create({
-        title: "Category Created",
-        message: `Category ${name} has been created`,
-        receiver: AdminsAndMerchants,
-        sender: req.user._id,
+        receivers: AdminsAndMerchants.map(user => user._id), // Convert to array of IDs
+        sender: "Misrify Store",
+        content: `Category ${name} has been created`,
         type: "category",
         isRead: false,
     })
@@ -51,7 +51,7 @@ export const editCategory = async (req, res, next) => {
     }
 
     category.name = name || category.name;
-    category.description = description || category.description;;
+    category.description = description || category.description;
 
     await category.save();
 
@@ -61,10 +61,9 @@ export const editCategory = async (req, res, next) => {
     });
 
     await Notification.create({
-        title: "Category Updated",
-        message: `Category ${name} has been updated`,
-        receiver: AdminsAndMerchants,
-        sender: req.user._id,
+        receivers: AdminsAndMerchants.map(user => user._id), // Convert to array of IDs
+        sender: "Misrify Store",
+        content: `Category ${name} has been updated`,
         type: "category",
         isRead: false,
     })
@@ -93,10 +92,9 @@ export const deleteCategory = async (req, res, next) => {
     });
 
     await Notification.create({
-        title: "Category Deleted",
-        message: `Category ${category.name} has been deleted`,
-        receiver: AdminsAndMerchants,
-        sender: req.user._id,
+        receivers: AdminsAndMerchants.map(user => user._id), // Convert to array of IDs
+        sender: "Misrify Store",
+        content: `Category ${category.name} has been deleted`,
         type: "category",
         isRead: false,
     })
