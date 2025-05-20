@@ -6,7 +6,7 @@ import { TailSpin } from "react-loader-spinner";
 import { FaEdit, FaTrashAlt, FaClipboardList, FaPlus, FaRegCheckCircle, FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { GiShop } from "react-icons/gi";
 import { BsEnvelope } from "react-icons/bs";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -16,7 +16,6 @@ import { getAllMerchants } from "../../features/userSlice";
 
 const Categories = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { categories, categoryLoading } = useSelector((state) => state.Categories);
   const { brands, brandLoading } = useSelector((state) => state.Brands);
   const { merchants } = useSelector((state) => state.user);

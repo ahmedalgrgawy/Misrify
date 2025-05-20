@@ -1,15 +1,17 @@
 import { IoCameraOutline } from "react-icons/io5";
 import { FaPencil } from "react-icons/fa6";
-import pic from "../../assets/profile tests/test.jpg";
+import pic from "../../assets/profile tests/user.png";
 import rock1 from "../../assets/profile tests/rock1.png";
 import rock2 from "../../assets/profile tests/rock2.png";
 import rock3 from "../../assets/profile tests/rock3.png";
 import style from "./Profile.module.css";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getProfile, editProfile } from "../../features/profileSlice";
+import Cropper from "react-easy-crop";
+import Resizer from "react-image-file-resizer";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -23,6 +25,13 @@ const Profile = () => {
     NPassword: true,
   });
   const [picLink, setPicLink] = useState(true);
+
+  // Crop state
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
+  const [imageSrc, setImageSrc] = useState(null);
+  const [showCropModal, setShowCropModal] = useState(false);
 
   useEffect(() => {
     dispatch(getProfile());
@@ -56,23 +65,22 @@ const Profile = () => {
   });
 
   function postNewData(data) {
-
-if(data.currentPassword == "" && data.newPassword == ""){
-  if (data.imgUrl == "") {
-    const {currentPassword , imgUrl ,newPassword , ...updatedData} = data;
-    dispatch(editProfile(updatedData));
-  }else{
-    const { currentPassword, newPassword, ...updatedData } = data;
-    dispatch(editProfile(updatedData));
-  }
-}else{
-  if (data.imgUrl == "") {
-    const { imgUrl, ...updatedData } = data;
-    dispatch(editProfile(updatedData));
-  } else {
-    dispatch(editProfile(data));
-  }
-}
+    if (data.currentPassword == "" && data.newPassword == "") {
+      if (data.imgUrl == "") {
+        const { currentPassword, imgUrl, newPassword, ...updatedData } = data;
+        dispatch(editProfile(updatedData));
+      } else {
+        const { currentPassword, newPassword, ...updatedData } = data;
+        dispatch(editProfile(updatedData));
+      }
+    } else {
+      if (data.imgUrl == "") {
+        const { imgUrl, ...updatedData } = data;
+        dispatch(editProfile(updatedData));
+      } else {
+        dispatch(editProfile(data));
+      }
+    }
   }
 
   const updateData = useFormik({
@@ -84,12 +92,93 @@ if(data.currentPassword == "" && data.newPassword == ""){
       currentPassword: "",
       newPassword: "",
       gender: profile.gender || "",
-      imgUrl: "",
+      imgUrl: profile.imgUrl || "",
     },
     validationSchema,
     onSubmit: postNewData,
     enableReinitialize: true,
   });
+
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  }, []);
+
+  const createImage = (url) =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      image.addEventListener("load", () => resolve(image));
+      image.addEventListener("error", (error) => reject(error));
+      image.setAttribute("crossOrigin", "anonymous");
+      image.src = url;
+    });
+
+  const getCroppedImg = async (imageSrc, croppedAreaPixels) => {
+    try {
+      const image = await createImage(imageSrc);
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = croppedAreaPixels.width;
+      canvas.height = croppedAreaPixels.height;
+
+      ctx.drawImage(
+        image,
+        croppedAreaPixels.x,
+        croppedAreaPixels.y,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height,
+        0,
+        0,
+        croppedAreaPixels.width,
+        croppedAreaPixels.height
+      );
+
+      return new Promise((resolve) => {
+        canvas.toBlob(
+          (blob) => {
+            resolve(blob);
+          },
+          "image/jpeg",
+          0.9
+        );
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const onFileChange = async (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      let imageUrl = URL.createObjectURL(file);
+      setImageSrc(imageUrl);
+      setShowCropModal(true);
+    }
+  };
+
+  const handleCropComplete = async () => {
+    try {
+      const croppedImage = await getCroppedImg(imageSrc, croppedAreaPixels);
+
+      // Resize the image before uploading
+      Resizer.imageFileResizer(
+        croppedImage,
+        300, // maxWidth
+        300, // maxHeight
+        "JPEG", // compressFormat
+        80, // quality
+        0, // rotation
+        (uri) => {
+          updateData.setFieldValue("imgUrl", uri);
+          setShowCropModal(false);
+          setPicLink(true);
+        },
+        "base64" // outputType
+      );
+    } catch (err) {
+      console.error("Error cropping image: ", err);
+    }
+  };
 
   return (
     <>
@@ -99,32 +188,23 @@ if(data.currentPassword == "" && data.newPassword == ""){
         <div className="relative flex flex-col justify-center items-center px-12 py-6 my-3 z-10">
           <div
             className={` relative w-36 h-36 mb-4 rounded-full bg-cover bg-center`}
-            style={{ backgroundImage: `url(${pic})` }}
+            style={{
+              backgroundImage: `url(${updateData.values.imgUrl || pic})`,
+            }}
           >
             <div className="absolute bottom-0 right-0 w-11 h-11">
-              <button
-                type="button"
-                onClick={() => {
-                  picLink ? setPicLink(false) : setPicLink(true);
-                }}
-              >
+              <label htmlFor="upload-input">
                 <IoCameraOutline
                   style={{ backgroundClip: "" }}
-                  className="absolute top-1/2 -translate-y-1/2 p-2 w-full h-full rounded-full text-white bg-[#15253FF5] "
+                  className="absolute top-1/2 -translate-y-1/2 p-2 w-full h-full rounded-full text-white bg-[#15253FF5] cursor-pointer"
                 />
-              </button>
-
+              </label>
               <input
-                className={`${
-                  picLink ? "hidden" : ""
-                }  absolute w-32 -bottom-11 -right-24 md:bottom-auto md:-right-60 md:top-1/2 md:-translate-y-1/2 md:w-56 shadow-inner bg-[#F2F4F8] py-2 px-3 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
-                type="text"
-                name="imgUrl"
-                id="imgUrl"
-                placeholder="Picture Link"
-                value={updateData.values.imgUrl}
-                onChange={updateData.handleChange}
-                onBlur={updateData.handleBlur}
+                id="upload-input"
+                type="file"
+                accept="image/*"
+                onChange={onFileChange}
+                className="hidden"
               />
             </div>
           </div>
@@ -154,6 +234,59 @@ if(data.currentPassword == "" && data.newPassword == ""){
         />
       </div>
 
+      {/* Crop Modal */}
+      {showCropModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 z-50 flex flex-col items-center justify-center p-4">
+          <div className="bg-white rounded-lg p-4 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">
+              Crop your profile picture
+            </h2>
+            <div className="relative w-full h-64 md:h-80 bg-gray-100">
+              <Cropper
+                image={imageSrc}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+                cropShape="round"
+                showGrid={false}
+              />
+            </div>
+            <div className="mt-4">
+              <input
+                type="range"
+                value={zoom}
+                min={1}
+                max={3}
+                step={0.1}
+                onChange={(e) => setZoom(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div className="flex justify-end mt-4 space-x-2">
+              <button
+                onClick={() => {
+                  setShowCropModal(false);
+                  setImageSrc(null);
+                }}
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCropComplete}
+                className="px-4 py-2 bg-title-blue text-white rounded hover:bg-main-blue"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rest of your existing code */}
       <div className="bg-bg-second overflow-hidden">
         <div className="font-inter my-6 mx-auto w-4/5 rounded-lg shadow-xl bg-white">
           <div className="border-b-2 border-[#D3D3D3] py-8 px-12">
