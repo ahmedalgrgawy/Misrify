@@ -25,7 +25,7 @@ export const editProfile = createAsyncThunk(
         `/user/update`,
         updatedData
       );
-      return response; //error back from backend
+      return response.user; //error back from backend
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }

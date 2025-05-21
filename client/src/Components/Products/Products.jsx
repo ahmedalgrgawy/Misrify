@@ -41,8 +41,8 @@ const Products = () => {
     discountAmount: 0,
   });
 
-  const brands = useSelector((state) => state.brand?.brands ?? []);
-  const categories = useSelector((state) => state.category?.categories ?? []);
+  const brands = useSelector((state) => state.Brands?.brands ?? []);
+  const categories = useSelector((state) => state.Categories?.categories ?? []);
   const brandsLoading = useSelector((state) => state.brand?.loading ?? false);
   const categoriesLoading = useSelector((state) => state.category?.loading ?? false);
 
