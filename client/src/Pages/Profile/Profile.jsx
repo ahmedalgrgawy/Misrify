@@ -24,7 +24,6 @@ const Profile = () => {
     CPassword: true,
     NPassword: true,
   });
-  const [picLink, setPicLink] = useState(true);
 
   // Crop state
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -35,7 +34,7 @@ const Profile = () => {
 
   useEffect(() => {
     dispatch(getProfile());
-  }, [dispatch]);
+  }, [dispatch, profile]);
 
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -171,7 +170,6 @@ const Profile = () => {
         (uri) => {
           updateData.setFieldValue("imgUrl", uri);
           setShowCropModal(false);
-          setPicLink(true);
         },
         "base64" // outputType
       );

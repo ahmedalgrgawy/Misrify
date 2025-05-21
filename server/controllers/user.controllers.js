@@ -57,7 +57,7 @@ export const updateProfile = async (req, res, next) => {
         receivers: [userId], // Changed to receivers array
         sender: "Misrify Store", // Updated to Misrify Store
         content: `Your profile has been updated`, // Changed to content
-        type: "profile", // Now valid with updated schema
+        type: "general", // Now valid with updated schema
         isRead: false,
     })
 
