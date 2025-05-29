@@ -18,8 +18,9 @@ const Footer = () => {
             <h2 className={[style.logoText]}>MISRIFY</h2>
             <p>
               Welcome to MISRIFY , your Favourate Website to get Egyption local
-              Brands ! you can start as merchant to sell your local products here ,
-              Also we provide these products to all the egyptians then to all over the world .
+              Brands ! you can start as merchant to sell your local products
+              here , Also we provide these products to all the egyptians then to
+              all over the world .
             </p>
           </div>
 
@@ -27,17 +28,17 @@ const Footer = () => {
             <h6 className="font-bold">Pages</h6>
             <ul>
               <li className="my-3 ">
-                <Link className="hover:text-dark-grey" to={"/"}>
+                <Link className="hover:text-dark-grey duration-300" to={"/"}>
                   Home
                 </Link>
               </li>
               <li className="my-3">
-                <Link className="hover:text-dark-grey" to={"/aboutus"}>
+                <Link className="hover:text-dark-grey duration-300" to={"/aboutus"}>
                   About Us
                 </Link>
               </li>
               <li className="mb-3 ">
-                <Link className="hover:text-dark-grey" to={"/contact"}>
+                <Link className="hover:text-dark-grey duration-300" to={"/contact"}>
                   Contact Us
                 </Link>
               </li>
@@ -48,17 +49,17 @@ const Footer = () => {
             <h6 className="font-bold">Account</h6>
             <ul>
               <li className="my-3">
-                <Link className=" hover:text-dark-grey" to={""}>
+                <Link className=" hover:text-dark-grey duration-300" to={"/profile"}>
                   My Account
                 </Link>
               </li>
               <li className="mb-3">
-                <Link className=" hover:text-dark-grey" to={""}>
-                  Login
+                <Link className=" hover:text-dark-grey duration-300" to={"/signup"}>
+                  signup
                 </Link>
                 <span> / </span>
-                <Link className=" hover:text-dark-grey" to={""}>
-                  Register
+                <Link className=" hover:text-dark-grey duration-300" to={"/login"}>
+                  Login
                 </Link>
               </li>
             </ul>
@@ -84,13 +85,13 @@ const Footer = () => {
             </div>
             <div className="flex justify-between w-2/5 md:w-3/5 my-5">
               <Link to={""}>
-                <RiFacebookLine className="text-3xl font-bold hover:bg-white hover:text-bg-footer p-1 rounded-full box-content transition-all" />
+                <RiFacebookLine className="text-3xl font-bold hover:bg-white duration-500 hover:text-bg-footer p-1 rounded-full box-content" />
               </Link>
               <Link to={""}>
-                <CiTwitter className="text-3xl font-bold hover:bg-white hover:text-bg-footer p-1 rounded-full box-content transition-all" />
+                <CiTwitter className="text-3xl font-bold hover:bg-white duration-500 hover:text-bg-footer p-1 rounded-full box-content" />
               </Link>
               <Link to={""}>
-                <FaInstagram className="text-3xl font-bold hover:bg-white hover:text-bg-footer p-1 rounded-full box-content transition-all" />
+                <FaInstagram className="text-3xl font-bold hover:bg-white duration-500 hover:text-bg-footer p-1 rounded-full box-content" />
               </Link>
             </div>
           </div>
