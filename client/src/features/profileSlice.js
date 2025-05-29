@@ -45,7 +45,6 @@ const ProfileSlice = createSlice({
       // Get Profile details
       .addCase(getProfile.pending, (state) => {
         state.Loading = true;
-        state.error = null;
       })
       .addCase(getProfile.fulfilled, (state, action) => {
         state.Loading = false;
@@ -58,7 +57,6 @@ const ProfileSlice = createSlice({
       // Edit Profile details
       .addCase(editProfile.pending, (state) => {
         state.Loading = true;
-        state.error = null;
       })
       .addCase(editProfile.fulfilled, (state, action) => {
         state.Loading = false;

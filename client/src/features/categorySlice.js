@@ -20,7 +20,7 @@ export const createCategory = createAsyncThunk(
   async (newCategory, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(`admin/create-category`, newCategory);
-      return response.data.newCategory; 
+      return response.data; 
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -45,8 +45,11 @@ export const editCategory = createAsyncThunk(
   "categories/editCategory",
   async ({ categoryId, updatedData }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`admin/edit-category/${categoryId}`,updatedData);
-      return response.data.Category;
+      const response = await axiosInstance.put(
+        `admin/edit-category/${categoryId}`,
+        updatedData
+      );
+      return response.data.category;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -83,7 +86,7 @@ const CategorySlice = createSlice({
       })
       .addCase(createCategory.fulfilled, (state, action) => {
        state.categoryLoading = false;
-       state.categories.push(action.payload);
+       
        })
       .addCase(createCategory.rejected, (state, action) => {
         state.categoryLoading = false;

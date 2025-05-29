@@ -12,10 +12,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProfile, editProfile } from "../../features/profileSlice";
 import Cropper from "react-easy-crop";
 import Resizer from "react-image-file-resizer";
+import { TailSpin } from "react-loader-spinner";
+import { Flip, toast, ToastContainer } from "react-toastify";
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { profile } = useSelector((state) => state.Profile);
+  const { profile, Loading } = useSelector((state) => state.Profile);
   const [isDisabled, setIsDisabled] = useState({
     name: true,
     email: true,
@@ -34,7 +36,7 @@ const Profile = () => {
 
   useEffect(() => {
     dispatch(getProfile());
-  }, [dispatch, profile]);
+  }, [dispatch]);
 
   const validationSchema = Yup.object({
     name: Yup.string()
@@ -67,17 +69,152 @@ const Profile = () => {
     if (data.currentPassword == "" && data.newPassword == "") {
       if (data.imgUrl == "") {
         const { currentPassword, imgUrl, newPassword, ...updatedData } = data;
-        dispatch(editProfile(updatedData));
+        dispatch(editProfile(updatedData))
+          .then(() => {
+            setTimeout(() => {
+              toast.success("the profile has been updated 👍", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+    dispatch(getProfile());
+          
+          })
+          .catch((err) => {
+            setTimeout(() => {
+              toast.error("there is something wrong 👎", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+            console.error("Error editing profile:", err);
+          });
       } else {
         const { currentPassword, newPassword, ...updatedData } = data;
-        dispatch(editProfile(updatedData));
+        dispatch(editProfile(updatedData))
+          .then(() => {
+            setTimeout(() => {
+              toast.success("the profile has been updated 👍", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+    dispatch(getProfile());
+          
+          })
+          .catch((err) => {
+            setTimeout(() => {
+              toast.error("there is something wrong 👎", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+
+            console.error("Error editing profile:", err);
+          });
       }
     } else {
       if (data.imgUrl == "") {
         const { imgUrl, ...updatedData } = data;
-        dispatch(editProfile(updatedData));
+        dispatch(editProfile(updatedData))
+          .then(() => {
+            setTimeout(() => {
+              toast.success("the profile has been updated 👍", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+    dispatch(getProfile());
+          
+          })
+          .catch((err) => {
+            setTimeout(() => {
+              toast.error("there is something wrong 👎", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+
+            console.error("Error editing profile:", err);
+          });
       } else {
-        dispatch(editProfile(data));
+        dispatch(editProfile(data))
+          .then(() => {
+            setTimeout(() => {
+              toast.success("the profile has been updated 👍", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+    dispatch(getProfile());
+          
+          })
+          .catch((err) => {
+            setTimeout(() => {
+              toast.error("there is something wrong 👎", {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+              });
+            }, 0);
+
+            console.error("Error editing profile:", err);
+          });
       }
     }
   }
@@ -177,6 +314,14 @@ const Profile = () => {
       console.error("Error cropping image: ", err);
     }
   };
+
+  if (Loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <TailSpin color="#2B3D5B" height={100} width={100} />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -596,6 +741,20 @@ const Profile = () => {
           </form>
         </div>
       </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover
+        theme="dark"
+        transition={Flip}
+        style={{ zIndex: 9999 }}
+      />
     </>
   );
 };
