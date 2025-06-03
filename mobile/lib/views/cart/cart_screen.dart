@@ -9,14 +9,12 @@ import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/common/shimmers/foodlist_shimmer.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/cart_controller.dart';
-import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
 import 'package:graduation_project1/hooks/fetch_cart.dart';
 import 'package:graduation_project1/hooks/fetch_all_products.dart';
 import 'package:graduation_project1/models/cart_response.dart';
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/auth/login_redirect.dart';
 import 'package:graduation_project1/views/cart/widgets/cart_tile.dart';
-import 'package:graduation_project1/models/products_model.dart' as models;
 import 'package:graduation_project1/views/entrypoint.dart';
 
 class CartScreen extends HookWidget {
@@ -36,12 +34,12 @@ class CartScreen extends HookWidget {
         (cart?.cartItems.map<CartItem>((cartItem) {
               final matched = allProducts.firstWhere(
                 (p) => p.id == cartItem.product.id,
-                orElse: () => models.Product(
+                orElse: () => Product(
                   id: cartItem.product.id,
                   name: cartItem.product.name,
                   price: cartItem.product.price,
-                  category: models.Brand.empty(),
-                  brand: models.Brand.empty(),
+                  category: Brand.empty(),
+                  brand: Brand.empty(),
                   description: '',
                   quantityInStock: 0,
                   colors: [],
@@ -164,6 +162,22 @@ class CartScreen extends HookWidget {
               Expanded(
                 child: Column(
                   children: [
+                    Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
+                      child: Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton.icon(
+                          onPressed: () => _showClearAllSheet(context, refetch),
+                          icon: const Icon(Icons.delete_outline,
+                              color: Colors.red),
+                          label: Text(
+                            "Clear All",
+                            style: appStyle(14, Colors.red, FontWeight.w500),
+                          ),
+                        ),
+                      ),
+                    ),
                     Expanded(
                       child: ListView.builder(
                         key: ValueKey(enrichedCartItems.length),
@@ -239,6 +253,64 @@ class CartScreen extends HookWidget {
           ),
         ),
       ],
+    );
+  }
+
+  void _showClearAllSheet(
+      BuildContext context, Future<void> Function()? refetch) {
+    final cartController = Get.find<CartController>();
+
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: EdgeInsets.all(16.r),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.warning_amber_rounded, size: 40.r, color: kRed),
+              SizedBox(height: 10.h),
+              Text(
+                "Are you sure you want to clear your cart?",
+                style: appStyle(14, Kfoundation, FontWeight.w500),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kRed,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      await cartController.clearCart();
+                      await cartController.refreshCartCount();
+                      await refetch?.call();
+                    },
+                    child: const Text("Yes, Clear"),
+                  ),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kLightBlue,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text("No, Cancel"),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 }
