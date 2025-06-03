@@ -49,6 +49,7 @@ class User {
   final int v;
   final dynamic resetPasswordOtp;
   final dynamic resetPasswordOtpExpiry;
+  final String? imgUrl; // ✅ Add this line
 
   User({
     required this.id,
@@ -69,6 +70,7 @@ class User {
     required this.v,
     required this.resetPasswordOtp,
     required this.resetPasswordOtpExpiry,
+    this.imgUrl, // ✅ Add this
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -92,6 +94,7 @@ class User {
         v: json["__v"],
         resetPasswordOtp: json["resetPasswordOtp"],
         resetPasswordOtpExpiry: json["resetPasswordOtpExpiry"],
+        imgUrl: json["imgUrl"], // ✅ Add this
       );
 
   Map<String, dynamic> toJson() => {
@@ -114,5 +117,6 @@ class User {
         "__v": v,
         "resetPasswordOtp": resetPasswordOtp,
         "resetPasswordOtpExpiry": resetPasswordOtpExpiry,
+        "imgUrl": imgUrl, // ✅ Add this
       };
 }

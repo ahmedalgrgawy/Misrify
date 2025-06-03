@@ -93,20 +93,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
         Get.find<RegistrationController>();
     return Scaffold(
       backgroundColor: Kbackground,
-      body: Padding(
-        padding: const EdgeInsets.only(top: 150.0),
-        child: BackGroundContainer(
-          color: Colors.white,
-          child: ClipRRect(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(40.r),
-              topRight: Radius.circular(40.r),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            backgroundColor: Kbackground,
+            expandedHeight: 150.h,
+            floating: false,
+            pinned: false,
+            automaticallyImplyLeading: false,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              background: Padding(
+                padding: EdgeInsets.only(top: 40.h),
+                child: Image.asset(
+                  'assets/icons/MISRIFY.png',
+                ),
+              ),
             ),
-            child: ListView(
-              children: [
-                Padding(
-                  padding:
-                      EdgeInsets.only(left: 30.w, right: 30.w, bottom: 20.h),
+          ),
+          SliverToBoxAdapter(
+            child: BackGroundContainer(
+              color: Colors.white,
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40.r),
+                  topRight: Radius.circular(40.r),
+                ),
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      left: 30.w, right: 30.w, bottom: 20.h, top: 30.h),
                   child: Column(
                     children: [
                       ReusableText(
@@ -151,6 +166,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         fieldName: 'address',
                       ),
                       SizedBox(height: 10.h),
+
+                      /// Gender Dropdown
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -176,8 +193,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               onChanged: (String? value) {
                                 if (value != null) {
                                   _genderController.text = value;
-                                  registrationController.fieldErrors.remove(
-                                      "gender"); // ✅ Fixed: Remove by key
+                                  registrationController.fieldErrors
+                                      .remove("gender");
                                   registrationController.fieldErrors.refresh();
                                 }
                               },
@@ -187,8 +204,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 isDense: true,
                                 contentPadding: EdgeInsets.symmetric(
                                     vertical: 10.h, horizontal: 12.w),
-                                errorText:
-                                    errorMessage, // ✅ Show validation error under field
+                                errorText: errorMessage,
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(
                                       color: errorMessage != null
@@ -230,13 +246,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                               ),
                             );
-                          })
+                          }),
                         ],
                       ),
 
-                      SizedBox(height: 120.h),
+                      SizedBox(height: 60.h),
 
-                      /// ✅ Checkbox for Agreement
+                      /// Checkbox
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -265,7 +281,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       SizedBox(height: 16.h),
 
-                      /// ✅ Sign Up Button
+                      /// Sign Up Button
                       CustomButton(
                         onTap: _registerUser,
                         text: 'Sign Up',
@@ -273,24 +289,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         btnHeight: 48.h,
                         textcolor: Kbackground,
                         btnWidth: width,
-                      ),
-                      SizedBox(height: 30.h),
-
-                      ReusableText(
-                          text: 'Or',
-                          style: appStyle(12, kBlue, FontWeight.w700)),
-                      SizedBox(height: 30.h),
-
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            LoginIconbutton(image: LogoImages.google),
-                            LoginIconbutton(image: LogoImages.ios),
-                            LoginIconbutton(image: LogoImages.facebook),
-                          ],
-                        ),
                       ),
                       SizedBox(height: 30.h),
 
@@ -315,11 +313,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     ],
                   ),
-                )
-              ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

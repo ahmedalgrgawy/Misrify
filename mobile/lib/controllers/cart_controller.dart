@@ -20,6 +20,76 @@ class CartController extends GetxController {
     itemCount.value = count;
   }
 
+  Future<void> clearCart({bool isRetrying = false}) async {
+    setLoading = true;
+    final accessToken = box.read('token');
+
+    if (accessToken == null) {
+      Get.offAll(() => const LoginScreen());
+      return;
+    }
+
+    final url = Uri.parse('$appBaseUrl/user/clear');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Cookie': 'accessToken=$accessToken',
+    };
+
+    try {
+      final response = await http.delete(url, headers: headers);
+      if (response.statusCode == 200) {
+        final resData = jsonDecode(response.body);
+        Get.snackbar(
+          'Cart Cleared',
+          resData['message'] ?? 'Your cart is now empty.',
+          colorText: kLightWhite,
+          backgroundColor: kLightBlue,
+          icon: const Icon(Icons.delete_outline, color: kLightWhite),
+        );
+        await refreshCartCount();
+      } else if (response.statusCode == 401 && !isRetrying) {
+        await refreshTokenAndRetryClear();
+      } else {
+        final error = apiErrorFromJson(response.body);
+        Get.snackbar('Error', error.message);
+      }
+    } catch (e) {
+      debugPrint('🚨 Clear cart error: $e');
+    } finally {
+      setLoading = false;
+    }
+  }
+
+  Future<void> refreshTokenAndRetryClear() async {
+    final refreshToken = box.read('refreshToken');
+    if (refreshToken == null) {
+      Get.offAll(() => const LoginScreen());
+      return;
+    }
+
+    final refreshUrl = Uri.parse('$appBaseUrl/auth/refresh-token');
+    final refreshResponse = await http.post(
+      refreshUrl,
+      headers: {
+        'Cookie': refreshToken,
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (refreshResponse.statusCode == 200) {
+      final newCookie = refreshResponse.headers['set-cookie'];
+      final match = RegExp(r'accessToken=([^;]+)').firstMatch(newCookie ?? '');
+      if (match != null) {
+        final newToken = match.group(1);
+        box.write('token', newToken);
+        await clearCart(isRetrying: true);
+        return;
+      }
+    }
+
+    Get.offAll(() => const LoginScreen());
+  }
+
   Future<void> refreshCartCount() async {
     final accessToken = box.read('token');
     if (accessToken == null) return;
