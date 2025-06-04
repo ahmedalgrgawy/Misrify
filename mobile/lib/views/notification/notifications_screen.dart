@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graduation_project1/common/app_style.dart';
@@ -18,14 +19,18 @@ class NotificationsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Notifications"),
+        title: Center(
+            child: ReusableText(
+          text: "Notifications",
+          style: appStyle(20, KTextColor, FontWeight.w600),
+        )),
         backgroundColor: Kbackground,
         actions: [
           Obx(() => controller.notifications.isNotEmpty
               ? IconButton(
                   icon: const Icon(
-                    Icons.delete_forever,
-                    color: KTextColor,
+                    CupertinoIcons.delete,
+                    color: kRed,
                   ),
                   tooltip: 'Delete All',
                   onPressed: () {
@@ -94,7 +99,7 @@ class NotificationsScreen extends StatelessWidget {
           return Center(
             child: ReusableText(
               text: "No notifications available.",
-              style: const TextStyle(fontSize: 16),
+              style: appStyle(20, kGray, FontWeight.w500),
             ),
           );
         }
