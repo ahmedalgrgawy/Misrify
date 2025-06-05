@@ -3,18 +3,32 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/views/auth/login_Screen.dart';
 
 class ProfileController extends GetxController {
   final box = GetStorage();
   RxBool isLoading = false.obs;
 
+  /// Picks an image and converts it to a base64 string with the required prefix
+  Future<String?> pickAndConvertImageToBase64() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) return null;
+
+    final bytes = await pickedFile.readAsBytes();
+    final ext = pickedFile.path.split('.').last.toLowerCase();
+    return 'data:image/$ext;base64,${base64Encode(bytes)}';
+  }
+
+  /// Sends profile update request with optional base64 image
   Future<void> updateProfile({
     required String name,
     required String phoneNumber,
     required String address,
+    String? base64Image,
     bool isRetrying = false,
   }) async {
     isLoading.value = true;
@@ -30,6 +44,7 @@ class ProfileController extends GetxController {
       'name': name,
       'phoneNumber': phoneNumber,
       'address': address,
+      if (base64Image != null) 'imgUrl': base64Image,
     });
 
     final headers = {
@@ -40,6 +55,7 @@ class ProfileController extends GetxController {
     try {
       final response = await http.put(url, headers: headers, body: body);
       final decoded = jsonDecode(response.body);
+      debugPrint('🟡 Response Body: ${response.body}');
 
       if (response.statusCode == 200 && decoded['success'] == true) {
         Get.snackbar(
@@ -50,12 +66,17 @@ class ProfileController extends GetxController {
           icon: const Icon(Icons.check_circle, color: Colors.white),
         );
       } else if (response.statusCode == 401 && !isRetrying) {
-        await _refreshTokenAndRetry(name, phoneNumber, address);
+        await _refreshTokenAndRetry(
+          name,
+          phoneNumber,
+          address,
+          base64Image: base64Image,
+        );
       } else {
-        final error = apiErrorFromJson(response.body);
+        final message = decoded['message']?.toString() ?? 'Unexpected error';
         Get.snackbar(
           "Error",
-          error.message,
+          message,
           backgroundColor: Colors.red,
           colorText: Colors.white,
         );
@@ -73,8 +94,13 @@ class ProfileController extends GetxController {
     }
   }
 
+  /// Automatically refresh token and retry update
   Future<void> _refreshTokenAndRetry(
-      String name, String phoneNumber, String address) async {
+    String name,
+    String phoneNumber,
+    String address, {
+    String? base64Image,
+  }) async {
     final refreshToken = box.read('refreshToken');
     if (refreshToken == null) {
       Get.offAll(() => const LoginScreen());
@@ -95,15 +121,21 @@ class ProfileController extends GetxController {
       final match = RegExp(r'accessToken=([^;]+)').firstMatch(newCookie ?? '');
       if (match != null) {
         final newToken = match.group(1);
-        box.write('token', newToken);
+        box.write('token', newToken); // ✅ Save token before retry
         await updateProfile(
           name: name,
           phoneNumber: phoneNumber,
           address: address,
+          base64Image: base64Image,
           isRetrying: true,
         );
         return;
+      } else {
+        debugPrint(
+            "⚠️ Token regex failed. No accessToken found in set-cookie.");
       }
+    } else {
+      debugPrint("⚠️ Token refresh failed: ${refreshResponse.body}");
     }
 
     Get.offAll(() => const LoginScreen());
