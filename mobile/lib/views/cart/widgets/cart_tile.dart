@@ -27,6 +27,61 @@ class CartTile extends StatelessWidget {
       onTap: () {
         Get.to(() => ProductDetailScreen(product: product));
       },
+      onLongPress: () {
+        showModalBottomSheet(
+          context: context,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16.r)),
+          ),
+          builder: (_) {
+            return Padding(
+              padding: EdgeInsets.all(16.r),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.warning_amber_rounded,
+                      size: 40.r, color: Colors.red),
+                  SizedBox(height: 10.h),
+                  Text(
+                    "Are you sure you want to remove this item from your cart?",
+                    style: appStyle(14, Kfoundation, FontWeight.w500),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20.h),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        ),
+                        onPressed: () async {
+                          Navigator.pop(context); // Close the sheet first
+                          await controller.removeFromCart(item.id);
+                          await controller.refreshCartCount();
+                          await refetch?.call();
+                        },
+                        child: const Text("Yes, Remove"),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: kLightBlue,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.symmetric(horizontal: 24.w),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("No, Keep"),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            );
+          },
+        );
+      },
       child: Container(
         margin: EdgeInsets.symmetric(vertical: 10.h, horizontal: 16.w),
         padding: EdgeInsets.all(10.r),
