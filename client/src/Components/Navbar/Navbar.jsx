@@ -27,7 +27,6 @@ const Navbar = memo(() => {
             { name: 'Home', path: '/' },
             { name: 'About', path: '/aboutus' },
             { name: 'Dashboard', path: '/dashboard' },
-            { name: 'Analytics', path: '/analytics' },
             { name: 'Contact Us', path: '/contact' }
         ]
         : [
@@ -94,7 +93,7 @@ const Navbar = memo(() => {
                 <div className="flex items-center gap-x-6">
                     {isAuthenticated ? (
                         <>
-                            <NavLink to="/cart" className="hover:opacity-80 transition-opacity duration-500">
+                            <NavLink to="/notifications" className="hover:opacity-80 transition-opacity duration-500">
                                 <IoNotifications className="text-main-blue text-xl cursor-pointer" />
                             </NavLink>
                             <NavLink to="/profile" className="hover:opacity-80 transition-opacity duration-500">
