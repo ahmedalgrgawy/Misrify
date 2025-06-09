@@ -105,7 +105,8 @@ class CartTile extends StatelessWidget {
                 child: SizedBox(
                   width: 80.w,
                   child: Image.network(
-                    "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
+                    product.imgUrl ??
+                        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
                     fit: BoxFit.cover,
                   ),
                 ),

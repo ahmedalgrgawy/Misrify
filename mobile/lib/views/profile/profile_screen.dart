@@ -45,21 +45,19 @@ class ProfileScreen extends HookWidget {
                         children: [
                           CircleAvatar(
                             radius: 43,
-                            backgroundImage: NetworkImage(user.imgUrl ??
-                                'assets/images/default_avatar.png'),
+                            backgroundImage: user.imgUrl != null
+                                ? NetworkImage(user.imgUrl!)
+                                : const AssetImage(
+                                        'assets/images/default_avatar.png')
+                                    as ImageProvider,
                           ),
                           GestureDetector(
                             onTap: () async {
-                              final base64Image = await profileController
-                                  .pickAndConvertImageToBase64();
-                              if (base64Image != null) {
-                                await profileController.updateProfile(
-                                  name: user.name,
-                                  phoneNumber: user.phoneNumber,
-                                  address: user.address,
-                                  base64Image: base64Image,
-                                );
-                              }
+                              await profileController.pickImageAndUpdateProfile(
+                                name: user.name,
+                                phoneNumber: user.phoneNumber,
+                                address: user.address,
+                              );
                             },
                             child: Container(
                               padding: const EdgeInsets.all(6),

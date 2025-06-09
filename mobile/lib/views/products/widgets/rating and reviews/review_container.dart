@@ -100,12 +100,8 @@ class _ReviewInputContainerState extends State<ReviewInputContainer> {
                     ),
                     const SizedBox(height: 12),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        ReusableText(
-                          text: "Rating: ",
-                          style: appStyle(13, KTextColor, FontWeight.w400),
-                        ),
-                        const SizedBox(width: 8),
                         Row(
                           children: List.generate(5, (index) {
                             return IconButton(

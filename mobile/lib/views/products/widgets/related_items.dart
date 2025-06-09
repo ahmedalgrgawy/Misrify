@@ -29,6 +29,7 @@ class RelatedItems extends StatelessWidget {
             brand: product.brand.name,
             price: product.price.toStringAsFixed(2),
             title: product.name,
+            image: product.imgUrl,
             isDiscounted: product.isDiscounted,
             discountAmount: product.discountAmount,
             id: product.id,

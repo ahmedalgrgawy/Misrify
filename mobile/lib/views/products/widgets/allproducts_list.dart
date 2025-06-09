@@ -47,8 +47,7 @@ class AllProductsList extends StatelessWidget {
             price: product.price.toStringAsFixed(2),
             isDiscounted: product.isDiscounted,
             discountAmount: product.discountAmount,
-            image:
-                "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
+            image: product.imgUrl,
           );
         },
       ),

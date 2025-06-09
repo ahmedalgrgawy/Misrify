@@ -55,6 +55,23 @@ class Brand {
         v: json["__v"],
       );
 
+  factory Brand.empty() => Brand(
+        // ✅ Add this method
+        id: '',
+        name: '',
+        owner: Owner(
+          id: '',
+          name: '',
+          email: '',
+          phoneNumber: '',
+          address: '',
+        ),
+        description: '',
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        v: 0,
+      );
+
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
