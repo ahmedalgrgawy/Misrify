@@ -6,6 +6,8 @@ import merchantProductsReducer from "../features/merchantProductSlice"
 import CategoryReducer from "../features/categorySlice";
 import BrandReducer from "../features/brandSlice";
 import ProfileReducer from "../features/profileSlice";
+import MessageReducer from "../features/messageSlice";
+import NotificationReducer from "../features/notificationSlice"
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -15,5 +17,7 @@ export const store = configureStore({
     Categories: CategoryReducer,
     Brands: BrandReducer,
     Profile: ProfileReducer,
+    messages:MessageReducer,
+    notifications:NotificationReducer,
   },
 });  

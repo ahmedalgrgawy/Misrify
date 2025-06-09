@@ -19,6 +19,8 @@ import Categories from '../Components/Categories/Categories';
 import Merchants from '../Components/Merchants/Merchants';
 import Support from '../Components/Support/Support';
 import Profile from './../Pages/Profile/Profile';
+import Messages from '../Components/Messages/Messages';
+import Notifications from '../Components/Notifications/Notifications';
 
 const router = createBrowserRouter([
   {
@@ -35,7 +37,8 @@ const router = createBrowserRouter([
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/password-success', element: <PasswordSuccess /> },
       { path: '/contact', element: <Contact /> },
-      { path: '/profile', element: <Profile /> }
+      { path: '/profile', element: <Profile /> },
+      { path: '/notifications', element: <Notifications /> }
     ],
   },
   {
@@ -48,7 +51,7 @@ const router = createBrowserRouter([
       { path: 'products', element: <Products /> },
       { path: 'categories', element: <Categories /> },
       { path: 'support', element: <Support /> },
-      // { path: 'settings', element: <Settings /> },
+      { path: 'messages', element: <Messages /> },
     ]
   },
   {
