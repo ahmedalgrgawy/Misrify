@@ -80,7 +80,7 @@ class NotificationTile extends StatelessWidget {
           ReusableText(
             text: notification.content,
             maxlines: 4,
-            style: appStyle(14, kGray, FontWeight.w400),
+            style: appStyle(13, kGray, FontWeight.w400),
           ),
           SizedBox(height: 10.h),
           InkWell(
@@ -89,7 +89,7 @@ class NotificationTile extends StatelessWidget {
             },
             child: ReusableText(
                 text: "Mark as read",
-                style: appStyle(14, KTextColor, FontWeight.w600)),
+                style: appStyle(12, KTextColor, FontWeight.w600)),
           )
         ],
       ),

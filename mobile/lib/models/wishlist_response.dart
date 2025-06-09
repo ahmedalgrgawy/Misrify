@@ -71,7 +71,9 @@ class WishlistItem {
   final String id;
   final String name;
   final String category;
-  final Brand brand; // ✅ From products_model.dart
+  final Brand brand;
+  final String? imgUrl;
+// ✅ From products_model.dart
   final String description;
   final int quantityInStock;
   final double price;
@@ -102,11 +104,14 @@ class WishlistItem {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
+    this.imgUrl,
   });
 
   factory WishlistItem.fromJson(Map<String, dynamic> json) => WishlistItem(
         id: json["_id"],
         name: json["name"],
+        imgUrl: json["imgUrl"],
+
         category: json["category"],
         brand: json["brand"] is Map<String, dynamic>
             ? Brand.fromJson(json["brand"])
@@ -127,6 +132,7 @@ class WishlistItem {
 
   Map<String, dynamic> toJson() => {
         "_id": id,
+        "imgUrl": imgUrl,
         "name": name,
         "category": category,
         "brand": brand.toJson(),

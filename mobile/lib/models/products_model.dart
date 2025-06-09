@@ -45,6 +45,7 @@ class Product {
   final List<Review> reviews;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? imgUrl;
   final int v;
 
   Product({
@@ -62,12 +63,14 @@ class Product {
     required this.isApproved,
     required this.reviews,
     required this.createdAt,
+    this.imgUrl,
     required this.updatedAt,
     required this.v,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json["_id"] ?? '',
+        imgUrl: json["imgUrl"],
         name: json["name"] ?? '',
         category: json["category"] != null
             ? Brand.fromJson(json["category"])
@@ -115,6 +118,7 @@ class Product {
 
   Map<String, dynamic> toJson() => {
         "_id": id,
+        "imgUrl": imgUrl,
         "name": name,
         "category": category.toJson(),
         "brand": brand.toJson(),

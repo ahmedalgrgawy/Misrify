@@ -44,8 +44,7 @@ class ProductList extends HookWidget {
                   price: product.price.toStringAsFixed(2),
                   title: product.name,
                   id: product.id,
-                  // image: product.imageUrl ??
-                  //     "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                  image: product.imgUrl,
                   isDiscounted: product.isDiscounted,
                   discountAmount: product.discountAmount,
                 );

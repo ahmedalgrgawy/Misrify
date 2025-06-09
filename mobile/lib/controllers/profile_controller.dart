@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -19,16 +20,49 @@ class ProfileController extends GetxController {
     if (pickedFile == null) return null;
 
     final bytes = await pickedFile.readAsBytes();
-    final ext = pickedFile.path.split('.').last.toLowerCase();
-    return 'data:image/$ext;base64,${base64Encode(bytes)}';
+
+    // Optional: file size check (e.g. max 5MB)
+    if (bytes.lengthInBytes > 5 * 1024 * 1024) {
+      Get.snackbar("Error", "Image is too large. Please choose one under 5MB.",
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return null;
+    }
+
+    final mimeType = pickedFile.mimeType ?? 'image/jpeg';
+    return 'data:$mimeType;base64,${base64Encode(bytes)}';
   }
 
-  /// Sends profile update request with optional base64 image
+  /// Combines picking image and updating profile
+  Future<void> pickImageAndUpdateProfile({
+    required String name,
+    required String phoneNumber,
+    required String address,
+  }) async {
+    final imgUrl = await pickAndConvertImageToBase64();
+    if (imgUrl != null) {
+      print('📷 BASE64 (truncated): ${imgUrl.substring(0, 100)}...');
+      await updateProfile(
+        name: name,
+        phoneNumber: phoneNumber,
+        address: address,
+        imgUrl: imgUrl,
+      );
+    } else {
+      Get.snackbar(
+        "Error",
+        "No image was selected or it was too large.",
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
+  /// Sends profile update request with optional base64 image under 'imgUrl'
   Future<void> updateProfile({
     required String name,
     required String phoneNumber,
     required String address,
-    String? base64Image,
+    String? imgUrl,
     bool isRetrying = false,
   }) async {
     isLoading.value = true;
@@ -44,7 +78,7 @@ class ProfileController extends GetxController {
       'name': name,
       'phoneNumber': phoneNumber,
       'address': address,
-      if (base64Image != null) 'imgUrl': base64Image,
+      if (imgUrl != null) 'imgUrl': imgUrl,
     });
 
     final headers = {
@@ -70,10 +104,10 @@ class ProfileController extends GetxController {
           name,
           phoneNumber,
           address,
-          base64Image: base64Image,
+          imgUrl: imgUrl,
         );
       } else {
-        final message = decoded['message']?.toString() ?? 'Unexpected error';
+        final message = extractErrorMessage(decoded['message']);
         Get.snackbar(
           "Error",
           message,
@@ -94,12 +128,25 @@ class ProfileController extends GetxController {
     }
   }
 
+  /// Extracts a readable error message from any format
+  String extractErrorMessage(dynamic messageField) {
+    if (messageField is String) {
+      return messageField;
+    } else if (messageField is Map) {
+      return messageField.values.map((v) => v.toString()).join(' | ');
+    } else if (messageField is List) {
+      return messageField.map((e) => e.toString()).join(' | ');
+    } else {
+      return jsonEncode(messageField);
+    }
+  }
+
   /// Automatically refresh token and retry update
   Future<void> _refreshTokenAndRetry(
     String name,
     String phoneNumber,
     String address, {
-    String? base64Image,
+    String? imgUrl,
   }) async {
     final refreshToken = box.read('refreshToken');
     if (refreshToken == null) {
@@ -121,12 +168,12 @@ class ProfileController extends GetxController {
       final match = RegExp(r'accessToken=([^;]+)').firstMatch(newCookie ?? '');
       if (match != null) {
         final newToken = match.group(1);
-        box.write('token', newToken); // ✅ Save token before retry
+        box.write('token', newToken);
         await updateProfile(
           name: name,
           phoneNumber: phoneNumber,
           address: address,
-          base64Image: base64Image,
+          imgUrl: imgUrl,
           isRetrying: true,
         );
         return;
