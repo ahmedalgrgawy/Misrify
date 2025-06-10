@@ -109,9 +109,7 @@ class ProfileScreen extends HookWidget {
                         icon: Icons.account_circle_outlined,
                         title: 'Edit profile',
                         onTap: () {
-                          Navigator.of(
-                            context,
-                          ).pushNamed(EditProfile.routeName);
+                          Get.to(() => EditProfile());
                         },
                       ),
                       ProfileTile(
@@ -128,9 +126,7 @@ class ProfileScreen extends HookWidget {
                           icon: Icons.headset_mic_sharp,
                           title: 'Contact Us',
                           onTap: () {
-                            Navigator.of(
-                              context,
-                            ).pushNamed(ContactUsScreen.routeName);
+                            Get.to(() => ContactUsScreen());
                           }),
                       ProfileTile(
                         icon: Icons.help_outline,
