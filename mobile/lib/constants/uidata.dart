@@ -1,3 +1,6 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
 List<dynamic> categories = [
   {
     "_id": "6537ece708ff5b7de97d0695",
@@ -112,69 +115,66 @@ This Privacy Policy describes how [Company Name] collects, uses, and protects th
 
 6. Consent 
 6.1. By using the UTU Attendance App, you consent to the collection and use of your information as outlined in this Privacy Policy. 
+
 ''';
 
-const cart = [
-  {
-    "_id": "653b6588541d2aa2c1e89cd1",
-    "userId": "6537a4448cd1bd140ebddcee",
-    "productId": {
-      "_id": "65316771f94c6496dc84f3bd",
-      "title": "Margherita Pizza",
-      "restaurant": "6530ebbcc9e72013e5b65933",
-      "rating": 4.5,
-      "ratingCount": "150",
-      "imageUrl": [
-        "https://d326fntlu7tb1e.cloudfront.net/uploads/5c2a9ca8-eb07-400b-b8a6-2acfab2a9ee2-image001.webp",
-        "https://d326fntlu7tb1e.cloudfront.net/uploads/5c2a9ca8-eb07-400b-b8a6-2acfab2a9ee2-image001.webp"
-      ]
-    },
-    "additives": ["Extra Cheese", "Mushrooms"],
-    "instructions": "",
-    "totalPrice": 25.98,
-    "quantity": 2,
-    "__v": 0
-  }
-];
+class FAQItem {
+  final IconData icon;
+  final String title;
+  final String description;
 
-const profile = {
-  "_id": "6537a4448cd1bd140ebddcee",
-  "username": "Dbestech",
-  "email": "db@king.com",
-  "uid": "4NmOkCbvu7ToaBS9ZR1UVpv0G1g2",
-  "address": [],
-  "userType": "Vendor",
-  "profile":
-      "https://d326fntlu7tb1e.cloudfront.net/uploads/bdec9d7d-0544-4fc4-823d-3b898f6dbbbf-vinci_03.jpeg",
-  "updatedAt": "2023-10-24T11:02:28.215Z"
-};
+  FAQItem({required this.icon, required this.title, required this.description});
+}
 
-const choicesList = [
-  {
-    "id": 1,
-    "name": "Pick Up",
-    "value": "pickup",
-  },
-  {
-    "id": 2,
-    "name": "4 Star",
-    "value": "4star",
-  },
-  {
-    "id": 3,
-    "name": "3 Star",
-    "value": "3star",
-  },
-  {
-    "id": 4,
-    "name": "Under 30 min",
-    "value": "under30",
-  },
-  {
-    "id": 5,
-    "name": "Recommended",
-    "value": "recommended",
-  },
+final List<FAQItem> faqItems = [
+  FAQItem(
+    icon: Icons.store,
+    title: "What do we do?",
+    description:
+        "Misrify aims to connect Egyptian brands and stores with consumers, promoting local products and supporting economic growth.",
+  ),
+  FAQItem(
+    icon: Icons.inventory_2_outlined,
+    title: "What products are available?",
+    description:
+        "You can find a variety of Egyptian brands and stores, showcasing a wide range of categories from traditional crafts to modern goods.",
+  ),
+  FAQItem(
+    icon: Icons.local_shipping,
+    title: "How can I track my order?",
+    description:
+        "Once your order is confirmed, you will receive tracking information via email, allowing you to monitor its status.",
+  ),
+  FAQItem(
+    icon: Icons.undo,
+    title: "What is the return policy?",
+    description:
+        "Customers can return products within a specified period if unsatisfied, provided items are in original condition.",
+  ),
+  FAQItem(
+    icon: Icons.chat_bubble_outline,
+    title: "How do I leave a review for a product?",
+    description:
+        "After purchasing a product, you can leave a review on the product page by rating it and providing your feedback.",
+  ),
+  FAQItem(
+    icon: Icons.credit_card,
+    title: "What payment methods do you accept?",
+    description:
+        "The marketplace supports a variety of payment options, including credit/debit cards and digital wallets.",
+  ),
+  FAQItem(
+    icon: Icons.school,
+    title: "What are student special codes?",
+    description:
+        "Student special codes allow you to earn points for discounts and promotions on the platform. Use your university email to access these benefits!",
+  ),
+  FAQItem(
+    icon: Icons.smart_toy,
+    title: "What is Misrify Bot?",
+    description:
+        "It's AI system analyzes your previous purchases and items in your cart to suggest products that you may be interested in, enhancing your shopping experience.",
+  ),
 ];
 
 class OnBoardingText {
@@ -191,10 +191,6 @@ class OnBoardingText {
 }
 
 class LogoImages {
-  static const String ios = "assets/icons/apple_signIn.png";
-  static const String google = "assets/icons/google.png";
-  static const String facebook = "assets/icons/facebook.png";
-
   static const String firstPage = "assets/onboarding/1.svg";
   static const String secondPage = "assets/onboarding/2.svg";
   static const String thirdPage = "assets/onboarding/3.svg";
