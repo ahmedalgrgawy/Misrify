@@ -9,6 +9,7 @@ import { TailSpin } from "react-loader-spinner";
 import { FaEdit, FaTrashAlt, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Flip, toast, ToastContainer } from "react-toastify";
+import { Tooltip } from "react-tooltip";
 
 const Merchants = () => {
   const dispatch = useDispatch();
@@ -217,12 +218,18 @@ const Merchants = () => {
                     <Link
                       onClick={() => handleEditClick(u)}
                       className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110"
+                      data-tooltip-id="Edit"
+                      data-tooltip-content="Edit"
+                      data-tooltip-place="bottom"
                     >
                       <FaEdit />
                     </Link>
                     <button
                       onClick={() => handleDeleteClick(u._id)}
                       className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110"
+                      data-tooltip-place="bottom"
+                      data-tooltip-id="Delete"
+                      data-tooltip-content="Delete"
                     >
                       <FaTrashAlt />
                     </button>
@@ -238,7 +245,14 @@ const Merchants = () => {
             )}
           </tbody>
         </table>
-
+        <Tooltip
+          id="Edit"
+          className="!z-50 !py-1 !px-2 !bg-title-blue !rounded-md"
+        />
+        <Tooltip
+          id="Delete"
+          className="!z-50 !py-1 !px-2 !bg-red-600 !rounded-md"
+        />
         {showDeleteModal && (
           <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
             <div className="bg-white p-12 rounded-lg shadow-xl w-2xl">

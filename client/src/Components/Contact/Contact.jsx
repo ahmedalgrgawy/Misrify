@@ -168,7 +168,7 @@ const Contact = () => {
                                     id="firstName"
                                     name="firstName"
                                     value={formData.firstName}
-                                    placeholder={user.name.split(' ')[0]}
+                                    placeholder={user?.name.split(' ')[0]}
                                     onChange={handleChange}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.firstName ? 'border-red-500' : ''}`}
                                 />
@@ -181,7 +181,7 @@ const Contact = () => {
                                     id="lastName"
                                     name="lastName"
                                     value={formData.lastName}
-                                    placeholder={user.name.split(' ')[1]}
+                                    placeholder={user?.name.split(' ')[1]}
                                     onChange={handleChange}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.lastName ? 'border-red-500' : ''}`}
                                 />
@@ -199,7 +199,7 @@ const Contact = () => {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    placeholder={user.email}
+                                    placeholder={user?.email}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.email ? 'border-red-500' : ''}`}
                                 />
                             </div>
@@ -215,7 +215,7 @@ const Contact = () => {
                                     id="phone"
                                     name="phone"
                                     value={formData.phone}
-                                    placeholder={user.phoneNumber}
+                                    placeholder={user?.phoneNumber}
                                     onChange={handleChange}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.phone ? 'border-red-500' : ''}`}
                                 />

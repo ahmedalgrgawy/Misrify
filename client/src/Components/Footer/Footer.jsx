@@ -33,12 +33,18 @@ const Footer = () => {
                 </Link>
               </li>
               <li className="my-3">
-                <Link className="hover:text-dark-grey duration-300" to={"/aboutus"}>
+                <Link
+                  className="hover:text-dark-grey duration-300"
+                  to={"/aboutus"}
+                >
                   About Us
                 </Link>
               </li>
               <li className="mb-3 ">
-                <Link className="hover:text-dark-grey duration-300" to={"/contact"}>
+                <Link
+                  className="hover:text-dark-grey duration-300"
+                  to={"/contact"}
+                >
                   Contact Us
                 </Link>
               </li>
@@ -49,16 +55,25 @@ const Footer = () => {
             <h6 className="font-bold">Account</h6>
             <ul>
               <li className="my-3">
-                <Link className=" hover:text-dark-grey duration-300" to={"/profile"}>
+                <Link
+                  className=" hover:text-dark-grey duration-300"
+                  to={"/profile"}
+                >
                   My Account
                 </Link>
               </li>
               <li className="mb-3">
-                <Link className=" hover:text-dark-grey duration-300" to={"/signup"}>
+                <Link
+                  className=" hover:text-dark-grey duration-300"
+                  to={"/signup"}
+                >
                   signup
                 </Link>
                 <span> / </span>
-                <Link className=" hover:text-dark-grey duration-300" to={"/login"}>
+                <Link
+                  className=" hover:text-dark-grey duration-300"
+                  to={"/login"}
+                >
                   Login
                 </Link>
               </li>
@@ -98,7 +113,7 @@ const Footer = () => {
         </div>
 
         <p className="px-16 py-4">
-          © 2025 the creation.design | All rights raserved
+          © 2025 the creation.design | All rights raserved by Misrify
         </p>
       </footer>
     </>

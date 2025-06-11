@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { TailSpin } from "react-loader-spinner";
 import loginImg from "../../assets/Sign imgs/login.png";
-import { loginUser, checkAuth } from "../../features/authSlice";
+import { loginUser, checkAuth, clearError } from "../../features/authSlice";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,12 +21,17 @@ const Login = () => {
 
   const emailErrorFromServer =
     error?.toLowerCase().includes("user not found") ||
-      error?.toLowerCase().includes("validation") ? error : "";
+    error?.toLowerCase().includes("validation")
+      ? error
+      : "";
 
-  const passwordErrorFromServer =
-    error?.toLowerCase().includes("wrong password") ? error : "";
+  const passwordErrorFromServer = error
+    ?.toLowerCase()
+    .includes("wrong password")
+    ? error
+    : "";
 
-  const fallbackError =
+  let fallbackError =
     error &&
     !emailErrorFromServer &&
     !passwordErrorFromServer &&
@@ -41,11 +46,18 @@ const Login = () => {
       navigate("/");
     }
   };
-
+  useEffect(() => {
+    // used to remove the message error " Wrong email or password. Please try again. " when go to any other pages
+    dispatch(clearError());
+  }, []);
   return (
     <div className="w-full h-screen flex flex-col md:flex-row items-start">
       <div className="hidden md:flex md:w-2/3 lg:w-1/2 h-full">
-        <img className="w-full h-full object-cover" src={loginImg} alt="Login" />
+        <img
+          className="w-full h-full object-cover"
+          src={loginImg}
+          alt="Login"
+        />
       </div>
 
       <div className="w-full md:w-2/3 lg:w-1/2 h-full bg-white flex flex-col p-6 md:p-14 justify-center">
@@ -65,15 +77,17 @@ const Login = () => {
               name="email"
               autoComplete="username"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() =>
-                setTouched((prev) => ({ ...prev, email: true }))
-              }
+              onChange={(e) => {
+                setEmail(e.target.value);
+                dispatch(clearError());
+              }}
+              onBlur={() => setTouched((prev) => ({ ...prev, email: true }))}
               required
-              className={`w-full bg-bg-main text-title-blue border-b py-2 px-3 mb-1 text-dark-grey focus:outline-none focus:border-dark-grey hover:shadow transition-all duration-300 ${emailRequired || emailErrorFromServer
-                ? "border-red-500"
-                : "border-second-grey"
-                }`}
+              className={`w-full bg-bg-main text-title-blue border-b py-2 px-3 mb-1  focus:outline-none focus:border-dark-grey hover:shadow transition-all duration-300 ${
+                emailRequired || emailErrorFromServer
+                  ? "border-red-500"
+                  : "border-second-grey"
+              }`}
             />
             {emailRequired && (
               <div className="bg-red-100 text-red-700 px-3 py-1 rounded-md text-sm mb-3">
@@ -97,15 +111,19 @@ const Login = () => {
                 name="password"
                 autoComplete="current-password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  dispatch(clearError());
+                }}
                 onBlur={() =>
                   setTouched((prev) => ({ ...prev, password: true }))
                 }
                 required
-                className={`w-full bg-bg-main text-title-blue border-b py-2 px-3 mb-1 text-dark-grey focus:outline-none focus:border-dark-grey hover:shadow transition-all duration-300 ${passwordRequired || passwordErrorFromServer
-                  ? "border-red-500"
-                  : "border-second-grey"
-                  }`}
+                className={`w-full bg-bg-main text-title-blue border-b py-2 px-3 mb-1 focus:outline-none focus:border-dark-grey hover:shadow transition-all duration-300 ${
+                  passwordRequired || passwordErrorFromServer
+                    ? "border-red-500"
+                    : "border-second-grey"
+                }`}
               />
               <button
                 type="button"

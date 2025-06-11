@@ -112,6 +112,9 @@ const authSlice = createSlice({
     },
     setOtp: (state, action) => {
       state.otp = action.payload;
+    },
+    clearError: (state) => {
+      state.error = null;
     }
   },
   extraReducers: (builder) => {
@@ -206,5 +209,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { logout, setAccessToken, setOtp } = authSlice.actions;
+export const { logout, setAccessToken, setOtp, clearError } = authSlice.actions;
 export default authSlice.reducer;
