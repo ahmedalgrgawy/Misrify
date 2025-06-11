@@ -9,18 +9,20 @@ FetchHook useGenericFetch<T>({
   final isLoading = useState<bool>(false);
   final error = useState<Exception?>(null);
   final apiError = useState<ApiError?>(null);
+  final isMounted = useIsMounted(); // ✅
 
   Future<void> fetchData() async {
+    if (!isMounted()) return; // early exit if widget is gone
     isLoading.value = true;
     try {
       final result = await onFetch();
-      data.value = result;
+      if (isMounted()) data.value = result;
     } catch (e) {
-      if (e is ApiError) {
+      if (e is ApiError && isMounted()) {
         apiError.value = e;
-      } else {}
+      }
     } finally {
-      isLoading.value = false;
+      if (isMounted()) isLoading.value = false;
     }
   }
 
