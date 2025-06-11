@@ -59,259 +59,60 @@ List<dynamic> categories = [
   }
 ];
 
-List<dynamic> restaurants = [
-  {
-    "_id": "6530ebbcc9e72013e5b65933",
-    "title": "Lapisara Eatery",
-    "time": "6:00am - 9:00pm",
-    "imageUrl":
-        "https://images.unsplash.com/photo-1534790566855-4cb788d389ec?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "owner": "fdfsdfsdfs",
-    "code": "41007428",
-    "logoUrl":
-        "https://1000logos.net/wp-content/uploads/2016/10/Burger-King_Logo.png",
-    "rating": 5,
-    "ratingCount": "6765",
-    "coords": {
-      "id": "2023",
-      "latitude": 37.78792117665919,
-      "longitude": -122.41325651079953,
-      "address": "698 Post St, San Francisco, CA 94109, United States",
-      "title": "Lapisara Eatery",
-      "latitudeDelta": 0.0122,
-      "longitudeDelta": 0.0221
-    }
-  },
-  {
-    "_id": "6530ea6bc9e72013e5b6592d",
-    "title": "Burger King",
-    "time": "6:00am - 9:00pm",
-    "imageUrl":
-        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "owner": "sjgdsjgfjshhjs",
-    "code": "41007428",
-    "logoUrl":
-        "https://1000logos.net/wp-content/uploads/2016/10/Burger-King_Logo.png",
-    "rating": 5,
-    "ratingCount": "3278",
-    "coords": {
-      "id": "2020",
-      "latitude": 37.785925590588505,
-      "longitude": -122.41007428687641,
-      "address": "333 O'Farrell St, San Francisco, CA 94102, United States",
-      "title": "Burger King",
-      "latitudeDelta": 0.0122,
-      "longitudeDelta": 0.0221
-    }
-  },
-  {
-    "_id": "6530eb66c9e72013e5b65931",
-    "title": "La Foods",
-    "time": "6:00am - 9:00pm",
-    "imageUrl":
-        "https://images.unsplash.com/photo-1542365887-1149961dccc7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "owner": "fgdgdfgd",
-    "code": "41007428",
-    "logoUrl":
-        "https://1000logos.net/wp-content/uploads/2016/10/Burger-King_Logo.png",
-    "rating": 5,
-    "ratingCount": "5666",
-    "coords": {
-      "id": "2022",
-      "latitude": 37.787503258917035,
-      "longitude": -122.39854938269353,
-      "address": "333 O'Farrell St, San Francisco, CA 94102, United States",
-      "title": "La Foods",
-      "latitudeDelta": 0.0122,
-      "longitudeDelta": 0.0221
-    }
-  },
-  {
-    "_id": "6530eb23c9e72013e5b6592f",
-    "title": "Italian Restaurant",
-    "time": "6:00am - 9:00pm",
-    "imageUrl":
-        "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "owner": "sjgdsjgfjshhjs",
-    "code": "41007428",
-    "logoUrl":
-        "https://1000logos.net/wp-content/uploads/2016/10/Burger-King_Logo.png",
-    "rating": 5,
-    "ratingCount": "3278",
-    "coords": {
-      "id": "2021",
-      "latitude": 37.78557922976825,
-      "longitude": -122.40722000299483,
-      "address": "333 O'Farrell St, San Francisco, CA 94102, United States",
-      "title": "Italian Restaurant",
-      "latitudeDelta": 0.0122,
-      "longitudeDelta": 0.0221
-    }
-  }
-];
+const String termsText = '''
+Welcome to the UTU Attendance App! These terms and conditions outline the rules and regulations for the use of the app. By accessing this app, we assume you accept these terms and conditions in full. Do not continue to use the UTU Attendance App if you do not accept all of the terms and conditions stated on this page. 
 
-List<Map<String, dynamic>> foods = [
-  {
-    "_id": "65316968f94c6496dc84f3c1",
-    "title": "Tiramisu",
-    "foodTags": ["Italian", "Dessert", "Coffee", "Mascarpone", "Cocoa"],
-    "foodType": ["Dessert"],
-    "code": "41007428",
-    "isAvailable": true,
-    "restaurant": "6530ea6bc9e72013e5b6592d",
-    "rating": 4.9,
-    "ratingCount": "420",
-    "description":
-        "A classic Italian dessert made of layers of coffee-soaked ladyfingers and creamy mascarpone, topped with cocoa.",
-    "price": 7.99,
-    "additives": [
-      {"id": 1, "title": "Ladyfingers", "price": "1.00"},
-      {"id": 2, "title": "Coffee", "price": "1.50"},
-      {"id": 3, "title": "Mascarpone Cheese", "price": "2.50"},
-      {"id": 4, "title": "Cocoa", "price": "0.50"},
-      {"id": 5, "title": "Sugar", "price": "0.50"}
-    ],
-    "imageUrl":
-        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "__v": 0,
-    "category": "6531209dbbe4998e90af3fef",
-    "time": "35 min"
-  },
-  {
-    "_id": "653168e9f94c6496dc84f3bf",
-    "title": "Spaghetti Carbonara",
-    "foodTags": ["Italian", "Creamy", "Pasta", "Bacon", "Egg"],
-    "foodType": ["Main Course", "Lunch", null],
-    "code": "41007428",
-    "isAvailable": true,
-    "restaurant": "6530ea6bc9e72013e5b6592d",
-    "rating": 4.7,
-    "ratingCount": "310",
-    "description":
-        "A traditional Italian pasta dish with creamy egg sauce, pancetta, and cheese.",
-    "price": 14.99,
-    "additives": [
-      {"id": 1, "title": "Egg", "price": "1.00"},
-      {"id": 2, "title": "Pancetta", "price": "3.00"},
-      {"id": 3, "title": "Parmesan Cheese", "price": "2.00"},
-      {"id": 4, "title": "Black Pepper", "price": "0.50"},
-      {"id": 5, "title": "Pasta", "price": "3.00"}
-    ],
-    "imageUrl":
-        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "__v": 2,
-    "category": "6531209dbbe4998e90af3fef",
-    "time": "20 min"
-  },
-  {
-    "_id": "653169a9f94c6496dc84f3c3",
-    "title": "Vegan Salad Bowl",
-    "foodTags": ["Vegan", "Healthy", "Salad", "Fresh", "Organic"],
-    "foodType": ["Starter", "Lunch", "Dinner", "Health", "Vegan"],
-    "code": "41007428",
-    "isAvailable": true,
-    "restaurant": "6530ea6bc9e72013e5b6592d",
-    "rating": 4.6,
-    "ratingCount": "230",
-    "description":
-        "A refreshing mix of organic vegetables, nuts, seeds, and a tangy vinaigrette.",
-    "price": 11.99,
-    "additives": [
-      {"id": 1, "title": "Mixed Greens", "price": "1.50"},
-      {"id": 2, "title": "Walnuts", "price": "2.00"},
-      {"id": 3, "title": "Quinoa", "price": "1.50"},
-      {"id": 4, "title": "Cherry Tomatoes", "price": "1.00"},
-      {"id": 5, "title": "Vinaigrette", "price": "0.50"}
-    ],
-    "imageUrl":
-        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "__v": 0,
-    "category": "6531209dbbe4998e90af3fef",
-    "time": "55 min"
-  },
-  {
-    "_id": "65316771f94c6496dc84f3bd",
-    "title": "Margherita Pizza",
-    "foodTags": ["Italian", "Cheesy", "Vegetarian"],
-    "foodType": ["Main Course"],
-    "code": "41007428",
-    "isAvailable": true,
-    "restaurant": "6530ebbcc9e72013e5b65933",
-    "rating": 4.5,
-    "ratingCount": "150",
-    "description":
-        "A classic Margherita pizza with fresh tomatoes, mozzarella cheese, basil, and olive oil.",
-    "price": 12.99,
-    "additives": [
-      {"id": 1, "title": "Cheese", "price": "2.00"},
-      {"id": 2, "title": "Pepperoni", "price": "2.50"},
-      {"id": 3, "title": "Ketch up", "price": "0.50"}
-    ],
-    "imageUrl":
-        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "__v": 0,
-    "category": "6531209dbbe4998e90af3fef",
-    "time": "30 min"
-  },
-  {
-    "_id": "65316a01f94c6496dc84f3c7",
-    "title": "Tropical Fruit Smoothie",
-    "foodTags": ["Fruit", "Smoothie", "Refreshing", "Sweet", "Cold"],
-    "foodType": ["Drink", "Breakfast", "Snack", "Dessert", "Vegan"],
-    "code": "41007428",
-    "isAvailable": true,
-    "restaurant": "6530ea6bc9e72013e5b6592d",
-    "rating": 4.7,
-    "ratingCount": "280",
-    "description":
-        "A delightful blend of tropical fruits, creating the perfect sweet and refreshing drink.",
-    "price": 6.99,
-    "additives": [
-      {"id": 1, "title": "Mango", "price": "2.00"},
-      {"id": 2, "title": "Pineapple", "price": "1.50"},
-      {"id": 3, "title": "Banana", "price": "1.00"},
-      {"id": 4, "title": "Coconut Milk", "price": "1.50"},
-      {"id": 5, "title": "Ice", "price": "0.50"}
-    ],
-    "imageUrl":
-        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "__v": 0,
-    "category": "6531209dbbe4998e90af3fef",
-    "time": "25 min"
-  },
-  {
-    "_id": "653169d8f94c6496dc84f3c5",
-    "title": "Mixed Grill Platter",
-    "foodTags": ["Barbecue", "Meat", "Grilled", "Spicy", "Savory"],
-    "foodType": [
-      "Main Course",
-      "Dinner",
-      "Grill",
-      "Non-Vegetarian",
-      "Barbecue"
-    ],
-    "code": "41007428",
-    "isAvailable": true,
-    "restaurant": "6530ea6bc9e72013e5b6592d",
-    "rating": 4.8,
-    "ratingCount": "320",
-    "description":
-        "A succulent assortment of grilled meats, served with sides and sauces.",
-    "price": 18.99,
-    "additives": [
-      {"id": 1, "title": "Chicken", "price": "3.00"},
-      {"id": 2, "title": "Beef", "price": "4.00"},
-      {"id": 3, "title": "Lamb", "price": "4.00"},
-      {"id": 4, "title": "Pork", "price": "3.50"},
-      {"id": 5, "title": "Barbecue Sauce", "price": "1.00"}
-    ],
-    "imageUrl":
-        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    "__v": 0,
-    "category": "6531209dbbe4998e90af3fef",
-    "time": "45 min"
-  }
-];
+1. Usage 
+1.1. The UTU Attendance App is provided to employees of [Company Name] for the sole purpose of managing attendance, leaves, and related tasks.
+1.2. You agree to use the app in compliance with all applicable laws, rules, and regulations. 
+
+2. Account Registration 
+2.1. To access the app, you must register using your valid phone number and OTP (One-Time Password). 
+2.2. You are responsible for maintaining the confidentiality of your account and password. You agree to notify us immediately of any unauthorized use of your account. 
+
+3. Attendance Tracking 
+3.1. The app utilizes geofencing technology to track your location when marking attendance. By using the app, you consent to this location tracking feature. 
+3.2. The accuracy of location-based attendance marking may vary based on network and GPS conditions. 
+
+4. Leave Application 
+4.1. The app allows you to apply for leaves. All leave applications are subject to the company's leave policies and manager approval. 
+4.2. The company reserves the right to reject or modify leave requests based on business needs and policies. 
+
+5. Profile 
+5.1. You are responsible for providing accurate and up-to-date information in your profile. 
+5.2. The company may use the information provided in your profile for administrative purposes related to employment. 
+
+6. Holidays 
+6.1. The app may display information about company holidays for reference purposes. 
+6.2. Company holidays may be subject to change based on business requirements. 
+''';
+
+const String privacyText = '''
+This Privacy Policy describes how [Company Name] collects, uses, and protects the information you provide when using the UTU Attendance App. 
+
+1. Information Collection 
+1.1. Personal Information: When you register and use the UTU Attendance App, we may collect personal information such as your name, phone number, and profile details. 
+1.2. Attendance Data: The app collects attendance data, including timestamps and location information through geofencing technology when you mark attendance. 
+1.3. Leave Application: Information submitted when applying for leaves, including leave type, duration, and reason, is stored within the app. 
+
+2. Use of Information 
+2.1. Attendance Tracking: Attendance data, including location information, is used solely for the purpose of managing employee attendance records. 
+2.2. Leave Management: Information provided during leave applications is used to process and manage employee leaves in accordance with company policies. 2.3. Profile Information: Personal details in your profile are used for administrative purposes related to employment, such as contact information and job role. 
+
+3. Data Security 
+3.1. We are committed to ensuring the security of your information. The UTU Attendance App employs industry-standard security measures to protect your data from unauthorized access, alteration, disclosure, or destruction. 
+3.2. Access to your personal information is restricted to authorized personnel who have a need to access this data for the purposes outlined in this Privacy Policy. 
+
+4. Information Sharing 
+4.1. We do not sell, trade, or otherwise transfer your personal information to outside parties unless required for legal compliance, law enforcement, or as necessary for the operation and maintenance of the app. 
+4.2. In certain instances, we may share aggregated and anonymized data for analytical purposes or reporting. 
+
+5. Third-Party Services 
+5.1. The UTU Attendance App may contain links to third-party websites or services. We are not responsible for the privacy practices or content of these third-party sites. 
+
+6. Consent 
+6.1. By using the UTU Attendance App, you consent to the collection and use of your information as outlined in this Privacy Policy. 
+''';
 
 const cart = [
   {

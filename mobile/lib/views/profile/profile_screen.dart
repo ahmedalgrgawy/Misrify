@@ -8,6 +8,9 @@ import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
 import 'package:graduation_project1/controllers/profile_controller.dart';
 import 'package:graduation_project1/hooks/fetch_profile.dart';
+import 'package:graduation_project1/views/profile/contactus.dart';
+import 'package:graduation_project1/views/profile/edit_profile_Screen.dart';
+import 'package:graduation_project1/views/profile/widgets/help%20and%20support/widget_help.dart';
 import 'package:graduation_project1/views/profile/widgets/profile_tile.dart';
 
 class ProfileScreen extends HookWidget {
@@ -106,7 +109,9 @@ class ProfileScreen extends HookWidget {
                       ProfileTile(
                         icon: Icons.account_circle_outlined,
                         title: 'Edit profile',
-                        onTap: () {},
+                        onTap: () {
+                          Get.to(() => EditProfile());
+                        },
                       ),
                       ProfileTile(
                         icon: CupertinoIcons.cube_box,
@@ -119,14 +124,17 @@ class ProfileScreen extends HookWidget {
                         onTap: () {},
                       ),
                       ProfileTile(
-                        icon: Icons.headset_mic_sharp,
-                        title: 'Contact Us',
-                        onTap: () {},
-                      ),
+                          icon: Icons.headset_mic_sharp,
+                          title: 'Contact Us',
+                          onTap: () {
+                            Get.to(() => ContactUsScreen());
+                          }),
                       ProfileTile(
                         icon: Icons.help_outline,
                         title: 'Help & Support',
-                        onTap: () {},
+                        onTap: () {
+                          Get.to(() => FAQPage());
+                        },
                       ),
                       ProfileTile(
                         icon: Icons.logout,
