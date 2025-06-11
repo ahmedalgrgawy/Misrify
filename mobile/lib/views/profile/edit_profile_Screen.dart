@@ -1,90 +1,99 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:graduation_project1/common/app_style.dart';
+import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
+import 'package:graduation_project1/controllers/profile_controller.dart';
 import 'package:graduation_project1/hooks/fetch_profile.dart';
+import 'package:graduation_project1/views/profile/widgets/editprofile_text_container.dart';
 
 class EditProfile extends HookWidget {
   const EditProfile({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final profileController = Get.put(ProfileController());
     final profileHook = useFetchProfile();
     final user = profileHook.data?.user;
 
-    final _formKey = useMemoized(() => GlobalKey<FormState>());
-    final _firstNameController = useTextEditingController();
-    final _emailController = useTextEditingController();
-    final _phoneController = useTextEditingController();
-    final _passwordController = useTextEditingController();
-    final _cityController = useTextEditingController();
+    final formKey = useMemoized(() => GlobalKey<FormState>());
+    final nameController = useTextEditingController();
+    final genderController = useTextEditingController();
+    final emailController = useTextEditingController();
+    final phoneController = useTextEditingController();
+    final newPasswordController = useTextEditingController();
+    final currentPasswordController = useTextEditingController();
+    final addressController = useTextEditingController();
 
     useEffect(() {
       if (user != null) {
-        _firstNameController.text = user.name ?? '';
-        _emailController.text = user.email ?? '';
-        _phoneController.text = user.phoneNumber ?? '';
-        _cityController.text = user.address ?? '';
+        nameController.text = user.name ?? '';
+        emailController.text = user.email ?? '';
+        phoneController.text = user.phoneNumber ?? '';
+        addressController.text = user.address ?? '';
+        genderController.text = user.gender ?? '';
       }
       return null;
     }, [user]);
 
-    void _updateProfile() {
-      if (_formKey.currentState!.validate()) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
+    if (profileHook.isLoading || user == null) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
-    Widget _buildTextField({
-      required String label,
-      required TextEditingController controller,
-      bool obscureText = false,
-      TextInputType keyboardType = TextInputType.text,
-    }) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ReusableText(
-              text: label, style: appStyle(14, kBlue, FontWeight.w400)),
-          const SizedBox(height: 6),
-          Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFFF5F5F5),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: TextFormField(
-              controller: controller,
-              obscureText: obscureText,
-              keyboardType: keyboardType,
-              style: appStyle(14, kBlue, FontWeight.w400),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: kLightWhite.withOpacity(0.45),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Kbackground, width: .5),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Kbackground, width: .5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: kLightGray, width: .5),
-                ),
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 10.h, horizontal: 12.w),
-              ),
-            ),
-          ),
-        ],
+    void handleUpdate() async {
+      profileController.fieldErrors.clear();
+      profileController.generalError.value = '';
+
+      final name = nameController.text.trim();
+      final email = emailController.text.trim();
+      final phone = phoneController.text.trim();
+      final address = addressController.text.trim();
+      final gender = genderController.text.trim();
+      final currentPassword = currentPasswordController.text.trim();
+      final newPassword = newPasswordController.text.trim();
+
+      final noChange = name == (user.name ?? '') &&
+          email == (user.email ?? '') &&
+          phone == (user.phoneNumber ?? '') &&
+          address == (user.address ?? '') &&
+          gender == (user.gender ?? '') &&
+          currentPassword.isEmpty &&
+          newPassword.isEmpty;
+
+      if (noChange) {
+        Get.snackbar(
+          "Info",
+          "No data changed",
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      if ((currentPassword.isNotEmpty && newPassword.isEmpty) ||
+          (newPassword.isNotEmpty && currentPassword.isEmpty)) {
+        Get.snackbar(
+          "Error",
+          "Both current and new passwords must be provided",
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        return;
+      }
+
+      await profileController.updateProfile(
+        name: name,
+        email: email,
+        phoneNumber: phone,
+        address: address,
+        gender: gender,
+        currentPassword: currentPassword.isNotEmpty ? currentPassword : null,
+        newPassword: newPassword.isNotEmpty ? newPassword : null,
+        onSuccess: profileHook.refetch,
       );
     }
 
@@ -112,42 +121,53 @@ class EditProfile extends HookWidget {
               child: Column(
                 children: [
                   Stack(
+                    alignment: Alignment.bottomRight,
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 60,
-                        backgroundImage: NetworkImage(
-                          "https://images.unsplash.com/photo-1563389234808-52344934935c?q=80",
-                        ),
+                        backgroundImage: user.imgUrl != null
+                            ? NetworkImage(user.imgUrl!)
+                            : const NetworkImage(
+                                "https://images.unsplash.com/photo-1563389234808-52344934935c?q=80",
+                              ),
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
+                      GestureDetector(
+                        onTap: () async {
+                          await profileController.pickImageAndUpdateProfile(
+                            name: nameController.text.trim(),
+                            phoneNumber: phoneController.text.trim(),
+                            address: addressController.text.trim(),
+                            email: emailController.text.trim(),
+                            gender: genderController.text.trim(),
+                            currentPassword:
+                                currentPasswordController.text.trim(),
+                            newPassword: newPasswordController.text.trim(),
+                          );
+                          await profileHook.refetch!();
+                        },
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(6),
                           decoration: const BoxDecoration(
                             color: Colors.white,
                             shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black26,
-                                blurRadius: 4,
-                                offset: Offset(0, 2),
-                              ),
-                            ],
                           ),
-                          child: const Icon(Icons.camera_alt, size: 20),
+                          child: const Icon(
+                            Icons.camera_alt_outlined,
+                            size: 16,
+                            color: kDarkBlue,
+                          ),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
                   ReusableText(
-                    text: user?.name ?? 'Loading...',
+                    text: user.name ?? '',
                     style: appStyle(22, kDarkBlue, FontWeight.w600),
                   ),
                   const SizedBox(height: 8),
                   ReusableText(
-                    text: user?.email ?? '',
+                    text: user.email ?? '',
                     style: appStyle(14, kLightBlue, FontWeight.w500),
                   ),
                 ],
@@ -156,50 +176,60 @@ class EditProfile extends HookWidget {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Form(
-                key: _formKey,
+                key: formKey,
                 child: Column(
                   children: [
-                    _buildTextField(
-                        label: 'Name', controller: _firstNameController),
+                    EditprofileTextContainer(
+                      label: 'Name',
+                      controller: nameController,
+                      errorText: profileController.fieldErrors['name'],
+                    ),
                     const SizedBox(height: 24),
-                    _buildTextField(
-                        label: 'Email',
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress),
+                    EditprofileTextContainer(
+                      label: 'Email',
+                      controller: emailController,
+                      errorText: profileController.fieldErrors['email'],
+                    ),
                     const SizedBox(height: 24),
-                    _buildTextField(
-                        label: 'Phone Number',
-                        controller: _phoneController,
-                        keyboardType: TextInputType.phone),
+                    EditprofileTextContainer(
+                      label: 'Gender',
+                      controller: genderController,
+                      errorText: profileController.fieldErrors['gender'],
+                    ),
                     const SizedBox(height: 24),
-                    _buildTextField(
-                        label: 'Password',
-                        controller: _passwordController,
-                        obscureText: true),
+                    EditprofileTextContainer(
+                      label: 'Phone Number',
+                      controller: phoneController,
+                      errorText: profileController.fieldErrors['phoneNumber'],
+                    ),
                     const SizedBox(height: 24),
-                    _buildTextField(
-                        label: 'Address', controller: _cityController),
+                    EditprofileTextContainer(
+                      label: 'Current Password',
+                      controller: currentPasswordController,
+                      obscureText: true,
+                      errorText: profileController.fieldErrors['password'],
+                    ),
+                    const SizedBox(height: 24),
+                    EditprofileTextContainer(
+                      label: 'New Password',
+                      controller: newPasswordController,
+                      obscureText: true,
+                      errorText: profileController.fieldErrors['password'],
+                    ),
+                    const SizedBox(height: 24),
+                    EditprofileTextContainer(
+                      label: 'Address',
+                      controller: addressController,
+                      errorText: profileController.fieldErrors['address'],
+                    ),
                     const SizedBox(height: 40),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: _updateProfile,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2C3E50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: const Text(
-                          'Update',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
+                    CustomButton(
+                      text: 'Update',
+                      onTap: handleUpdate,
+                      btnColor: kNavy,
+                      textcolor: Colors.white,
+                      btnWidth: double.infinity,
+                      btnHeight: 45,
                     ),
                     const SizedBox(height: 20),
                   ],

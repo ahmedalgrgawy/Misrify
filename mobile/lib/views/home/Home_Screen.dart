@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:graduation_project1/common/custom_button.dart';
-import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/controllers/category_controller.dart';
 import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
@@ -20,34 +18,53 @@ import 'package:graduation_project1/views/home/widgets/banner_slider.dart';
 import 'package:graduation_project1/views/search/widgets/search_container.dart';
 import 'package:graduation_project1/views/products/widgets/product_list.dart';
 
-class HomeScreen extends HookWidget {
+class HomeScreen extends StatefulHookWidget {
+  const HomeScreen({super.key});
   static const String routeName = "Home_Screen";
 
-  const HomeScreen({super.key});
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  final cartController = Get.put(CartController());
+  final notificationsController = Get.put(NotificationController());
+  final categoryController = Get.put(CategoryController());
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refetch(); // Initial load
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed &&
+        ModalRoute.of(context)?.isCurrent == true) {
+      _refetch(); // When app resumes and we're still on HomeScreen
+    }
+  }
+
+  void _refetch() {
+    categoryController.updateCategory = '';
+    categoryController.updateTitle = '';
+    cartController.refreshCartCount();
+    notificationsController.fetchNotifications();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final login = Get.put(LoginController());
-    final controller = Get.put(CategoryController());
-    final cartController = Get.put(CartController());
-    final TextEditingController searchController = TextEditingController();
-
-    // ✅ Reset category + refresh cart count on load
-    useEffect(() {
-      Future.microtask(() {
-        controller.updateCategory = '';
-        controller.updateTitle = '';
-        cartController.refreshCartCount();
-
-        final notificationController = Get.find<NotificationController>();
-        notificationController.fetchNotifications(); // ✅
-      });
-      return null;
-    }, []);
-
     final bestSellers = useFetchAllProducts();
     final newArrivals = useFetchNewArrivals();
     final specialOffers = useFetchDiscountedProducts();
+    final TextEditingController searchController = TextEditingController();
 
     return SafeArea(
       child: Scaffold(
@@ -69,42 +86,28 @@ class HomeScreen extends HookWidget {
               },
             ),
             const CategoryList(),
-            Obx(() => controller.categoryValue == ''
+            Obx(() => categoryController.categoryValue == ''
                 ? Column(
                     children: [
                       SectionHeading(
                         title: 'Best Sellers',
-                        onPress: () {
-                          Get.to(() => const AllbestSeller(),
-                              duration: const Duration(milliseconds: 900),
-                              transition: Transition.cupertino);
-                        },
+                        onPress: () => Get.to(() => const AllbestSeller()),
                       ),
                       ProductList(hookresults: bestSellers),
                       SectionHeading(
                         title: 'New Products',
-                        onPress: () {
-                          Get.to(() => const AllnewArrival(),
-                              duration: const Duration(milliseconds: 900),
-                              transition: Transition.cupertino);
-                        },
+                        onPress: () => Get.to(() => const AllnewArrival()),
                       ),
                       ProductList(hookresults: newArrivals),
                       SectionHeading(
                         title: 'Special Offers',
-                        onPress: () {
-                          Get.to(() => const AllspecialOffers(),
-                              duration: const Duration(milliseconds: 900),
-                              transition: Transition.cupertino);
-                        },
+                        onPress: () => Get.to(() => const AllspecialOffers()),
                       ),
                       ProductList(hookresults: specialOffers),
-                      SizedBox(
-                        height: 20,
-                      )
+                      const SizedBox(height: 20),
                     ],
                   )
-                : Container()),
+                : const SizedBox.shrink()),
           ],
         ),
       ),
