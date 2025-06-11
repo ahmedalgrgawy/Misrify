@@ -20,7 +20,7 @@ const Sidebar = () => {
                 <NavLink
                     to="/"
                     style={{ fontFamily: "Jaro" }}
-                    className="block text-3xl font-medium tracking-wide text-center text-title-blue mb-8"
+                    className="block text-4xl font-medium tracking-wide text-center text-title-blue mb-8"
                 >
                     MISRIFY
                 </NavLink>

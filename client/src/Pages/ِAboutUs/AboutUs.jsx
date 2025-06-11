@@ -58,7 +58,7 @@ const AboutUs = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6 md:p-10 lg:p-16">
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Greg}
@@ -83,7 +83,7 @@ const AboutUs = () => {
           </div>
         </div>
 
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Siam}
@@ -108,7 +108,7 @@ const AboutUs = () => {
           </div>
         </div>
 
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Negm}
@@ -133,7 +133,7 @@ const AboutUs = () => {
           </div>
         </div>
 
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Zeyad}
@@ -158,7 +158,7 @@ const AboutUs = () => {
           </div>
         </div>
 
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Ali}
@@ -183,7 +183,7 @@ const AboutUs = () => {
           </div>
         </div>
 
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Sandy}
@@ -208,7 +208,7 @@ const AboutUs = () => {
           </div>
         </div>
 
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Sara}
@@ -233,7 +233,7 @@ const AboutUs = () => {
           </div>
         </div>
 
-        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl transition-all rounded-xl border-2 border-transparent hover:border-gray-400">
+        <div className="card w-3/4 mx-auto md:w-full hover:shadow-2xl duration-300 rounded-xl border-2 border-transparent hover:border-gray-400">
           <img
             className={`w-full bg-[#F5F5F5] rounded-lg box-content ${style.cardFrim}`}
             src={Reem}

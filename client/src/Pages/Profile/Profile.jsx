@@ -14,6 +14,7 @@ import Cropper from "react-easy-crop";
 import Resizer from "react-image-file-resizer";
 import { TailSpin } from "react-loader-spinner";
 import { Flip, toast, ToastContainer } from "react-toastify";
+import { Tooltip } from "react-tooltip";
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -66,169 +67,226 @@ const Profile = () => {
   });
 
   function postNewData(data) {
-    if (data.currentPassword == "" && data.newPassword == "") {
-      if (data.imgUrl == "") {
+    const handleDispatch = (payload) => {
+      dispatch(editProfile(payload))
+        .then(() => {
+          setTimeout(() => {
+            toast.success("the profile has been updated 👍", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: false,
+              progress: undefined,
+              theme: "dark",
+              transition: Flip,
+            });
+          }, 0);
+          dispatch(getProfile());
+        })
+        .catch((err) => {
+          setTimeout(() => {
+            toast.error("there is something wrong 👎", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: false,
+              progress: undefined,
+              theme: "dark",
+              transition: Flip,
+            });
+          }, 0);
+
+          console.error("Error editing profile:", err);
+        });
+    };
+
+    if (data.currentPassword === "" && data.newPassword === "") {
+      if (data.imgUrl === "") {
         const { currentPassword, imgUrl, newPassword, ...updatedData } = data;
-        dispatch(editProfile(updatedData))
-          .then(() => {
-            setTimeout(() => {
-              toast.success("the profile has been updated 👍", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-    dispatch(getProfile());
-          
-          })
-          .catch((err) => {
-            setTimeout(() => {
-              toast.error("there is something wrong 👎", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-            console.error("Error editing profile:", err);
-          });
+        handleDispatch(updatedData);
       } else {
         const { currentPassword, newPassword, ...updatedData } = data;
-        dispatch(editProfile(updatedData))
-          .then(() => {
-            setTimeout(() => {
-              toast.success("the profile has been updated 👍", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-    dispatch(getProfile());
-          
-          })
-          .catch((err) => {
-            setTimeout(() => {
-              toast.error("there is something wrong 👎", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-
-            console.error("Error editing profile:", err);
-          });
+        handleDispatch(updatedData);
       }
     } else {
-      if (data.imgUrl == "") {
+      if (data.imgUrl === "") {
         const { imgUrl, ...updatedData } = data;
-        dispatch(editProfile(updatedData))
-          .then(() => {
-            setTimeout(() => {
-              toast.success("the profile has been updated 👍", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-    dispatch(getProfile());
-          
-          })
-          .catch((err) => {
-            setTimeout(() => {
-              toast.error("there is something wrong 👎", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-
-            console.error("Error editing profile:", err);
-          });
+        handleDispatch(updatedData);
       } else {
-        dispatch(editProfile(data))
-          .then(() => {
-            setTimeout(() => {
-              toast.success("the profile has been updated 👍", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-    dispatch(getProfile());
-          
-          })
-          .catch((err) => {
-            setTimeout(() => {
-              toast.error("there is something wrong 👎", {
-                position: "bottom-right",
-                autoClose: 2000,
-                hideProgressBar: false,
-                closeOnClick: false,
-                pauseOnHover: true,
-                draggable: false,
-                progress: undefined,
-                theme: "dark",
-                transition: Flip,
-              });
-            }, 0);
-
-            console.error("Error editing profile:", err);
-          });
+        handleDispatch(data);
       }
     }
+    setIsDisabled({
+      name: true,
+      email: true,
+      phone: true,
+      address: true,
+      CPassword: true,
+      NPassword: true,
+    });
+    // if (data.currentPassword == "" && data.newPassword == "") {
+    //   if (data.imgUrl == "") {
+    //     const { currentPassword, imgUrl, newPassword, ...updatedData } = data;
+    //     dispatch(editProfile(updatedData))
+    //       .then(() => {
+    //         setTimeout(() => {
+    //           toast.success("the profile has been updated 👍", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+    //         dispatch(getProfile());
+    //       })
+    //       .catch((err) => {
+    //         setTimeout(() => {
+    //           toast.error("there is something wrong 👎", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+    //         console.error("Error editing profile:", err);
+    //       });
+    //   } else {
+    //     const { currentPassword, newPassword, ...updatedData } = data;
+    //     dispatch(editProfile(updatedData))
+    //       .then(() => {
+    //         setTimeout(() => {
+    //           toast.success("the profile has been updated 👍", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+    //         dispatch(getProfile());
+    //       })
+    //       .catch((err) => {
+    //         setTimeout(() => {
+    //           toast.error("there is something wrong 👎", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+
+    //         console.error("Error editing profile:", err);
+    //       });
+    //   }
+    // } else {
+    //   if (data.imgUrl == "") {
+    //     const { imgUrl, ...updatedData } = data;
+    //     dispatch(editProfile(updatedData))
+    //       .then(() => {
+    //         setTimeout(() => {
+    //           toast.success("the profile has been updated 👍", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+    //         dispatch(getProfile());
+    //       })
+    //       .catch((err) => {
+    //         setTimeout(() => {
+    //           toast.error("there is something wrong 👎", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+
+    //         console.error("Error editing profile:", err);
+    //       });
+    //   } else {
+    //     dispatch(editProfile(data))
+    //       .then(() => {
+    //         setTimeout(() => {
+    //           toast.success("the profile has been updated 👍", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+    //         dispatch(getProfile());
+    //       })
+    //       .catch((err) => {
+    //         setTimeout(() => {
+    //           toast.error("there is something wrong 👎", {
+    //             position: "bottom-right",
+    //             autoClose: 2000,
+    //             hideProgressBar: false,
+    //             closeOnClick: false,
+    //             pauseOnHover: true,
+    //             draggable: false,
+    //             progress: undefined,
+    //             theme: "dark",
+    //             transition: Flip,
+    //           });
+    //         }, 0);
+
+    //         console.error("Error editing profile:", err);
+    //       });
+    //   }
+    // }
   }
 
   const updateData = useFormik({
     initialValues: {
-      name: profile.name || "",
-      email: profile.email || "",
-      phoneNumber: profile.phoneNumber || "",
-      address: profile.address || "",
+      name: profile?.name || "",
+      email: profile?.email || "",
+      phoneNumber: profile?.phoneNumber || "",
+      address: profile?.address || "",
       currentPassword: "",
       newPassword: "",
-      gender: profile.gender || "",
-      imgUrl: profile.imgUrl || "",
+      gender: profile?.gender || "",
+      imgUrl: profile?.imgUrl || "",
     },
     validationSchema,
     onSubmit: postNewData,
@@ -335,7 +393,13 @@ const Profile = () => {
               backgroundImage: `url(${updateData.values.imgUrl || pic})`,
             }}
           >
-            <div className="absolute bottom-0 right-0 w-11 h-11">
+            <div
+              data-tooltip-place="right"
+              data-tooltip-id="Upload"
+              data-tooltip-content="Upload"
+              data-tooltip-offset="5"
+              className="absolute bottom-0 right-0 w-11 h-11"
+            >
               <label htmlFor="upload-input">
                 <IoCameraOutline
                   style={{ backgroundClip: "" }}
@@ -353,9 +417,9 @@ const Profile = () => {
           </div>
 
           <h2 className="font-inter mb-2 text-bg-second font-semibold text-2xl">
-            {profile.name}
+            {profile?.name}
           </h2>
-          <p className="font-inter text-[#A2A2A2]">{profile.email}</p>
+          <p className="font-inter text-[#A2A2A2]">{profile?.email}</p>
         </div>
 
         <img
@@ -471,6 +535,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, name: false });
                     }}
@@ -512,6 +579,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, email: false });
                     }}
@@ -553,6 +623,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, phone: false });
                     }}
@@ -595,6 +668,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, address: false });
                     }}
@@ -636,6 +712,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, CPassword: false });
                     }}
@@ -678,6 +757,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, NPassword: false });
                     }}
@@ -754,6 +836,14 @@ const Profile = () => {
         theme="dark"
         transition={Flip}
         style={{ zIndex: 9999 }}
+      />
+      <Tooltip
+        id="Edit"
+        className="!z-50 !py-1 !px-2 !bg-title-blue !rounded-md"
+      />
+      <Tooltip
+        id="Upload"
+        className="!z-50 !py-1 !px-2 !bg-dark-grey !rounded-md"
       />
     </>
   );

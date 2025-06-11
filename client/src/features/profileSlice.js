@@ -60,12 +60,10 @@ const ProfileSlice = createSlice({
       })
       .addCase(editProfile.fulfilled, (state, action) => {
         state.Loading = false;
-        // state.profile = action.payload; //don't store the backend error in the profile
+        state.profile = action.payload; //don't store the backend error in the profile
       })
       .addCase(editProfile.rejected, (state, action) => {
-        state.Loading = false;
-        console.log(action.payload);
-        
+        state.Loading = false;        
         state.error = action.payload;
       });
   },

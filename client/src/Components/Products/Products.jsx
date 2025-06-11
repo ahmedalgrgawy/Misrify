@@ -16,6 +16,7 @@ import { getAllBrands } from "../../features/brandSlice";
 import { getAllCategories } from "../../features/categorySlice";
 import { TailSpin } from "react-loader-spinner";
 import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
+import { Tooltip } from "react-tooltip";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -394,7 +395,6 @@ const Products = () => {
           <FaPlus /> Add Product
         </button>
       </div>
-
       {error && (
         <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
           {error}
@@ -405,7 +405,6 @@ const Products = () => {
           {success}
         </div>
       )}
-
       {loading || brandsLoading || categoriesLoading ? (
         <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
           <TailSpin color="#2B3D5B" height={100} width={100} />
@@ -460,15 +459,16 @@ const Products = () => {
                           product.colors.map((color, i) => (
                             <span
                               key={i}
-                              className={`w-5 h-5 rounded-full ${{
-                                red: "bg-red-500",
-                                green: "bg-green-500",
-                                blue: "bg-blue-500",
-                                Navy: "bg-indigo-900",
-                                Teal: "bg-teal-500",
-                                Orange: "bg-orange-500",
-                              }[color] || "bg-gray-500"
-                                } transition duration-300 transform hover:scale-125`}
+                              className={`w-5 h-5 rounded-full ${
+                                {
+                                  red: "bg-red-500",
+                                  green: "bg-green-500",
+                                  blue: "bg-blue-500",
+                                  Navy: "bg-indigo-900",
+                                  Teal: "bg-teal-500",
+                                  Orange: "bg-orange-500",
+                                }[color] || "bg-gray-500"
+                              } transition duration-300 transform hover:scale-125`}
                             ></span>
                           ))
                         ) : (
@@ -483,12 +483,18 @@ const Products = () => {
                         <button
                           onClick={() => handleEditClick(product)}
                           className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110"
+                          data-tooltip-id="Edit"
+                          data-tooltip-content="Edit"
+                          data-tooltip-place="bottom"
                         >
                           <FaEdit />
                         </button>
                         <button
                           onClick={() => handleDeleteClick(product._id)}
                           className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110"
+                          data-tooltip-place="bottom"
+                          data-tooltip-id="Delete"
+                          data-tooltip-content="Delete"
                         >
                           <FaTrashAlt />
                         </button>
@@ -498,10 +504,7 @@ const Products = () => {
                 ))
               ) : (
                 <tr>
-                  <td
-                    colSpan="8"
-                    className="text-center text-title-blue py-4"
-                  >
+                  <td colSpan="8" className="text-center text-title-blue py-4">
                     No Products found
                   </td>
                 </tr>
@@ -536,6 +539,8 @@ const Products = () => {
       )}
       {showCreateModal && renderProductModal("create")}
       {showEditModal && renderProductModal("edit")}
+      <Tooltip id="Edit" className="!py-1 !px-2 !bg-title-blue !rounded-md" />
+      <Tooltip id="Delete" className="!py-1 !px-2 !bg-red-600 !rounded-md" />
     </div>
   );
 };

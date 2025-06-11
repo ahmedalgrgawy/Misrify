@@ -33,6 +33,7 @@ import "swiper/css/pagination";
 import { getAllMerchants } from "../../features/userSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { Flip, ToastContainer, toast } from "react-toastify";
+import { Tooltip } from "react-tooltip";
 
 const Categories = () => {
   const dispatch = useDispatch();
@@ -249,6 +250,8 @@ const Categories = () => {
   const arrCategories = Array.isArray(categories) ? categories : [];
   const arrBrands = Array.isArray(brands) ? brands : [];
 
+  const categoriesNames = arrCategories.map((category) => category.name);
+  const brandssNames = arrBrands.map((brand) => brand.name);
   return (
     <div className="p-6 bg-bg-second font-montserrat">
       {/* Header */}
@@ -434,8 +437,13 @@ const Categories = () => {
                 </button>
                 <button
                   onClick={() => {
+
+                    
                     if (!newCategory.name.trim()) {
                       alert("Category name is required.");
+                      return;
+                    }else if(categoriesNames.includes(newCategory.name)){
+                      alert("This name is already used.\n Try another one");
                       return;
                     }
 
@@ -548,6 +556,9 @@ const Categories = () => {
                   onClick={() => {
                     if (!newBrand.name.trim()) {
                       alert("Brand name is required.");
+                      return;
+                    }else if (brandssNames.includes(newBrand.name)) {
+                      alert("This name is already used.\n Try another one");
                       return;
                     }
 
@@ -676,12 +687,18 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
                     <button
                       onClick={() => onEdit(item._id)}
                       className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110"
+                      data-tooltip-id="Edit"
+                      data-tooltip-content="Edit"
+                      data-tooltip-place="bottom"
                     >
                       <FaEdit />
                     </button>
                     <button
                       onClick={() => onDelete(item._id)}
                       className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110"
+                      data-tooltip-place="bottom"
+                      data-tooltip-id="Delete"
+                      data-tooltip-content="Delete"
                     >
                       <FaTrashAlt />
                     </button>
@@ -708,6 +725,14 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
           <FaArrowRight />
         </button>
       </div>
+      <Tooltip
+        id="Edit"
+        className="!z-50 !py-1 !px-2 !bg-title-blue !rounded-md"
+      />
+      <Tooltip
+        id="Delete"
+        className="!z-50 !py-1 !px-2 !bg-red-600 !rounded-md"
+      />
     </div>
   );
 };
