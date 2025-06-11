@@ -17,7 +17,6 @@ class ProfileScreen extends HookWidget {
   Widget build(BuildContext context) {
     final login = Get.put(LoginController());
     final profileController = Get.put(ProfileController());
-
     final profileHook = useFetchProfile();
     final user = profileHook.data?.user;
 
@@ -52,27 +51,6 @@ class ProfileScreen extends HookWidget {
                                 : const AssetImage(
                                         'assets/images/default_avatar.png')
                                     as ImageProvider,
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              await profileController.pickImageAndUpdateProfile(
-                                name: user.name,
-                                phoneNumber: user.phoneNumber,
-                                address: user.address,
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.camera_alt_outlined,
-                                size: 16,
-                                color: kDarkBlue,
-                              ),
-                            ),
                           ),
                         ],
                       ),
@@ -109,7 +87,10 @@ class ProfileScreen extends HookWidget {
                         icon: Icons.account_circle_outlined,
                         title: 'Edit profile',
                         onTap: () {
-                          Get.to(() => EditProfile());
+                          Get.to(() => const EditProfile())?.then((_) {
+                            // Trigger refetch after returning from edit screen
+                            profileHook.refetch?.call();
+                          });
                         },
                       ),
                       ProfileTile(
@@ -126,7 +107,7 @@ class ProfileScreen extends HookWidget {
                           icon: Icons.headset_mic_sharp,
                           title: 'Contact Us',
                           onTap: () {
-                            Get.to(() => ContactUsScreen());
+                            Get.to(() => const ContactUsScreen());
                           }),
                       ProfileTile(
                         icon: Icons.help_outline,
