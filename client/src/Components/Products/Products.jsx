@@ -17,6 +17,7 @@ import { getAllCategories } from "../../features/categorySlice";
 import { TailSpin } from "react-loader-spinner";
 import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
+import productImg from "../../assets/product.png";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -431,9 +432,9 @@ const Products = () => {
                     key={product._id}
                     className={index % 2 !== 0 ? "bg-[#F9F9FF]" : ""}
                   >
-                    <td className="py-4 px-6 flex justify-center">
+                    <td className="py-4 px-6 w-16 h-16 box-content flex justify-center">
                       <img
-                        src={product.image || ""}
+                        src={product.image || productImg}
                         alt={product.name}
                         className="w-16 h-16 rounded-xl"
                       />

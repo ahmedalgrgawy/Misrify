@@ -71,33 +71,13 @@ const Profile = () => {
       dispatch(editProfile(payload))
         .then(() => {
           setTimeout(() => {
-            toast.success("the profile has been updated 👍", {
-              position: "bottom-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: false,
-              progress: undefined,
-              theme: "dark",
-              transition: Flip,
-            });
+            showToast("the profile has been updated 👍", "success");
           }, 0);
           dispatch(getProfile());
         })
         .catch((err) => {
           setTimeout(() => {
-            toast.error("there is something wrong 👎", {
-              position: "bottom-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: false,
-              progress: undefined,
-              theme: "dark",
-              transition: Flip,
-            });
+            showToast("there is something wrong 👎", "error");
           }, 0);
 
           console.error("Error editing profile:", err);
@@ -128,153 +108,6 @@ const Profile = () => {
       CPassword: true,
       NPassword: true,
     });
-    // if (data.currentPassword == "" && data.newPassword == "") {
-    //   if (data.imgUrl == "") {
-    //     const { currentPassword, imgUrl, newPassword, ...updatedData } = data;
-    //     dispatch(editProfile(updatedData))
-    //       .then(() => {
-    //         setTimeout(() => {
-    //           toast.success("the profile has been updated 👍", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-    //         dispatch(getProfile());
-    //       })
-    //       .catch((err) => {
-    //         setTimeout(() => {
-    //           toast.error("there is something wrong 👎", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-    //         console.error("Error editing profile:", err);
-    //       });
-    //   } else {
-    //     const { currentPassword, newPassword, ...updatedData } = data;
-    //     dispatch(editProfile(updatedData))
-    //       .then(() => {
-    //         setTimeout(() => {
-    //           toast.success("the profile has been updated 👍", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-    //         dispatch(getProfile());
-    //       })
-    //       .catch((err) => {
-    //         setTimeout(() => {
-    //           toast.error("there is something wrong 👎", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-
-    //         console.error("Error editing profile:", err);
-    //       });
-    //   }
-    // } else {
-    //   if (data.imgUrl == "") {
-    //     const { imgUrl, ...updatedData } = data;
-    //     dispatch(editProfile(updatedData))
-    //       .then(() => {
-    //         setTimeout(() => {
-    //           toast.success("the profile has been updated 👍", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-    //         dispatch(getProfile());
-    //       })
-    //       .catch((err) => {
-    //         setTimeout(() => {
-    //           toast.error("there is something wrong 👎", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-
-    //         console.error("Error editing profile:", err);
-    //       });
-    //   } else {
-    //     dispatch(editProfile(data))
-    //       .then(() => {
-    //         setTimeout(() => {
-    //           toast.success("the profile has been updated 👍", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-    //         dispatch(getProfile());
-    //       })
-    //       .catch((err) => {
-    //         setTimeout(() => {
-    //           toast.error("there is something wrong 👎", {
-    //             position: "bottom-right",
-    //             autoClose: 2000,
-    //             hideProgressBar: false,
-    //             closeOnClick: false,
-    //             pauseOnHover: true,
-    //             draggable: false,
-    //             progress: undefined,
-    //             theme: "dark",
-    //             transition: Flip,
-    //           });
-    //         }, 0);
-
-    //         console.error("Error editing profile:", err);
-    //       });
-    //   }
-    // }
   }
 
   const updateData = useFormik({
@@ -380,7 +213,19 @@ const Profile = () => {
       </div>
     );
   }
-
+  const showToast = (message, type = "success") => {
+    toast[type](message, {
+      position: "bottom-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
+    });
+  };
   return (
     <>
       <div

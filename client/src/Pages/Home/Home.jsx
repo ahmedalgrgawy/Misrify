@@ -48,7 +48,9 @@ const Home = () => {
             </button>
 
             <div className="flex flex-col md:flex-row md:justify-between w-full">
-              <div className={`${style.info} text-center mb-5 md:mb-0 md:w-1/3`}>
+              <div
+                className={`${style.info} text-center mb-5 md:mb-0 md:w-1/3`}
+              >
                 <h5>200+</h5>
                 <p>Local Brands</p>
               </div>
@@ -60,7 +62,9 @@ const Home = () => {
                 <p>High-Quality Products</p>
               </div>
 
-              <div className={`${style.info} text-center mb-5 md:mb-0 md:w-1/3`}>
+              <div
+                className={`${style.info} text-center mb-5 md:mb-0 md:w-1/3`}
+              >
                 <h5>30,000+</h5>
                 <p>Happy Customers</p>
               </div>
@@ -93,7 +97,9 @@ const Home = () => {
         </div>
 
         <div>
-          <h2 className={`${style.categoriesTitle} my-24`}>Find Your Categories</h2>
+          <h2 className={`${style.categoriesTitle} my-24`}>
+            Find Your Categories
+          </h2>
           <div className="grid grid-cols-12 gap-5 grid-rows-3 xl:grid-rows-2">
             <div className="flex flex-col justify-around md:justify-start col-span-12 xl:col-span-4 2xl:col-span-4 bg-white rounded-3xl p-8">
               <p
@@ -157,11 +163,11 @@ const Home = () => {
           className={`${style.download} text-center md:text-start w-full xl:w-1/2 mt-10 xl:mt-0`}
         >
           <h2 className="text-dark-blue mb-2">Download App Now</h2>
-          <p className="mb-11">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Viverra
-            nunc ante velit vitae. Est tellus vitae, nullam lobortis enim.
-            Faucibus amet etiam tincidunt rhoncus, ullamcorper velit.
-            Ullamcorper risus tempor, ac nunc libero urna, feugiat.
+          <p className={`${style.heroDescription} mb-11 `}>
+            Discover and support Egypt’s best local brands all in one app! From
+            fashion and accessories to handmade crafts and home essentials, shop
+            original Egyptian products and enjoy exclusive offers, fast
+            delivery, and secure payments.
           </p>
           <div className="flex justify-around lg:justify-start flex-wrap mb-16">
             <img className="md:me-7" src={GooglePlay} alt="GooglePlay Logo" />

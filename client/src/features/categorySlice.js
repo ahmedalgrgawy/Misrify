@@ -19,8 +19,11 @@ export const createCategory = createAsyncThunk(
   "categories/createCategory",
   async (newCategory, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.post(`admin/create-category`, newCategory);
-      return response.data; 
+      const response = await axiosInstance.post(
+        `admin/create-category`,
+        newCategory
+      );
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -74,6 +77,9 @@ const CategorySlice = createSlice({
       .addCase(getAllCategories.fulfilled, (state, action) => {
         state.categoryLoading = false;
         state.categories = action.payload;
+        state.categories.map((category) => {
+          category.image = "category";
+        }); //just for pictures / deleted if there picture returned from backend
       })
       .addCase(getAllCategories.rejected, (state, action) => {
         state.categoryLoading = false;
@@ -85,9 +91,8 @@ const CategorySlice = createSlice({
         state.error = null;
       })
       .addCase(createCategory.fulfilled, (state, action) => {
-       state.categoryLoading = false;
-       
-       })
+        state.categoryLoading = false;
+      })
       .addCase(createCategory.rejected, (state, action) => {
         state.categoryLoading = false;
         state.error = action.payload;

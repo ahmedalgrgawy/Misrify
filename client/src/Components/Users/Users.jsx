@@ -40,33 +40,13 @@ const Users = () => {
         setUserToDelete(null);
 
         setTimeout(() => {
-          toast.success("user has been deleted 👍", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
+          showToast("user has been deleted 👍", "success");
         }, 0);
         
       })
       .catch((error) => {
         setTimeout(() => {
-          toast.error("there is something wrong 👎", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
+          showToast("there is something wrong 👎", "error");
         }, 0);
         console.error("Error deleting user:", error);
       });
@@ -97,17 +77,7 @@ const Users = () => {
         setUserToEdit(null);
         setEditData({ name: "", phoneNumber: "", address: "", role: "" });
         setTimeout(() => {
-          toast.success("user has been updated 👍", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
+          showToast("user has been updated 👍", "success");
         }, 0);
           dispatch(getAllUsers());
 
@@ -115,17 +85,7 @@ const Users = () => {
       })
       .catch((error) => {
         setTimeout(() => {
-          toast.error("there is something wrong 👎", {
-          position: "bottom-right",
-          autoClose: 2000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: false,
-          progress: undefined,
-          theme: "dark",
-          transition: Flip,
-        });
+          showToast("there is something wrong 👎", "error");
         }, 0);
         console.error("Error editing user:", error);
       });
@@ -152,7 +112,19 @@ const Users = () => {
       (u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         u.email?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
+  const showToast = (message, type = "success") => {
+    toast[type](message, {
+      position: "bottom-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
+    });
+  };
   return (
     <div className="p-6 bg-bg-second">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">

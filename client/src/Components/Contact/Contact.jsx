@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { Flip, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 import axiosInstance from '../../utils/axiosInstance';
@@ -64,7 +64,17 @@ const Contact = () => {
         e.preventDefault();
 
         if (!validateForm()) {
-            toast.error('Please fix the form errors');
+            toast.error("Please fix the form errors", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: false,
+              progress: undefined,
+              theme: "dark",
+              transition: Flip,
+            });
             return;
         }
 
@@ -79,7 +89,17 @@ const Contact = () => {
                 message: formData.message
             });
 
-            toast.success('Message sent successfully!');
+            toast.success('Message sent successfully!',{
+                  position: "bottom-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: false,
+                  progress: undefined,
+                  theme: "dark",
+                  transition: Flip,
+                });
             setFormData({
                 firstName: '',
                 lastName: '',
@@ -89,7 +109,17 @@ const Contact = () => {
             });
             setErrors({});
         } catch (error) {
-            toast.error('Failed to send message');
+            toast.error('Failed to send message',{
+                  position: "bottom-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: false,
+                  progress: undefined,
+                  theme: "dark",
+                  transition: Flip,
+                });
             console.error('API error:', error);
         } finally {
             setIsSubmitting(false);
