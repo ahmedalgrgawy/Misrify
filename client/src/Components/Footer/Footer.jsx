@@ -77,6 +77,14 @@ const Footer = () => {
                   Login
                 </Link>
               </li>
+              <li className="my-3">
+                <Link
+                  className=" hover:text-dark-grey duration-300"
+                  to={"/notifications"}
+                >
+                  Notifications
+                </Link>
+              </li>
             </ul>
           </div>
 

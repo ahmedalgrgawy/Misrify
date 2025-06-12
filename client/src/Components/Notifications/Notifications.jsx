@@ -5,7 +5,7 @@ import { TailSpin } from "react-loader-spinner";
 import { TiInputChecked } from "react-icons/ti";
 import { BiSolidCheckboxChecked } from "react-icons/bi";
 import { FaTrashAlt } from "react-icons/fa";
-import { ToastContainer, toast } from 'react-toastify';
+import { Flip, ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Tooltip } from 'react-tooltip';
 
@@ -32,25 +32,38 @@ const Notifications = () => {
     const handleMarkAsRead = (id) => {
         dispatch(markAsRead(id))
             .then(() => {
-                toast.success("Notification marked as read!");
+              showToast("Notification marked as read!", "success");
             })
             .catch(() => {
-                toast.error("Notification deleted successfully!");
+              showToast("there is something wrong!", "error");
             });
     };
 
     const handleDeleteNotification = (id) => {
         dispatch(deleteNotification(id))
             .then(() => {
-                toast.success("Notification deleted!");
+              showToast("Notification deleted!", "success");
             })
             .catch(() => {
-                toast.error("Failed to delete notification.");
+              showToast("Failed to delete notification!", "error");
             });
     };
 
     const handleDeleteAll = () => {
         dispatch(deleteAllNotifications());
+    };
+    const showToast = (message, type = "success") => {
+      toast[type](message, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+      });
     };
 
     if (notificationsLoading) {

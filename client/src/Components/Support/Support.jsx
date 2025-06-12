@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { Flip, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEnvelope, FaPhone, FaStore, FaBoxOpen, FaTruck, FaUndo, FaCommentDots, FaCreditCard, FaRobot } from 'react-icons/fa';
 import { PiStudentFill } from "react-icons/pi";
@@ -47,13 +47,13 @@ const Support = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) {
-            toast.error('Please fix the form errors');
+          showToast("Please fix the form errors!", "error");
             return;
         }
         setIsSubmitting(true);
         try {
             await axiosInstance.post('user/contact', formData);
-            toast.success('Message sent successfully!');
+            showToast("Message sent successfully!", "success");
             setFormData({
                 firstName: '',
                 lastName: '',
@@ -63,13 +63,25 @@ const Support = () => {
             });
             setErrors({});
         } catch (error) {
-            toast.error('Failed to send message');
+          showToast("Failed to send message!", "error");
             console.error('API error:', error);
         } finally {
             setIsSubmitting(false);
         }
     };
-
+    const showToast = (message, type = "success") => {
+      toast[type](message, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+      });
+    };
     return (
       <>
         <div className="max-w-4xl mx-auto py-10">

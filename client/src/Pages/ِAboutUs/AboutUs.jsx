@@ -20,12 +20,12 @@ const AboutUs = () => {
         <div className="w-full lg:w-3/6 order-2 lg:order-1">
           <h2 className={`${style.title} mb-5`}>What We Do ?</h2>
           <p className={`${style.description}`}>
-            This project aims to establish a comprehensive online marketplace
-            exclusively dedicated to Egyptian brands and stores.
-            <br /> The platform will serve as a centralized hub for local
-            businesses to showcase their products and reach a wider customer
-            base, while also offering consumers a convenient and unique shopping
-            experience.
+            We are building a digital marketplace tailored for Egyptian brands
+            and local stores. Our platform provides small and medium businesses
+            with the tools they need to grow online, connect with more
+            customers, and stand out in a competitive market. Whether it’s
+            fashion, crafts, or local goods — we make them accessible to
+            everyone, everywhere.
           </p>
         </div>
         <div className="w-full lg:w-3/6 order-1 lg:order-2">
@@ -48,11 +48,11 @@ const AboutUs = () => {
         <div className="w-full lg:w-3/6">
           <h2 className={`${style.title} mb-5`}>Who We Are?</h2>
           <p className={`${style.description}`}>
-            This project aims to establish a comprehensive online marketplace
-            exclusively dedicated to Egyptian brands and stores. The platform
-            will serve as a centralized hub for local businesses to showcase
-            their products and reach a wider customer base, while also offering
-            consumers a convenient and unique shopping experience.
+            We are a passionate team of developers, designers, and testers
+            committed to empowering local Egyptian businesses through
+            technology. United by a shared vision, we aim to create innovative
+            digital solutions that support local commerce and celebrate Egypt’s
+            unique products and talents.
           </p>
         </div>
       </div>

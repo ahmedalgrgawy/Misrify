@@ -64,7 +64,7 @@ const Sidebar = () => {
                                 }
                             >
                                 <FaClipboardList className="text-xl" />
-                                <span className="text-sm font-medium">Categories</span>
+                                <span className="text-sm font-medium">Categories & Brands</span>
                             </NavLink>
 
                             <NavLink

@@ -71,6 +71,9 @@ const BrandSlice = createSlice({
       .addCase(getAllBrands.fulfilled, (state, action) => {
         state.brandLoading = false;
         state.brands = action.payload;
+        state.brands.map((brand) => {
+          brand.image = "brand";
+        }); //just for pictures / deleted if there picture returned from backend
       })
       .addCase(getAllBrands.rejected, (state, action) => {
         state.brandLoading = false;

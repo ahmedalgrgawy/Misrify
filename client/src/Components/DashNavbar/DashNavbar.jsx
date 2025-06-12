@@ -4,6 +4,7 @@ import { userProfile } from "../../features/userSlice";
 import userImg from "../../assets/user.png";
 import { TailSpin } from 'react-loader-spinner';
 import { Link } from 'react-router-dom';
+import { Tooltip } from "react-tooltip";
 
 const DashNavbar = () => {
     const dispatch = useDispatch();
@@ -34,7 +35,13 @@ const DashNavbar = () => {
                   </span>
                 </div>
                 <div className="ml-4">
-                  <Link to={"/profile"} className="relative">
+                  <Link
+                    data-tooltip-id="Profile"
+                    data-tooltip-place="bottom"
+                    data-tooltip-content="Profile"
+                    to={"/profile"}
+                    className="relative"
+                  >
                     <img
                       src={userImg}
                       alt="Profile"
@@ -46,6 +53,10 @@ const DashNavbar = () => {
               </div>
             )}
           </nav>
+                <Tooltip
+                  id="Profile"
+                  className="!py-1 !px-2 !bg-title-blue !rounded-md"
+                />
         </div>
       </>
     );

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   deleteCategory,
@@ -34,6 +34,8 @@ import { getAllMerchants } from "../../features/userSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { Flip, ToastContainer, toast } from "react-toastify";
 import { Tooltip } from "react-tooltip";
+import categoriesImg from "../../assets/categories.jpeg";//just for pictures / deleted if there picture returned from backend
+import brandsImg from "../../assets/brands.jpeg";//just for pictures / deleted if there picture returned from backend
 
 const Categories = () => {
   const dispatch = useDispatch();
@@ -78,71 +80,43 @@ const Categories = () => {
         : { name: newBrand.name };
 
     if (itemType === "category") {
+      if (!updatedData.name.trim()) {
+        showToast("the category name is required ❗", "error");
+        return;
+      } else if (categoriesNames.includes(updatedData.name)) {
+        showToast("This name is already used ❗ Try another one", "error");
+        return;
+      }
+
       dispatch(editCategory({ categoryId: itemToEdit, updatedData }))
         .then(() => {
           setShowEditModal(false);
           setItemToEdit(null);
           setItemType("");
-          toast.success("the category has been updated 👍", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
-          // tostify here
+          showToast("the category has been updated 👍", "success");
         })
         .catch((err) => {
-          // tostify here
-          toast.error("there is something wrong 👎", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
+          showToast("there is something wrong 👎", "error");
           console.error("Error editing category:", err);
         });
     } else if (itemType === "brand") {
+      if (!updatedData.name.trim()) {
+        showToast("the Brand name is required ❗", "error");
+        return;
+      } else if (brandsNames.includes(updatedData.name)) {
+        showToast("This name is already used ❗ Try another one", "error");
+        return;
+      }
+
       dispatch(editBrand({ brandId: itemToEdit, updatedData }))
         .then(() => {
           setShowEditModal(false);
           setItemToEdit(null);
           setItemType("");
-          toast.success("the brand has been updated 👍", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
-          // tostify here
+          showToast("the brand has been updated 👍", "success");
         })
         .catch((err) => {
-          toast.error("there is something wrong 👎", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
-          // tostify here
+          showToast("there is something wrong 👎", "error");
           console.error("Error editing brand:", err);
         });
     }
@@ -171,32 +145,10 @@ const Categories = () => {
         .then(() => {
           setShowDeleteModal(false);
           setCategoryToDelete(null);
-          toast.success("the category has been deleted 🗑", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
-          // tostify here
+          showToast("the category has been deleted 🗑", "success");
         })
         .catch((err) => {
-          toast.error("there is something wrong 👎", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          });
-          // tostify here
+          showToast("there is something wrong 👎", "error");
           console.error("Error deleting category:", err);
         });
     } else if (brandToDelete) {
@@ -204,30 +156,10 @@ const Categories = () => {
         .then(() => {
           setShowDeleteModal(false);
           setBrandToDelete(null);
-          toast.success("the brand has been deleted 🗑", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          }); // tostify here
+          showToast("the brand has been deleted 🗑", "success");
         })
         .catch((err) => {
-          toast.error("there is something wrong 👎", {
-            position: "bottom-right",
-            autoClose: 2000,
-            hideProgressBar: false,
-            closeOnClick: false,
-            pauseOnHover: true,
-            draggable: false,
-            progress: undefined,
-            theme: "dark",
-            transition: Flip,
-          }); // tostify here
+          showToast("there is something wrong 👎", "error");
           console.error("Error deleting brand:", err);
         });
     }
@@ -236,7 +168,7 @@ const Categories = () => {
   useEffect(() => {
     dispatch(getAllCategories());
     dispatch(getAllBrands());
-    dispatch(getAllMerchants());
+    dispatch(getAllMerchants());    
   }, [dispatch]);
 
   if (categoryLoading || brandLoading) {
@@ -250,8 +182,29 @@ const Categories = () => {
   const arrCategories = Array.isArray(categories) ? categories : [];
   const arrBrands = Array.isArray(brands) ? brands : [];
 
-  const categoriesNames = arrCategories.map((category) => category.name);
-  const brandssNames = arrBrands.map((brand) => brand.name);
+  const categoriesNames = useMemo(
+    () => arrCategories.map((category) => category.name),
+    [arrCategories]
+  );
+
+  const brandsNames = useMemo(
+    () => arrBrands.map((brand) => brand.name),
+    [arrBrands]
+  );
+
+  const showToast = (message, type = "success") => {
+    toast[type](message, {
+      position: "bottom-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
+    });
+  };
   return (
     <div className="p-6 bg-bg-second font-montserrat">
       {/* Header */}
@@ -437,13 +390,17 @@ const Categories = () => {
                 </button>
                 <button
                   onClick={() => {
-
-                    
                     if (!newCategory.name.trim()) {
-                      alert("Category name is required.");
+                      showToast("the Category name is required ❗", "error");
                       return;
-                    }else if(categoriesNames.includes(newCategory.name)){
-                      alert("This name is already used.\n Try another one");
+                    } else if (categoriesNames.includes(newCategory.name)) {
+                      showToast(
+                        "This name is already used ❗ Try another one",
+                        "error"
+                      );
+                      return;
+                    } else if (!newCategory.description.trim()) {
+                      showToast("Category description is required ❗", "error");
                       return;
                     }
 
@@ -456,34 +413,17 @@ const Categories = () => {
 
                         setTimeout(() => {
                           // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
-                          toast.success("the category has been created 👍", {
-                            position: "bottom-right",
-                            autoClose: 2000,
-                            hideProgressBar: false,
-                            closeOnClick: false,
-                            pauseOnHover: true,
-                            draggable: false,
-                            progress: undefined,
-                            theme: "dark",
-                            transition: Flip,
-                          });
+                          showToast(
+                            "the category has been created 👍",
+                            "success"
+                          );
                         }, 0);
                         // tostify here
                       })
                       .catch((err) => {
                         // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
                         setTimeout(() => {
-                          toast.error("there is something wrong 👎", {
-                            position: "bottom-right",
-                            autoClose: 2000,
-                            hideProgressBar: false,
-                            closeOnClick: false,
-                            pauseOnHover: true,
-                            draggable: false,
-                            progress: undefined,
-                            theme: "dark",
-                            transition: Flip,
-                          });
+                          showToast("there is something wrong 👎", "error");
                         }, 0);
                         console.error("Error creating category:", err);
                       });
@@ -555,10 +495,16 @@ const Categories = () => {
                 <button
                   onClick={() => {
                     if (!newBrand.name.trim()) {
-                      alert("Brand name is required.");
+                      showToast("Brand name is required ❗", "error");
                       return;
-                    }else if (brandssNames.includes(newBrand.name)) {
-                      alert("This name is already used.\n Try another one");
+                    } else if (brandsNames.includes(newBrand.name)) {
+                      showToast(
+                        "This name is already used ❗ Try another one",
+                        "error"
+                      );
+                      return;
+                    } else if (!newBrand.description.trim()) {
+                      showToast("Brand description is required ❗", "error");
                       return;
                     }
 
@@ -570,33 +516,12 @@ const Categories = () => {
                         setNewBrand({ name: "", description: "" });
                         setTimeout(() => {
                           // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
-                          toast.success("the brand has been created 👍", {
-                            position: "bottom-right",
-                            autoClose: 2000,
-                            hideProgressBar: false,
-                            closeOnClick: false,
-                            pauseOnHover: true,
-                            draggable: false,
-                            progress: undefined,
-                            theme: "dark",
-                            transition: Flip,
-                          });
+                          showToast("the brand has been created 👍", "success");
                         }, 0);
-                        // tostify here
                       })
                       .catch((err) => {
                         // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
-                        toast.error("there is something wrong 👎", {
-                          position: "bottom-right",
-                          autoClose: 2000,
-                          hideProgressBar: false,
-                          closeOnClick: false,
-                          pauseOnHover: true,
-                          draggable: false,
-                          progress: undefined,
-                          theme: "dark",
-                          transition: Flip,
-                        });
+                        showToast("there is something wrong 👎", "error");
                         console.error("Error creating brand:", err);
                       });
                   }}
@@ -668,17 +593,20 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
           data.map((item) => (
             <SwiperSlide
               key={item._id}
-              className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-lg transition-all duration-300"
+              className="w-80 bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-lg transition-all duration-300"
             >
               <img
-                src={item?.image || "/placeholder.jpg"}
+                src={item.image === "category" ? categoriesImg : brandsImg} //just for pictures / changed to (item.image) if there picture returned from backend
                 alt={item.name}
-                className="h-40 w-full object-cover bg-[#d9d9d9]"
+                className="h-full w-full object-cover bg-[#d9d9d9]"
               />
               <div className="p-4">
-                <h6 className="font-bold text-main-blue text-base mb-1">
+                <h6 className="font-bold text-main-blue text-xl mb-1">
                   {item.name}
                 </h6>
+                <p className="mb-1.5 text-base font-semibold">
+                  {item.description}
+                </p>
                 <div className="flex justify-between items-center">
                   <span className="badge bg-green-100 text-green-600 text-sm px-4 py-3 rounded flex items-center gap-1">
                     <FaRegCheckCircle /> Available
