@@ -130,7 +130,7 @@ const Signup = () => {
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute inset-y-0 right-2 flex items-center"
+                                    className="absolute bottom-4 right-2 flex items-center"
                                 >
                                     {showPassword ? <FiEyeOff className="text-title-blue" /> : <FiEye className="text-title-blue" />}
                                 </button>
