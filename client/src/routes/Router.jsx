@@ -11,7 +11,7 @@ import Layout from '../Components/Layout/Layout';
 import Contact from '../Components/Contact/Contact';
 import AboutUs from '../Pages/ِAboutUs/AboutUs';
 import Home from '../Pages/Home/Home';
-import Dashboard from '../Components/Dashboard/Dashboard';
+import Analytics from '../Components/Analytics/Analytics';
 import DashboardLayout from '../Components/DashboardLayout/DashboardLayout';
 import Users from '../Components/Users/Users';
 import Products from '../Components/Products/Products';
@@ -19,6 +19,8 @@ import Categories from '../Components/Categories/Categories';
 import Merchants from '../Components/Merchants/Merchants';
 import Support from '../Components/Support/Support';
 import Profile from './../Pages/Profile/Profile';
+import Messages from '../Components/Messages/Messages';
+import Notifications from '../Components/Notifications/Notifications';
 
 const router = createBrowserRouter([
   {
@@ -35,20 +37,21 @@ const router = createBrowserRouter([
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/password-success', element: <PasswordSuccess /> },
       { path: '/contact', element: <Contact /> },
-      { path: '/profile', element: <Profile /> }
+      { path: '/profile', element: <Profile /> },
+      { path: '/notifications', element: <Notifications /> }
     ],
   },
   {
-    path: '/dashboard',
+    path: '/analytics',
     element: <DashboardLayout />,
     children: [
-      { index: true, element: <Dashboard /> },
+      { index: true, element: <Analytics /> },
       { path: 'users', element: <Users /> },
       { path: 'merchants', element: <Merchants /> },
       { path: 'products', element: <Products /> },
       { path: 'categories', element: <Categories /> },
       { path: 'support', element: <Support /> },
-      // { path: 'settings', element: <Settings /> },
+      { path: 'messages', element: <Messages /> },
     ]
   },
   {

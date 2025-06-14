@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 import { LuMail } from "react-icons/lu";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import { toast } from "react-toastify";
+import { Flip, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useSelector } from "react-redux";
 
@@ -28,7 +28,7 @@ const CheckGmail = () => {
         } catch (err) {
             const errMsg = err.response?.data?.message || "Error verifying OTP.";
             setError(errMsg);
-            toast.error(errMsg);
+            showToast(errMsg, "error");
         }
     };
 
@@ -39,15 +39,27 @@ const CheckGmail = () => {
             const response = await axiosInstance.post("/auth/forgot-password", { email });
 
             if (response.data.success) {
-                toast.success("A new OTP has been sent to your email.");
+                showToast("A new OTP has been sent to your email.", "success");
             }
         } catch (err) {
             const errMsg = err.response?.data?.message || "Error resending OTP.";
             setError(errMsg);
-            toast.error(errMsg);
+            showToast(errMsg, "error");
         }
     };
-
+    const showToast = (message, type = "success") => {
+      toast[type](message, {
+        position: "bottom-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: false,
+        progress: undefined,
+        theme: "dark",
+        transition: Flip,
+      });
+    };
     return (
         <div className="flex justify-center items-center h-screen bg-bg-main p-6">
             <div className="bg-white p-8 rounded-lg shadow-md w-[400px] text-center">

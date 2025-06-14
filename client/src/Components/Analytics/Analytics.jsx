@@ -1,10 +1,10 @@
 import React from "react";
-const Dashboard = () => {
+const Analytics = () => {
     return <>
         <div>
-            <h1>dashboard</h1>
+            <h1>Analytics</h1>
         </div>
     </>
 };
 
-export default Dashboard;
+export default Analytics;

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
+import { Flip, toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt, FaFacebookF, FaInstagram, FaTwitter } from 'react-icons/fa';
 import axiosInstance from '../../utils/axiosInstance';
@@ -64,7 +64,17 @@ const Contact = () => {
         e.preventDefault();
 
         if (!validateForm()) {
-            toast.error('Please fix the form errors');
+            toast.error("Please fix the form errors", {
+              position: "bottom-right",
+              autoClose: 2000,
+              hideProgressBar: false,
+              closeOnClick: false,
+              pauseOnHover: true,
+              draggable: false,
+              progress: undefined,
+              theme: "dark",
+              transition: Flip,
+            });
             return;
         }
 
@@ -79,7 +89,17 @@ const Contact = () => {
                 message: formData.message
             });
 
-            toast.success('Message sent successfully!');
+            toast.success('Message sent successfully!',{
+                  position: "bottom-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: false,
+                  progress: undefined,
+                  theme: "dark",
+                  transition: Flip,
+                });
             setFormData({
                 firstName: '',
                 lastName: '',
@@ -89,7 +109,17 @@ const Contact = () => {
             });
             setErrors({});
         } catch (error) {
-            toast.error('Failed to send message');
+            toast.error('Failed to send message',{
+                  position: "bottom-right",
+                  autoClose: 2000,
+                  hideProgressBar: false,
+                  closeOnClick: false,
+                  pauseOnHover: true,
+                  draggable: false,
+                  progress: undefined,
+                  theme: "dark",
+                  transition: Flip,
+                });
             console.error('API error:', error);
         } finally {
             setIsSubmitting(false);
@@ -168,7 +198,7 @@ const Contact = () => {
                                     id="firstName"
                                     name="firstName"
                                     value={formData.firstName}
-                                    placeholder={user.name.split(' ')[0]}
+                                    placeholder={user?.name.split(' ')[0]}
                                     onChange={handleChange}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.firstName ? 'border-red-500' : ''}`}
                                 />
@@ -181,7 +211,7 @@ const Contact = () => {
                                     id="lastName"
                                     name="lastName"
                                     value={formData.lastName}
-                                    placeholder={user.name.split(' ')[1]}
+                                    placeholder={user?.name.split(' ')[1]}
                                     onChange={handleChange}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 px-3 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.lastName ? 'border-red-500' : ''}`}
                                 />
@@ -199,7 +229,7 @@ const Contact = () => {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    placeholder={user.email}
+                                    placeholder={user?.email}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.email ? 'border-red-500' : ''}`}
                                 />
                             </div>
@@ -215,7 +245,7 @@ const Contact = () => {
                                     id="phone"
                                     name="phone"
                                     value={formData.phone}
-                                    placeholder={user.phoneNumber}
+                                    placeholder={user?.phoneNumber}
                                     onChange={handleChange}
                                     className={`w-full bg-bg-second text-title-blue border-b border-second-grey py-2 pl-10 mb-2 focus:outline-none focus:border-dark-grey hover:shadow ${errors.phone ? 'border-red-500' : ''}`}
                                 />

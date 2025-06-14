@@ -1,9 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteCategory, getAllCategories, createCategory, editCategory } from "../../features/categorySlice";
-import { createBrand, deleteBrand, getAllBrands, editBrand } from "../../features/brandSlice";
+import {
+  deleteCategory,
+  getAllCategories,
+  createCategory,
+  editCategory,
+} from "../../features/categorySlice";
+import {
+  createBrand,
+  deleteBrand,
+  getAllBrands,
+  editBrand,
+} from "../../features/brandSlice";
 import { TailSpin } from "react-loader-spinner";
-import { FaEdit, FaTrashAlt, FaClipboardList, FaPlus, FaRegCheckCircle, FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import {
+  FaEdit,
+  FaTrashAlt,
+  FaClipboardList,
+  FaPlus,
+  FaRegCheckCircle,
+  FaArrowRight,
+  FaArrowLeft,
+} from "react-icons/fa";
 import { GiShop } from "react-icons/gi";
 import { BsEnvelope } from "react-icons/bs";
 import { Link } from "react-router-dom";
@@ -13,12 +31,30 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { getAllMerchants } from "../../features/userSlice";
+import "react-toastify/dist/ReactToastify.css";
+import { Flip, ToastContainer, toast } from "react-toastify";
+import { Tooltip } from "react-tooltip";
+import categoriesImg from "../../assets/categories.jpeg";//just for pictures / deleted if there picture returned from backend
+import brandsImg from "../../assets/brands.jpeg";//just for pictures / deleted if there picture returned from backend
 
 const Categories = () => {
   const dispatch = useDispatch();
   const { categories, categoryLoading } = useSelector((state) => state.Categories);
   const { brands, brandLoading } = useSelector((state) => state.Brands);
   const { merchants } = useSelector((state) => state.user);
+
+  const arrCategories = Array.isArray(categories) ? categories : [];
+  const arrBrands = Array.isArray(brands) ? brands : [];
+
+  const categoriesNames = useMemo(
+    () => arrCategories.map((category) => category.name),
+    [arrCategories]
+  );
+
+  const brandsNames = useMemo(
+    () => arrBrands.map((brand) => brand.name),
+    [arrBrands]
+  );
 
   // Create State
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
@@ -31,10 +67,10 @@ const Categories = () => {
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const [brandToDelete, setBrandToDelete] = useState(null);
 
-  // Edit State 
+  // Edit State
   const [showEditModal, setShowEditModal] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
-  const [itemType, setItemType] = useState('');
+  const [itemType, setItemType] = useState("");
 
   const handleEditItem = (itemId, type) => {
     setItemToEdit(itemId);
@@ -45,30 +81,55 @@ const Categories = () => {
   const handleCancelEdit = () => {
     setShowEditModal(false);
     setItemToEdit(null);
-    setItemType('');
+    setItemType("");
   };
 
   const handleConfirmEdit = () => {
-    const updatedData = itemType === 'category'
-      ? { name: newCategory.name }
-      : { name: newBrand.name };
+    const updatedData =
+      itemType === "category"
+        ? { name: newCategory.name }
+        : { name: newBrand.name };
 
-    if (itemType === 'category') {
+    if (itemType === "category") {
+      if (!updatedData.name.trim()) {
+        showToast("the category name is required ❗", "error");
+        return;
+      } else if (categoriesNames.includes(updatedData.name)) {
+        showToast("This name is already used ❗ Try another one", "error");
+        return;
+      }
+
       dispatch(editCategory({ categoryId: itemToEdit, updatedData }))
         .then(() => {
           setShowEditModal(false);
           setItemToEdit(null);
-          setItemType('');
+          setItemType("");
+          showToast("the category has been updated 👍", "success");
         })
-        .catch(err => console.error("Error editing category:", err));
-    } else if (itemType === 'brand') {
+        .catch((err) => {
+          showToast("there is something wrong 👎", "error");
+          console.error("Error editing category:", err);
+        });
+    } else if (itemType === "brand") {
+      if (!updatedData.name.trim()) {
+        showToast("the Brand name is required ❗", "error");
+        return;
+      } else if (brandsNames.includes(updatedData.name)) {
+        showToast("This name is already used ❗ Try another one", "error");
+        return;
+      }
+
       dispatch(editBrand({ brandId: itemToEdit, updatedData }))
         .then(() => {
           setShowEditModal(false);
           setItemToEdit(null);
-          setItemType('');
+          setItemType("");
+          showToast("the brand has been updated 👍", "success");
         })
-        .catch(err => console.error("Error editing brand:", err));
+        .catch((err) => {
+          showToast("there is something wrong 👎", "error");
+          console.error("Error editing brand:", err);
+        });
     }
   };
 
@@ -95,22 +156,30 @@ const Categories = () => {
         .then(() => {
           setShowDeleteModal(false);
           setCategoryToDelete(null);
+          showToast("the category has been deleted 🗑", "success");
         })
-        .catch((err) => console.error("Error deleting category:", err));
+        .catch((err) => {
+          showToast("there is something wrong 👎", "error");
+          console.error("Error deleting category:", err);
+        });
     } else if (brandToDelete) {
       dispatch(deleteBrand(brandToDelete))
         .then(() => {
           setShowDeleteModal(false);
           setBrandToDelete(null);
+          showToast("the brand has been deleted 🗑", "success");
         })
-        .catch((err) => console.error("Error deleting brand:", err));
+        .catch((err) => {
+          showToast("there is something wrong 👎", "error");
+          console.error("Error deleting brand:", err);
+        });
     }
   };
 
   useEffect(() => {
     dispatch(getAllCategories());
     dispatch(getAllBrands());
-    dispatch(getAllMerchants())
+    dispatch(getAllMerchants());
   }, [dispatch]);
 
   if (categoryLoading || brandLoading) {
@@ -121,27 +190,58 @@ const Categories = () => {
     );
   }
 
-  const arrCategories = Array.isArray(categories) ? categories : [];
-  const arrBrands = Array.isArray(brands) ? brands : [];
-
-
+  const showToast = (message, type = "success") => {
+    toast[type](message, {
+      position: "bottom-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
+    });
+  };
   return (
     <div className="p-6 bg-bg-second font-montserrat">
       {/* Header */}
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h3 className="text-3xl font-bold text-title-blue">Categories</h3>
         <div>
-          <Link to="/dashboard" className="text-lg font-semibold text-dark-grey">Dashboard</Link>
+          <Link
+            to="/analytics"
+            className="text-lg font-semibold text-dark-grey"
+          >
+            Analytics
+          </Link>
           <span className="mx-2 text-dark-grey">/</span>
-          <span className="text-lg font-semibold text-title-blue">Categories</span>
+          <span className="text-lg font-semibold text-title-blue">
+            Categories
+          </span>
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        <SummaryCard icon={<FaClipboardList />} label="Total Categories" value={arrCategories.length} color="blue" />
-        <SummaryCard icon={<GiShop />} label="Total Merchants" value={merchants.length || 0} color="green" />
-        <SummaryCard icon={<BsEnvelope />} label="Total Brands" value={arrBrands.length} color="purple" />
+        <SummaryCard
+          icon={<FaClipboardList />}
+          label="Total Categories"
+          value={arrCategories.length}
+          color="blue"
+        />
+        <SummaryCard
+          icon={<GiShop />}
+          label="Total Merchants"
+          value={merchants.length || 0}
+          color="green"
+        />
+        <SummaryCard
+          icon={<BsEnvelope />}
+          label="Total Brands"
+          value={arrBrands.length}
+          color="purple"
+        />
       </div>
 
       {/* Categories Section */}
@@ -158,8 +258,8 @@ const Categories = () => {
       <SwiperSection
         title="Categories"
         data={arrCategories}
-        type="category"
-        onEdit={(itemId) => handleEditItem(itemId, 'category')}
+        type="Categories"
+        onEdit={(itemId) => handleEditItem(itemId, "category")}
         onDelete={handleDeleteCategory}
       />
 
@@ -178,7 +278,7 @@ const Categories = () => {
         title="Brands"
         data={arrBrands}
         type="brand"
-        onEdit={(itemId) => handleEditItem(itemId, 'brand')}
+        onEdit={(itemId) => handleEditItem(itemId, "brand")}
         onDelete={handleDeleteBrand}
       />
 
@@ -187,7 +287,8 @@ const Categories = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-12 rounded-lg shadow-xl w-2xl">
             <h3 className="text-lg font-semibold text-main-blue mb-10">
-              Are you sure you want to delete this {categoryToDelete ? "category" : "brand"}?
+              Are you sure you want to delete this{" "}
+              {categoryToDelete ? "category" : "brand"}?
             </h3>
             <div className="flex justify-end gap-4">
               <button
@@ -211,18 +312,37 @@ const Categories = () => {
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md">
-            <h2 className="text-2xl font-semibold text-main-blue mb-6">Edit {itemType === 'category' ? 'Category' : 'Brand'}</h2>
+            <h2 className="text-2xl font-semibold text-main-blue mb-6">
+              Edit {itemType === "category" ? "Category" : "Brand"}
+            </h2>
             <div className="flex flex-col gap-4">
               <input
                 type="text"
-                placeholder={`${itemType === 'category' ? 'Category' : 'Brand'} Name`}
-                value={itemType === 'category' ? newCategory.name : newBrand.name}
-                onChange={(e) => itemType === 'category' ? setNewCategory({ ...newCategory, name: e.target.value }) : setNewBrand({ ...newBrand, name: e.target.value })}
+                placeholder={`${itemType === "category" ? "Category" : "Brand"
+                  } Name`}
+                value={
+                  itemType === "category" ? newCategory.name : newBrand.name
+                }
+                onChange={(e) =>
+                  itemType === "category"
+                    ? setNewCategory({ ...newCategory, name: e.target.value })
+                    : setNewBrand({ ...newBrand, name: e.target.value })
+                }
                 className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               />
               <div className="flex justify-end gap-4 mt-4">
-                <button onClick={handleCancelEdit} className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md">Cancel</button>
-                <button onClick={handleConfirmEdit} className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg">Save</button>
+                <button
+                  onClick={handleCancelEdit}
+                  className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleConfirmEdit}
+                  className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg"
+                >
+                  Save
+                </button>
               </div>
             </div>
           </div>
@@ -233,20 +353,29 @@ const Categories = () => {
       {showAddCategoryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md">
-            <h2 className="text-2xl font-semibold text-main-blue mb-6">Add New Category</h2>
+            <h2 className="text-2xl font-semibold text-main-blue mb-6">
+              Add New Category
+            </h2>
             <div className="flex flex-col gap-4">
               <input
                 type="text"
                 placeholder="Category Name"
                 value={newCategory.name}
-                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, name: e.target.value })
+                }
                 className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               />
               <input
                 type="text"
                 placeholder="Description"
                 value={newCategory.description}
-                onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+                onChange={(e) =>
+                  setNewCategory({
+                    ...newCategory,
+                    description: e.target.value,
+                  })
+                }
                 className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               />
               <div className="flex justify-end gap-4 mt-4">
@@ -259,7 +388,16 @@ const Categories = () => {
                 <button
                   onClick={() => {
                     if (!newCategory.name.trim()) {
-                      alert("Category name is required.");
+                      showToast("the Category name is required ❗", "error");
+                      return;
+                    } else if (categoriesNames.includes(newCategory.name)) {
+                      showToast(
+                        "This name is already used ❗ Try another one",
+                        "error"
+                      );
+                      return;
+                    } else if (!newCategory.description.trim()) {
+                      showToast("Category description is required ❗", "error");
                       return;
                     }
 
@@ -269,13 +407,25 @@ const Categories = () => {
                         dispatch(getAllCategories());
                         setShowAddCategoryModal(false);
                         setNewCategory({ name: "", description: "" });
+
+                        setTimeout(() => {
+                          showToast(
+                            "the category has been created 👍",
+                            "success"
+                          );
+                        }, 0);
                       })
+                      .catch((err) => {
+                        setTimeout(() => {
+                          showToast("there is something wrong 👎", "error");
+                        }, 0);
+                        console.error("Error creating category:", err);
+                      });
                   }}
                   className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg"
                 >
                   Add
                 </button>
-
               </div>
             </div>
           </div>
@@ -286,30 +436,44 @@ const Categories = () => {
       {showAddBrandModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md">
-            <h2 className="text-2xl font-semibold text-main-blue mb-6">Add New Brand</h2>
+            <h2 className="text-2xl font-semibold text-main-blue mb-6">
+              Add New Brand
+            </h2>
             <div className="flex flex-col gap-4">
               <input
                 type="text"
                 placeholder="Brand Name"
                 value={newBrand.name}
-                onChange={(e) => setNewBrand({ ...newBrand, name: e.target.value })}
+                onChange={(e) =>
+                  setNewBrand({ ...newBrand, name: e.target.value })
+                }
                 className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               />
               <input
                 type="text"
                 placeholder="Description"
                 value={newBrand.description}
-                onChange={(e) => setNewBrand({ ...newBrand, description: e.target.value })}
+                onChange={(e) =>
+                  setNewBrand({ ...newBrand, description: e.target.value })
+                }
                 className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               />
               <select
                 value={newBrand.ownerId}
-                onChange={(e) => setNewBrand({ ...newBrand, ownerId: e.target.value })}
+                onChange={(e) =>
+                  setNewBrand({ ...newBrand, ownerId: e.target.value })
+                }
                 className="border border-light-grey rounded-md text-dark-grey py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               >
-                <option value="" className="bg-bg-main">Select Merchant</option>
+                <option value="" className="bg-bg-main">
+                  Select Merchant
+                </option>
                 {merchants.map((merchant) => (
-                  <option key={merchant._id} value={merchant._id} className="bg-second text-dark-grey">
+                  <option
+                    key={merchant._id}
+                    value={merchant._id}
+                    className="bg-second text-dark-grey"
+                  >
                     {merchant.name}
                   </option>
                 ))}
@@ -325,7 +489,16 @@ const Categories = () => {
                 <button
                   onClick={() => {
                     if (!newBrand.name.trim()) {
-                      alert("Brand name is required.");
+                      showToast("Brand name is required ❗", "error");
+                      return;
+                    } else if (brandsNames.includes(newBrand.name)) {
+                      showToast(
+                        "This name is already used ❗ Try another one",
+                        "error"
+                      );
+                      return;
+                    } else if (!newBrand.description.trim()) {
+                      showToast("Brand description is required ❗", "error");
                       return;
                     }
 
@@ -335,18 +508,38 @@ const Categories = () => {
                         dispatch(getAllBrands());
                         setShowAddBrandModal(false);
                         setNewBrand({ name: "", description: "" });
+                        setTimeout(() => {
+                          showToast("the brand has been created 👍", "success");
+                        }, 0);
                       })
+                      .catch((err) => {
+                        showToast("there is something wrong 👎", "error");
+                        console.error("Error creating brand:", err);
+                      });
                   }}
                   className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg"
                 >
                   Add
                 </button>
-
               </div>
             </div>
           </div>
         </div>
       )}
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover
+        theme="dark"
+        transition={Flip}
+        style={{ zIndex: 9999 }}
+      />
     </div>
   );
 };
@@ -376,8 +569,7 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
   const navPrev = `.swiper-${title}-prev`;
 
   return (
-    <div className="mb-16">
-      <h5 className="text-lg font-semibold mb-4">{title}</h5>
+    <div className="mb-10">
       <Swiper
         modules={[Navigation, Pagination]}
         breakpoints={{
@@ -386,29 +578,48 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
           1280: { slidesPerView: 3, spaceBetween: 30 },
         }}
         navigation={{ nextEl: navNext, prevEl: navPrev }}
-        pagination={{ clickable: true, el: ".swiper-pagination" }}
-        className="relative"
+        pagination={{ clickable: true }}
+        className="relative pb-10"
       >
         {data.length > 0 ? (
           data.map((item) => (
-            <SwiperSlide key={item._id} className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-lg transition-all duration-300">
+            <SwiperSlide
+              key={item._id}
+              className="w-80 bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-lg transition-all duration-300"
+            >
               <img
-                src={item.image || "/placeholder.jpg"}
+                src={item.image === "category" ? categoriesImg : brandsImg} //just for pictures / changed to (item.image) if there picture returned from backend
                 alt={item.name}
-                className="h-40 w-full object-cover bg-[#d9d9d9]"
+                className="h-full w-full object-cover bg-[#d9d9d9]"
               />
               <div className="p-4">
-                <h6 className="font-bold text-main-blue text-base mb-1">{item.name}</h6>
-                <p className="text-xs text-gray-600 mb-3">64 items</p>
+                <h6 className="font-bold text-main-blue text-xl mb-3">
+                  {item.name}
+                </h6>
+                <p className="mb-2 text-sm font-normal text-dark-grey">
+                  {item.description}
+                </p>
                 <div className="flex justify-between items-center">
                   <span className="badge bg-green-100 text-green-600 text-sm px-4 py-3 rounded flex items-center gap-1">
                     <FaRegCheckCircle /> Available
                   </span>
                   <div className="flex gap-3">
-                    <button onClick={() => onEdit(item._id)} className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110">
+                    <button
+                      onClick={() => onEdit(item._id)}
+                      className="text-blue-900 hover:text-main-blue transition duration-300 transform hover:scale-110"
+                      data-tooltip-id="Edit"
+                      data-tooltip-content="Edit"
+                      data-tooltip-place="bottom"
+                    >
                       <FaEdit />
                     </button>
-                    <button onClick={() => onDelete(item._id)} className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110">
+                    <button
+                      onClick={() => onDelete(item._id)}
+                      className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110"
+                      data-tooltip-place="bottom"
+                      data-tooltip-id="Delete"
+                      data-tooltip-content="Delete"
+                    >
                       <FaTrashAlt />
                     </button>
                   </div>
@@ -417,17 +628,31 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
             </SwiperSlide>
           ))
         ) : (
-          <div className="text-center font-bold text-title-blue text-xl p-10">No {title}</div>
+          <div className="text-center font-bold text-title-blue text-xl p-10">
+            No {title}
+          </div>
         )}
       </Swiper>
-      <div className="flex justify-between mt-4">
-        <button className={`swiper-${title}-prev text-2xl text-main-blue hover:text-title-blue transition duration-300 transform hover:scale-110`}>
+      <div className="flex justify-between">
+        <button
+          className={`swiper-${title}-prev text-2xl text-main-blue hover:text-title-blue transition duration-300 transform hover:scale-110`}
+        >
           <FaArrowLeft />
         </button>
-        <button className={`swiper-${title}-next text-2xl text-main-blue hover:text-title-blue transition duration-300 transform hover:scale-110`}>
+        <button
+          className={`swiper-${title}-next text-2xl text-main-blue hover:text-title-blue transition duration-300 transform hover:scale-110`}
+        >
           <FaArrowRight />
         </button>
       </div>
+      <Tooltip
+        id="Edit"
+        className="!z-50 !py-1 !px-2 !bg-title-blue !rounded-md"
+      />
+      <Tooltip
+        id="Delete"
+        className="!z-50 !py-1 !px-2 !bg-red-600 !rounded-md"
+      />
     </div>
   );
 };
