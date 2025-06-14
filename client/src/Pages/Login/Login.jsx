@@ -128,7 +128,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-2 flex items-center"
+                className="absolute bottom-4 right-2 flex items-center"
               >
                 {showPassword ? (
                   <FiEyeOff className="text-title-blue" />
@@ -148,11 +148,7 @@ const Login = () => {
               </div>
             )}
 
-            <div className="w-full flex flex-row items-center justify-between text-sm mt-2">
-              <label className="flex items-center">
-                <input type="checkbox" className="mr-2" />
-                Remember Me
-              </label>
+            <div className="w-full flex items-center justify-end text-sm mt-2">
               <Link
                 to="/forgot-password"
                 className="text-main-blue hover:text-dark-blue"

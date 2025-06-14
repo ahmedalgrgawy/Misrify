@@ -46,7 +46,8 @@ export const editProduct = createAsyncThunk(
         `admin/edit-product/${productId}`,
         updatedData
       );
-      return response.data.Product;
+      // return response.data.Product;
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -99,18 +100,35 @@ const productsSlice = createSlice({
       .addCase(editProduct.fulfilled, (state, action) => {
         state.loading = false;
         const updatedProduct = action.payload;
-        state.products = state.products.map((product) =>
-          product._id === updatedProduct._id ? updatedProduct : product
-        );
+        // state.products = state.products.map((product) =>
+        //   product._id === updatedProduct._id ? updatedProduct : product
+        // );
+        if (updatedProduct && updatedProduct._id) {
+          const index = state.products.findIndex(product => product._id === updatedProduct._id);
+          if (index !== -1) {
+              state.products[index] = updatedProduct;
+          }
+      }
       })
       .addCase(editProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       //Create Product
+       .addCase(createProduct.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        })
       .addCase(createProduct.fulfilled, (state, action) => {
-        state.products.push(action.payload);
-        });
+        // state.products.push(action.payload);
+         if (action.payload) {
+          state.products.push(action.payload);
+        }
+        })
+      .addCase(createProduct.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.payload;
+        })
   },
 });
 

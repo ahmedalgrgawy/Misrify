@@ -17,6 +17,7 @@ import { getAllCategories } from "../../features/categorySlice";
 import { TailSpin } from "react-loader-spinner";
 import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
+import { unwrapResult } from "@reduxjs/toolkit";
 import productImg from "../../assets/product.png";
 
 const Products = () => {
@@ -45,9 +46,9 @@ const Products = () => {
 
   const brands = useSelector((state) => state.Brands?.brands ?? []);
   const categories = useSelector((state) => state.Categories?.categories ?? []);
-  const brandsLoading = useSelector((state) => state.brand?.loading ?? false);
-  const categoriesLoading = useSelector((state) => state.category?.loading ?? false);
-
+  const brandsLoading = useSelector((state) => state.Brands?.loading ?? false);
+  const categoriesLoading = useSelector((state) => state.Categories?.loading ?? false);
+  const user = useSelector((state) => state.auth.user);
   const userRole = useSelector((state) => state.auth.user?.role);
   const products = useSelector((state) => {
     if (userRole === "merchant") {
@@ -66,7 +67,11 @@ const Products = () => {
     const fetchData = async () => {
       try {
         if (userRole === "merchant") {
-          await dispatch(getMerchantProducts());
+          await Promise.all([
+            dispatch(getMerchantProducts()),
+            dispatch(getAllBrands()),
+            dispatch(getAllCategories()),
+          ]);
         } else if (userRole === "admin") {
           await Promise.all([
             dispatch(getAllProducts()),
@@ -132,7 +137,9 @@ const Products = () => {
     setFormData({
       name: "",
       categoryId: "",
-      brandId: "",
+      //Test here >>>>>>>>>>>>>>
+      // brandId: userRole === "merchant" && user?.brand?._id ? user.brand._id : "",
+      brandId: userRole === "merchant" && user?.brand?._id ? user.brand._id : "",
       description: "",
       quantityInStock: 0,
       price: 0,
@@ -172,36 +179,53 @@ const Products = () => {
         isDiscounted: formData.isDiscounted,
         discountAmount: Number(formData.discountAmount),
       };
-
       if (actionType === "edit") {
         const action = userRole === "merchant" ? editMerchantProduct : editProduct;
-        await dispatch(action({
+        const resultAction = await dispatch(action({
           productId: selectedProduct._id,
           updatedData: dataToSend
         }));
+        // unwrap() will throw an error if the thunk was rejected
+        unwrapResult(resultAction);
+
         setSuccess("Product updated successfully");
+        setShowEditModal(false);
+
+        if (userRole === "merchant") {
+          dispatch(getMerchantProducts());
+        } else {
+          dispatch(getAllProducts());
+        }
+
       } else {
         const action = userRole === "merchant" ? createMerchantProduct : createProduct;
-        await dispatch(action(dataToSend));
+        const resultAction = await dispatch(action(dataToSend));
+        unwrapResult(resultAction);
         setSuccess("Product created successfully");
-      }
-
-      setShowEditModal(false);
-      setShowCreateModal(false);
-      if (userRole === "merchant") {
-        dispatch(getMerchantProducts());
-      } else {
-        dispatch(getAllProducts());
+        setShowCreateModal(false);
+        if (userRole === "merchant") {
+          dispatch(getMerchantProducts());
+        } else {
+          dispatch(getAllProducts());
+        }
       }
     } catch (err) {
+      console.error("Failed to submit form:", err);
       setError(err.message || "Operation failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
+  // Test Here >>>>>>>>>>>>
+  const getBrandNameById = (id) => {
+    if (brandsLoading) return "Loading brand...";
+    const brand = brands.find((b) => b._id === id);
+    return brand ? brand.name : "Brand not found";
+  };
+
+  let displayBrandName = userRole === "merchant" ? getBrandNameById(formData.brandId) : "";
 
   const arrProducts = Array.isArray(products) ? products : [];
-
   const renderProductModal = (actionType) => {
     const isEdit = actionType === "edit";
     const title = isEdit ? "Edit Product" : "Create New Product";
@@ -212,68 +236,91 @@ const Products = () => {
         <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-lg">
           <h2 className="text-xl font-bold text-title-blue mb-6">{title}</h2>
           <form onSubmit={(e) => handleFormSubmit(e, actionType)} className="space-y-4">
-            <input
-              name="name"
-              value={formData.name}
-              placeholder="Product Name"
-              className="w-full p-2 border border-gray-300 rounded-md"
-              onChange={handleFormChange}
-              required
-            />
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Product Name
+              </label>
+              <input
+                name="name"
+                value={formData.name}
+                placeholder="Product Name"
+                className="w-full p-2 border border-gray-300 rounded-md"
+                onChange={handleFormChange}
+                required
+              />
+            </div>
 
             {userRole === "admin" && (
-              <>
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Category
-                  </label>
-                  <select
-                    name="categoryId"
-                    value={formData.categoryId}
-                    onChange={handleFormChange}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {categories.map((cat) => (
-                      <option key={cat._id} value={cat._id}>
-                        {cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Brand
-                  </label>
-                  <select
-                    name="brandId"
-                    value={formData.brandId}
-                    onChange={handleFormChange}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                    required
-                  >
-                    <option value="">Select Brand</option>
-                    {brands.map((brand) => (
-                      <option key={brand._id} value={brand._id}>
-                        {brand.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Brand
+                </label>
+                <select
+                  name="brandId"
+                  value={formData.brandId}
+                  onChange={handleFormChange}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  required
+                >
+                  <option value="">Select Brand</option>
+                  {brands.map((brand) => (
+                    <option key={brand._id} value={brand._id}>
+                      {brand.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {userRole === "merchant" && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Brand
+                </label>
+                <input
+                  name="brandId"
+                  // Test here >>>>>>>>
+                  // value={displayBrandName}
+                  value={getBrandNameById(formData.brandId)}
+                  readOnly
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                />
+              </div>
             )}
 
-            <input
-              name="description"
-              value={formData.description}
-              placeholder="Description"
-              className="w-full p-2 border border-gray-300 rounded-md"
-              onChange={handleFormChange}
-              required
-              rows={3}
-            />
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Category
+              </label>
+              <select
+                name="categoryId"
+                value={formData.categoryId}
+                onChange={handleFormChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+                required
+              >
+                <option value="">Select Category</option>
+                {categories.map((cat) => (
+                  <option key={cat._id} value={cat._id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
+              <input
+                name="description"
+                value={formData.description}
+                placeholder="Description"
+                className="w-full p-2 border border-gray-300 rounded-md"
+                onChange={handleFormChange}
+                required
+                rows={3}
+              />
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
@@ -358,7 +405,8 @@ const Products = () => {
             <div className="flex justify-end gap-4 pt-4">
               <button
                 type="button"
-                onClick={() => isEdit ? setShowEditModal(false) : setShowCreateModal(false)}
+                onClick={() =>
+                  isEdit ? setShowEditModal(false) : setShowCreateModal(false)}
                 className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md"
                 disabled={isSubmitting}
               >
@@ -434,7 +482,8 @@ const Products = () => {
                   >
                     <td className="py-4 px-6 w-16 h-16 box-content flex justify-center">
                       <img
-                        src={product.image || productImg}
+                        // src={product.image || productImg}
+                        src={product?.image || productImg}
                         alt={product.name}
                         className="w-16 h-16 rounded-xl"
                       />
@@ -460,16 +509,15 @@ const Products = () => {
                           product.colors.map((color, i) => (
                             <span
                               key={i}
-                              className={`w-5 h-5 rounded-full ${
-                                {
-                                  red: "bg-red-500",
-                                  green: "bg-green-500",
-                                  blue: "bg-blue-500",
-                                  Navy: "bg-indigo-900",
-                                  Teal: "bg-teal-500",
-                                  Orange: "bg-orange-500",
-                                }[color] || "bg-gray-500"
-                              } transition duration-300 transform hover:scale-125`}
+                              className={`w-5 h-5 rounded-full ${{
+                                red: "bg-red-500",
+                                green: "bg-green-500",
+                                blue: "bg-blue-500",
+                                Navy: "bg-indigo-900",
+                                Teal: "bg-teal-500",
+                                Orange: "bg-orange-500",
+                              }[color] || "bg-gray-500"
+                                } transition duration-300 transform hover:scale-125`}
                             ></span>
                           ))
                         ) : (

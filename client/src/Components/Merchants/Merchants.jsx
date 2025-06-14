@@ -131,14 +131,14 @@ const Merchants = () => {
         <h3 className="text-3xl font-bold text-title-blue">Merchants</h3>
         <div>
           <Link
-            to="/dashboard"
+            to="/analytics"
             className="text-lg font-semibold text-dark-grey"
           >
-            Dashboard
+            Analytics
           </Link>
           <span className="mx-2 font-semi text-dark-grey">/</span>
           <Link
-            to="/dashboard/merchants"
+            to="/analytics/merchants"
             className="text-lg font-semibold text-title-blue"
           >
             Merchants

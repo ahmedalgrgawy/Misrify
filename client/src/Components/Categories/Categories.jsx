@@ -39,11 +39,22 @@ import brandsImg from "../../assets/brands.jpeg";//just for pictures / deleted i
 
 const Categories = () => {
   const dispatch = useDispatch();
-  const { categories, categoryLoading } = useSelector(
-    (state) => state.Categories
-  );
+  const { categories, categoryLoading } = useSelector((state) => state.Categories);
   const { brands, brandLoading } = useSelector((state) => state.Brands);
   const { merchants } = useSelector((state) => state.user);
+
+  const arrCategories = Array.isArray(categories) ? categories : [];
+  const arrBrands = Array.isArray(brands) ? brands : [];
+
+  const categoriesNames = useMemo(
+    () => arrCategories.map((category) => category.name),
+    [arrCategories]
+  );
+
+  const brandsNames = useMemo(
+    () => arrBrands.map((brand) => brand.name),
+    [arrBrands]
+  );
 
   // Create State
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
@@ -168,7 +179,7 @@ const Categories = () => {
   useEffect(() => {
     dispatch(getAllCategories());
     dispatch(getAllBrands());
-    dispatch(getAllMerchants());    
+    dispatch(getAllMerchants());
   }, [dispatch]);
 
   if (categoryLoading || brandLoading) {
@@ -178,19 +189,6 @@ const Categories = () => {
       </div>
     );
   }
-
-  const arrCategories = Array.isArray(categories) ? categories : [];
-  const arrBrands = Array.isArray(brands) ? brands : [];
-
-  const categoriesNames = useMemo(
-    () => arrCategories.map((category) => category.name),
-    [arrCategories]
-  );
-
-  const brandsNames = useMemo(
-    () => arrBrands.map((brand) => brand.name),
-    [arrBrands]
-  );
 
   const showToast = (message, type = "success") => {
     toast[type](message, {
@@ -212,10 +210,10 @@ const Categories = () => {
         <h3 className="text-3xl font-bold text-title-blue">Categories</h3>
         <div>
           <Link
-            to="/dashboard"
+            to="/analytics"
             className="text-lg font-semibold text-dark-grey"
           >
-            Dashboard
+            Analytics
           </Link>
           <span className="mx-2 text-dark-grey">/</span>
           <span className="text-lg font-semibold text-title-blue">
@@ -320,9 +318,8 @@ const Categories = () => {
             <div className="flex flex-col gap-4">
               <input
                 type="text"
-                placeholder={`${
-                  itemType === "category" ? "Category" : "Brand"
-                } Name`}
+                placeholder={`${itemType === "category" ? "Category" : "Brand"
+                  } Name`}
                 value={
                   itemType === "category" ? newCategory.name : newBrand.name
                 }
@@ -412,16 +409,13 @@ const Categories = () => {
                         setNewCategory({ name: "", description: "" });
 
                         setTimeout(() => {
-                          // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
                           showToast(
                             "the category has been created 👍",
                             "success"
                           );
                         }, 0);
-                        // tostify here
                       })
                       .catch((err) => {
-                        // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
                         setTimeout(() => {
                           showToast("there is something wrong 👎", "error");
                         }, 0);
@@ -515,12 +509,10 @@ const Categories = () => {
                         setShowAddBrandModal(false);
                         setNewBrand({ name: "", description: "" });
                         setTimeout(() => {
-                          // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
                           showToast("the brand has been created 👍", "success");
                         }, 0);
                       })
                       .catch((err) => {
-                        // setTimeout is needed here to make toastify work because the modal closes (setShowAddCategoryModal(false)) synchronously right before the toast, React may unmount the <ToastContainer /> before the toast has a chance to render.
                         showToast("there is something wrong 👎", "error");
                         console.error("Error creating brand:", err);
                       });
@@ -601,10 +593,10 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
                 className="h-full w-full object-cover bg-[#d9d9d9]"
               />
               <div className="p-4">
-                <h6 className="font-bold text-main-blue text-xl mb-1">
+                <h6 className="font-bold text-main-blue text-xl mb-3">
                   {item.name}
                 </h6>
-                <p className="mb-1.5 text-base font-semibold">
+                <p className="mb-2 text-sm font-normal text-dark-grey">
                   {item.description}
                 </p>
                 <div className="flex justify-between items-center">

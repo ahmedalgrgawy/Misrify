@@ -27,7 +27,7 @@ const Navbar = memo(() => {
       ? [
           { name: "Home", path: "/" },
           { name: "About", path: "/aboutus" },
-          { name: "Dashboard", path: "/dashboard" },
+        { name: "Dashboard", path: "/analytics" },
           { name: "Contact Us", path: "/contact" },
         ]
       : [
