@@ -11,7 +11,7 @@ import Layout from '../Components/Layout/Layout';
 import Contact from '../Components/Contact/Contact';
 import AboutUs from '../Pages/ِAboutUs/AboutUs';
 import Home from '../Pages/Home/Home';
-import Dashboard from '../Components/Dashboard/Dashboard';
+import Analytics from '../Components/Analytics/Analytics';
 import DashboardLayout from '../Components/DashboardLayout/DashboardLayout';
 import Users from '../Components/Users/Users';
 import Products from '../Components/Products/Products';
@@ -42,10 +42,10 @@ const router = createBrowserRouter([
     ],
   },
   {
-    path: '/dashboard',
+    path: '/analytics',
     element: <DashboardLayout />,
     children: [
-      { index: true, element: <Dashboard /> },
+      { index: true, element: <Analytics /> },
       { path: 'users', element: <Users /> },
       { path: 'merchants', element: <Merchants /> },
       { path: 'products', element: <Products /> },
