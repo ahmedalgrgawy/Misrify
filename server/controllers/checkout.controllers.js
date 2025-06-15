@@ -643,49 +643,114 @@ export const initializePayment = async (req, res, next) => {
 };
 
 export const handlePaymentCallback = async (req, res, next) => {
-    // Get data from either query params or request body
-    const data = req.method === 'POST' ? req.body : req.query;
-    const { order, success, transaction_id } = data;
+    const { id: transactionId, order: paymobOrderId, success } = req.body;
 
-    // For Paymob specifically, they might use different parameter names
-    const paymobOrderId = order || data.order_id || data.merchant_order_id;
-    const isSuccess = success === 'true' || data.is_success === 'true' || data.success === true;
-    const transactionId = transaction_id || data.txn_id || data.transaction_id;
-
-    if (!paymobOrderId) {
-        return next(new AppError('Missing Paymob order ID', 400));
+    // Validate required parameters
+    if (!paymobOrderId || !transactionId || success === undefined) {
+        return next(new AppError('Missing required Paymob parameters', 400));
     }
 
-    // Find the payment by Paymob order ID
-    const payment = await Payment.findOne({ 'paymentDetails.paymobOrderId': paymobOrderId });
+    // Determine payment status
+    const isPaymentSuccessful = success === true || success === 'true';
 
-    if (!payment) {
-        return next(new AppError('Payment Not found', 401));
-    }
+    // Start a Mongoose transaction
+    const session = await mongoose.startSession();
+    try {
+        session.startTransaction();
 
-    // Update payment status
-    payment.status = isSuccess ? 'success' : 'failed';
-    payment.paymentDetails.transactionId = transactionId;
-    await payment.save();
+        // Find payment by Paymob order ID
+        const paymentDoc = await Payment.findOne(
+            { 'paymentDetails.paymobOrderId': paymobOrderId },
+            null,
+            { session }
+        );
 
-    // If payment was successful, update order status
-    if (isSuccess) {
-        const orderRecord = await Order.findById(payment.order);
-        if (orderRecord) {
-            orderRecord.status = 'paid';
-            await orderRecord.save();
-            return res.status(200).json({
-                success: true,
-                message: 'Payment status updated successfully'
-            });
+        if (!paymentDoc) {
+            await session.abortTransaction();
+            return next(new AppError('Payment record not found', 404));
         }
-    } else {
-        return res.status(400).json({
+
+        // Update payment record
+        paymentDoc.status = isPaymentSuccessful ? 'success' : 'failed';
+        paymentDoc.paymentDetails.transactionId = transactionId;
+        await paymentDoc.save({ session });
+
+        // Update order status if payment is successful
+        if (isPaymentSuccessful) {
+            const orderDoc = await Order.findById(paymentDoc.order, null, { session });
+            if (!orderDoc) {
+                await session.abortTransaction();
+                return next(new AppError('Order not found', 404));
+            }
+            if (orderDoc.status !== 'pending') {
+                await session.abortTransaction();
+                return next(new AppError('Order is not in a payable state', 400));
+            }
+            orderDoc.status = 'paid';
+            await orderDoc.save({ session });
+        }
+
+        // Commit transaction
+        await session.commitTransaction();
+
+        // Respond with success
+        return res.status(200).json({
             success: true,
-            message: 'Payment Failed'
+            message: isPaymentSuccessful
+                ? 'Payment processed successfully'
+                : 'Payment failed and recorded',
         });
+    } catch (error) {
+        await session.abortTransaction();
+        console.error('Payment callback error:', error.message);
+        return next(new AppError('Failed to process payment callback', 500));
+    } finally {
+        session.endSession();
     }
 };
+
+// export const handlePaymentCallback = async (req, res, next) => {
+//     const { orderId, success, transaction_id } = req.body;
+
+//     // For Paymob specifically, they might use different parameter names
+//     const paymobOrderId = order || data.order_id || data.merchant_order_id;
+//     const isSuccess = success === 'true' || data.is_success === 'true' || data.success === true;
+//     const transactionId = transaction_id || data.txn_id || data.transaction_id;
+
+//     if (!paymobOrderId) {
+//         return next(new AppError('Missing Paymob order ID', 400));
+//     }
+
+//     // Find the payment by Paymob order ID
+//     const payment = await Payment.findOne({ 'paymentDetails.paymobOrderId': paymobOrderId });
+
+//     if (!payment) {
+//         return next(new AppError('Payment Not found', 401));
+//     }
+
+//     // Update payment status
+//     payment.status = isSuccess ? 'success' : 'failed';
+//     payment.paymentDetails.transactionId = transactionId;
+//     await payment.save();
+
+//     // If payment was successful, update order status
+//     if (isSuccess) {
+//         const orderRecord = await Order.findById(payment.order);
+//         if (orderRecord) {
+//             orderRecord.status = 'paid';
+//             await orderRecord.save();
+//             return res.status(200).json({
+//                 success: true,
+//                 message: 'Payment status updated successfully'
+//             });
+//         }
+//     } else {
+//         return res.status(400).json({
+//             success: true,
+//             message: 'Payment Failed'
+//         });
+//     }
+// };
 
 // export const initializePayment = async (req, res) => {
 //     try {
