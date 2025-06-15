@@ -72,7 +72,7 @@ router.put("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), 
 router.delete("/order/:id", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(cancelOrder))
 
 router.post("/payment", catchAsync(protectedRoute), catchAsync(customerRoute), catchAsync(initializePayment))
-router.get('/payment/callback', catchAsync(handlePaymentCallback));
+router.post('/payment/callback', catchAsync(handlePaymentCallback));
 
 // Handling contact us
 router.post("/contact", validate(contactSchema), catchAsync(submitContactForm));
