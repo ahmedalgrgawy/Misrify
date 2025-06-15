@@ -7,7 +7,7 @@ export const userProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.get("/user/profile");
-      return response.data.user; 
+      return response.data.user;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -46,7 +46,7 @@ export const deleteUser = createAsyncThunk(
   async (userId, { rejectWithValue }) => {
     try {
       await axiosInstance.delete(`/admin/delete-user/${userId}`);
-      return userId; 
+      return userId;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -59,13 +59,25 @@ export const editUser = createAsyncThunk(
   async ({ userId, updatedData }, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.put(`/admin/edit-user/${userId}`, updatedData);
-      return response.data.user; 
+      return response.data.user;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
   }
 );
 
+// create user 
+export const createUser = createAsyncThunk(
+  "admin/createUser",
+  async (newUserData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/admin/create-user", newUserData);
+      return response.data.user;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message);
+    }
+  }
+);
 const userSlice = createSlice({
   name: 'user',
   initialState: {
@@ -127,9 +139,9 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(deleteUser.fulfilled, (state, action) => {
-       state.loading = false;
-       state.users = state.users.filter(user => user._id !== action.payload);
-       state.merchants = state.merchants.filter(merchant => merchant._id !== action.payload);
+        state.loading = false;
+        state.users = state.users.filter(user => user._id !== action.payload);
+        state.merchants = state.merchants.filter(merchant => merchant._id !== action.payload);
       })
       .addCase(deleteUser.rejected, (state, action) => {
         state.loading = false;
@@ -152,6 +164,26 @@ const userSlice = createSlice({
         );
       })
       .addCase(editUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Create User
+      .addCase(createUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createUser.fulfilled, (state, action) => {
+        state.loading = false;
+        // const newUser = action.payload;
+        // // Add to appropriate array based on role
+        // if (newUser.role === 'merchant') {
+        //   state.merchants.push(newUser);
+        // } else {
+        //   state.users.push(newUser);
+        // }
+        state.error = null;
+      })
+      .addCase(createUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
