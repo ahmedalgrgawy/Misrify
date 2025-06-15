@@ -66,14 +66,14 @@ export const createProductSchema = Joi.object({
 
     // until front integrations
 
-    // imgUrl: Joi.string()
-    //     .uri()
-    //     .required()
-    //     .messages({
-    //         'string.empty': 'Image URL is required',
-    //         'string.uri': 'Image must be a valid URL',
-    //         'any.required': 'Image URL is required',
-    //     }),
+    imgUrl: Joi.string()
+        .uri()
+        .required()
+        .messages({
+            'string.empty': 'Image URL is required',
+            'string.uri': 'Image must be a valid URL',
+            'any.required': 'Image URL is required',
+        }),
 
     isDiscounted: Joi.boolean()
         .default(false)
