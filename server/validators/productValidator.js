@@ -68,7 +68,7 @@ export const createProductSchema = Joi.object({
 
     imgUrl: Joi.string()
         .uri()
-        .required()
+        .optional()
         .messages({
             'string.empty': 'Image URL is required',
             'string.uri': 'Image must be a valid URL',
