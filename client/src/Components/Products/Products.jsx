@@ -255,11 +255,11 @@ const Products = () => {
   // Test Here >>>>>>>>>>>>
   const getBrandNameById = (id) => {
     if (brandsLoading) return "Loading brand...";
-    const brand = brands.find((b) => b._id === id);
+    const brand = brands.find((b) => b.owner === id);
     return brand ? brand.name : "Brand not found";
   };
 
-  let displayBrandName = userRole === "merchant" ? getBrandNameById(formData.brandId) : "";
+  let displayBrandName = userRole === "merchant" ? getBrandNameById(user.id) : "";
 
   const arrProducts = Array.isArray(products) ? products : [];
   const renderProductModal = (actionType) => {

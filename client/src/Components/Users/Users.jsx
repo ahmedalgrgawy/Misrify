@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteUser, getAllUsers, editUser } from "../../features/userSlice";
+import { deleteUser, getAllUsers, editUser, createUser } from "../../features/userSlice";
 import { TailSpin } from "react-loader-spinner";
-import { FaEdit, FaTrashAlt, FaSearch } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaSearch, FaPlus } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Flip, toast, ToastContainer } from "react-toastify";
 import { Tooltip } from "react-tooltip";
@@ -21,6 +21,41 @@ const Users = () => {
     address: "",
     role: "",
   });
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newUserData, setNewUserData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    phoneNumber: "",
+    address: "",
+    gender: "male",
+    role: "user",
+  });
+
+  const handleConfirmCreate = () => {
+    dispatch(createUser(newUserData))
+      .then(() => {
+        setShowAddUserModal(false);
+        setNewUserData({
+          name: "",
+          email: "",
+          password: "",
+          phoneNumber: "",
+          address: "",
+          gender: "male",
+          role: "user",
+        });
+        setTimeout(() => {
+          showToast("User has been created 👍", "success");
+        }, 0);
+        dispatch(getAllUsers());
+      })
+      .catch(() => {
+        setTimeout(() => {
+          showToast("There was an error 👎", "error");
+        }, 0);
+      });
+  };
 
   // Delete Funcs
   const handleDeleteClick = (userId) => {
@@ -42,7 +77,7 @@ const Users = () => {
         setTimeout(() => {
           showToast("user has been deleted 👍", "success");
         }, 0);
-        
+
       })
       .catch((error) => {
         setTimeout(() => {
@@ -79,7 +114,7 @@ const Users = () => {
         setTimeout(() => {
           showToast("user has been updated 👍", "success");
         }, 0);
-          dispatch(getAllUsers());
+        dispatch(getAllUsers());
 
 
       })
@@ -146,16 +181,25 @@ const Users = () => {
         </div>
       </div>
 
-      <div className="mb-6 relative w-full">
-        <FaSearch className="absolute left-4 top-3.5 text-gray-400" />
-        <input
-          type="text"
-          placeholder="Search by name or email"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-12 pr-4 py-2 rounded-md border border-light-grey focus:outline-none focus:ring-2
+      <div className="flex justify-between items-center mb-6 flex-nowrap gap-4">
+        <div className="relative w-full">
+          <FaSearch className="absolute left-4 top-3.5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search by name or email"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full pl-12 pr-4 py-2 rounded-md border border-light-grey focus:outline-none focus:ring-2
                     focus:ring-second-grey hover:shadow transition ease-in-out duration-300 bg-white text-base"
-        />
+          />
+        </div>
+
+        <button
+          onClick={() => setShowAddUserModal(true)}
+          className="btn text-lg hover:bg-main-blue bg-title-blue text-white p-3 rounded-3xl flex items-center gap-2"
+        >
+          <FaPlus /> Add User
+        </button>
       </div>
 
       <div className="overflow-x-auto bg-white rounded-xl shadow-sm border border-light-grey">
@@ -318,6 +362,107 @@ const Users = () => {
             </div>
           </div>
         )}
+
+        {showAddUserModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white p-8 rounded-lg shadow-lg w-[90%] max-w-md">
+              <h2 className="text-2xl font-semibold text-main-blue mb-6">Create User</h2>
+              <div className="flex flex-col gap-4">
+                <input
+                  type="text"
+                  placeholder="Name"
+                  value={newUserData.name}
+                  onChange={(e) =>
+                    setNewUserData({ ...newUserData, name: e.target.value })
+                  }
+                  className="border border-light-grey rounded-md text-dark-grey py-2 px-3"
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={newUserData.email}
+                  onChange={(e) =>
+                    setNewUserData({ ...newUserData, email: e.target.value })
+                  }
+                  className="border border-light-grey rounded-md text-dark-grey py-2 px-3"
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={newUserData.password}
+                  onChange={(e) =>
+                    setNewUserData({ ...newUserData, password: e.target.value })
+                  }
+                  className="border border-light-grey rounded-md text-dark-grey py-2 px-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Phone Number"
+                  value={newUserData.phoneNumber}
+                  onChange={(e) =>
+                    setNewUserData({ ...newUserData, phoneNumber: e.target.value })
+                  }
+                  className="border border-light-grey rounded-md text-dark-grey py-2 px-3"
+                />
+                <input
+                  type="text"
+                  placeholder="Address"
+                  value={newUserData.address}
+                  onChange={(e) =>
+                    setNewUserData({ ...newUserData, address: e.target.value })
+                  }
+                  className="border border-light-grey rounded-md text-dark-grey py-2 px-3"
+                />
+                <select
+                  value={newUserData.gender}
+                  onChange={(e) =>
+                    setNewUserData({ ...newUserData, gender: e.target.value })
+                  }
+                  className="border border-light-grey rounded-md text-dark-grey py-2 px-3"
+                >
+                  <option value="male" className="bg-second text-dark-grey">
+                    Male
+                  </option>
+                  <option value="female" className="bg-second text-dark-grey">
+                    Female
+                  </option>
+                </select>
+                <select
+                  value={newUserData.role}
+                  onChange={(e) =>
+                    setNewUserData({ ...newUserData, role: e.target.value })
+                  }
+                  className="border border-light-grey rounded-md text-dark-grey py-2 px-3"
+                >
+                  <option value="admin" className="bg-second text-dark-grey">
+                    Admin
+                  </option>
+                  <option value="merchant" className="bg-second text-dark-grey">
+                    Merchant
+                  </option>
+                  <option value="user" className="bg-second text-dark-grey">
+                    User
+                  </option>
+                </select>
+                <div className="flex justify-end gap-4 mt-4">
+                  <button
+                    onClick={() => setShowAddUserModal(false)}
+                    className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleConfirmCreate}
+                    className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg"
+                  >
+                    Create
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
       <ToastContainer
         position="bottom-right"
