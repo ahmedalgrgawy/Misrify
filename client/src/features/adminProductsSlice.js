@@ -13,7 +13,7 @@ export const getAllProducts = createAsyncThunk("products/getAllProducts",
   }
 );
 // Admin Create Product
-export const createProduct = createAsyncThunk( "products/createProduct",
+export const createProduct = createAsyncThunk("products/createProduct",
   async (productData, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.post(`/admin/create-product`, productData);
@@ -106,29 +106,29 @@ const productsSlice = createSlice({
         if (updatedProduct && updatedProduct._id) {
           const index = state.products.findIndex(product => product._id === updatedProduct._id);
           if (index !== -1) {
-              state.products[index] = updatedProduct;
+            state.products[index] = updatedProduct;
           }
-      }
+        }
       })
       .addCase(editProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
       //Create Product
-       .addCase(createProduct.pending, (state) => {
+      .addCase(createProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
-        })
+      })
       .addCase(createProduct.fulfilled, (state, action) => {
         // state.products.push(action.payload);
-         if (action.payload) {
+        if (action.payload) {
           state.products.push(action.payload);
         }
-        })
+      })
       .addCase(createProduct.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload;
-        })
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 

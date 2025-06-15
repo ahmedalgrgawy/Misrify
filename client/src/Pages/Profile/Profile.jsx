@@ -87,6 +87,8 @@ const Profile = () => {
     if (data.currentPassword === "" && data.newPassword === "") {
       if (data.imgUrl === "") {
         const { currentPassword, imgUrl, newPassword, ...updatedData } = data;
+        console.log(updatedData);
+
         handleDispatch(updatedData);
       } else {
         const { currentPassword, newPassword, ...updatedData } = data;
@@ -363,11 +365,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.name
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.name
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="text"
                     name="name"
                     id="name"
@@ -407,11 +408,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.email
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.email
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="email"
                     name="email"
                     id="email"
@@ -451,11 +451,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.phone
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.phone
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="tel"
                     name="phoneNumber"
                     id="phoneNumber"
@@ -479,7 +478,7 @@ const Profile = () => {
                   </button>
                 </div>
                 {updateData.errors.phoneNumber &&
-                updateData.touched.phoneNumber ? (
+                  updateData.touched.phoneNumber ? (
                   <p className="text-red-600 ps-5 mt-1">
                     {updateData.errors.phoneNumber}
                   </p>
@@ -496,11 +495,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.address
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.address
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="text"
                     name="address"
                     id="address"
@@ -540,11 +538,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.CPassword
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.CPassword
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="Password"
                     name="currentPassword"
                     id="currentPassword"
@@ -568,7 +565,7 @@ const Profile = () => {
                   </button>
                 </div>
                 {updateData.errors.currentPassword &&
-                updateData.touched.currentPassword ? (
+                  updateData.touched.currentPassword ? (
                   <p className="text-red-600 ps-5 mt-1">
                     {updateData.errors.currentPassword}
                   </p>
@@ -585,11 +582,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.NPassword
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.NPassword
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="Password"
                     name="newPassword"
                     id="newPassword"
@@ -613,7 +609,7 @@ const Profile = () => {
                   </button>
                 </div>
                 {updateData.errors.newPassword &&
-                updateData.touched.newPassword ? (
+                  updateData.touched.newPassword ? (
                   <p className="text-red-600 ps-5 mt-1">
                     {updateData.errors.newPassword}
                   </p>
@@ -629,11 +625,10 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={() => updateData.setFieldValue("gender", "male")}
-                    className={`flex-1 text-center py-1 rounded-full ${
-                      updateData.values.gender === "male"
-                        ? "bg-title-blue text-white"
-                        : "text-dark-grey"
-                    }`}
+                    className={`flex-1 text-center py-1 rounded-full ${updateData.values.gender === "male"
+                      ? "bg-title-blue text-white"
+                      : "text-dark-grey"
+                      }`}
                   >
                     Male
                   </button>
@@ -641,11 +636,10 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={() => updateData.setFieldValue("gender", "female")}
-                    className={`flex-1 text-center py-1 rounded-full ${
-                      updateData.values.gender === "female"
-                        ? "bg-title-blue text-white"
-                        : "text-dark-grey"
-                    }`}
+                    className={`flex-1 text-center py-1 rounded-full ${updateData.values.gender === "female"
+                      ? "bg-title-blue text-white"
+                      : "text-dark-grey"
+                      }`}
                   >
                     Female
                   </button>

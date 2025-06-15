@@ -19,6 +19,7 @@ import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { unwrapResult } from "@reduxjs/toolkit";
 import productImg from "../../assets/product.png";
+import Resizer from "react-image-file-resizer";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const Products = () => {
     sizes: "",
     isDiscounted: false,
     discountAmount: 0,
+    imgUrl: "",
   });
 
   const brands = useSelector((state) => state.Brands?.brands ?? []);
@@ -96,9 +98,9 @@ const Products = () => {
   const handleConfirmDelete = async () => {
     try {
       if (userRole === "merchant") {
-        await dispatch(deleteMerchantProduct(productToDelete));
+        dispatch(deleteMerchantProduct(productToDelete));
       } else {
-        await dispatch(deleteProduct(productToDelete));
+        dispatch(deleteProduct(productToDelete));
       }
       setSuccess("Product deleted successfully");
       if (userRole === "merchant") {
@@ -127,6 +129,7 @@ const Products = () => {
       sizes: product?.sizes?.join(", ") || "",
       isDiscounted: product?.isDiscounted || false,
       discountAmount: product?.discountAmount || 0,
+      imgUrl: product?.imgUrl || "",
     });
     setShowEditModal(true);
     setError(null);
@@ -147,6 +150,7 @@ const Products = () => {
       sizes: "",
       isDiscounted: false,
       discountAmount: 0,
+      imgUrl: "",
     });
     setShowCreateModal(true);
     setError(null);
@@ -159,6 +163,29 @@ const Products = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+  };
+
+  const onFileChange = async (e) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      try {
+        Resizer.imageFileResizer(
+          file,
+          300,
+          300,
+          "JPEG",
+          80,
+          0,
+          (uri) => {
+            setFormData((prev) => ({ ...prev, imgUrl: uri }));
+          },
+          "base64"
+        );
+      } catch (err) {
+        console.error("Error processing image:", err);
+        setError("Failed to process image. Please try again.");
+      }
+    }
   };
 
   const handleFormSubmit = async (e, actionType) => {
@@ -178,10 +205,15 @@ const Products = () => {
         sizes: formData.sizes.split(",").map(s => s.trim()),
         isDiscounted: formData.isDiscounted,
         discountAmount: Number(formData.discountAmount),
+        imgUrl: formData.imgUrl,
       };
+
+      console.log(dataToSend);
+
+
       if (actionType === "edit") {
         const action = userRole === "merchant" ? editMerchantProduct : editProduct;
-        const resultAction = await dispatch(action({
+        const resultAction = dispatch(action({
           productId: selectedProduct._id,
           updatedData: dataToSend
         }));
@@ -199,7 +231,11 @@ const Products = () => {
 
       } else {
         const action = userRole === "merchant" ? createMerchantProduct : createProduct;
-        const resultAction = await dispatch(action(dataToSend));
+        console.log("data" + dataToSend);
+
+        const resultAction = dispatch(action(dataToSend));
+        console.log(resultAction);
+
         unwrapResult(resultAction);
         setSuccess("Product created successfully");
         setShowCreateModal(false);
@@ -236,6 +272,17 @@ const Products = () => {
         <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-lg">
           <h2 className="text-xl font-bold text-title-blue mb-6">{title}</h2>
           <form onSubmit={(e) => handleFormSubmit(e, actionType)} className="space-y-4">
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Product Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={onFileChange}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Product Name
@@ -483,7 +530,7 @@ const Products = () => {
                     <td className="py-4 px-6 w-16 h-16 box-content flex justify-center">
                       <img
                         // src={product.image || productImg}
-                        src={product?.image || productImg}
+                        src={product?.imgUrl || productImg}
                         alt={product.name}
                         className="w-16 h-16 rounded-xl"
                       />
