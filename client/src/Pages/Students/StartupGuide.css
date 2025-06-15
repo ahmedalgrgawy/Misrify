@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'Jaro';
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    --white: #FFFFFF;
+    --bg-main: #EBEBEF;
+    --bg-second: #EFF2F6;
+    --light-grey: #DDDEE5;
+    --second-grey: #C3C3C3;
+    --dark-grey: #6E7786;
+    --main-blue: #2B3D5B;
+    --title-blue: #15253F;
+    --dark-blue: #081120;
+    --bg-footer: #0B172A;
+}
+
+.card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

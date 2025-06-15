@@ -34,6 +34,7 @@ const Navbar = memo(() => {
           { name: "Home", path: "/" },
           { name: "About", path: "/aboutus" },
           { name: "Contact Us", path: "/contact" },
+          { name: "Students", path: "/students" },
         ];
 
   return (
