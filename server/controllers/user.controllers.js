@@ -33,14 +33,19 @@ export const updateProfile = async (req, res, next) => {
         user.password = newPassword;
     }
 
-    if (imgUrl) {
-        if (user.imgUrl) {
-            await cloudinary.uploader.destroy(user.imgUrl.split("/").pop().split(".")[0]);
-        }
+    // if (imgUrl) {
+    //     console.log("pass");
 
-        const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
-        imgUrl = uploadedResponse.secure_url;
-    }
+    //     if (user.imgUrl) {
+    //         await cloudinary.uploader.destroy(user.imgUrl.split("/").pop().split(".")[0]);
+    //         console.log("pass");
+    //     }
+
+    //     const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
+    //     console.log("pass");
+    //     imgUrl = uploadedResponse.secure_url;
+    //     console.log("pass");
+    // }
 
     user.name = name || user.name;
     user.email = email || user.email;

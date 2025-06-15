@@ -92,18 +92,10 @@ export const approveOrRejectProduct = async (req, res, next) => {
 }
 
 export const createProduct = async (req, res, next) => {
-    const { name, categoryId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
-    let { imgUrl, brandId } = req.body;
+    const { name, categoryId, description, quantityInStock, price, colors, imgUrl, sizes, isDiscounted, discountAmount } = req.body
+    let { brandId } = req.body;
 
     const user = req.user;
-
-    if (imgUrl) {
-        const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
-            folder: "Products"
-        });
-
-        imgUrl = uploadedResponse.secure_url;
-    }
 
     if (user.role === 'merchant') {
         const merchantBrand = await Brand.findOne({ owner: user._id });
@@ -181,13 +173,13 @@ export const editProduct = async (req, res, next) => {
         }
     }
 
-    if (imgUrl) {
-        await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
-        const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
-            folder: "Products"
-        });
-        imgUrl = uploadedResponse.secure_url;
-    }
+    // if (imgUrl) {
+    //     await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
+    //     const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
+    //         folder: "Products"
+    //     });
+    //     imgUrl = uploadedResponse.secure_url;
+    // }
 
     product.name = name || product.name;
     product.category = categoryId || product.category.id;
@@ -222,7 +214,7 @@ export const deleteProduct = async (req, res, next) => {
     const { id } = req.params;
     const user = req.user;
 
-    if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
+    // if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
 
     const product = await Product.findById(id).populate("category").populate("brand");
 
@@ -236,7 +228,7 @@ export const deleteProduct = async (req, res, next) => {
         }
     }
 
-    await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
+    // await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
 
     product.reviews.map(async (singleReview) => {
 
