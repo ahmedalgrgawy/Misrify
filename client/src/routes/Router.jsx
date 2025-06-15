@@ -21,6 +21,7 @@ import Support from '../Components/Support/Support';
 import Profile from './../Pages/Profile/Profile';
 import Messages from '../Components/Messages/Messages';
 import Notifications from '../Components/Notifications/Notifications';
+import StartupGuide from '../Pages/Students/StartupGuide';
 
 const router = createBrowserRouter([
   {
@@ -38,7 +39,8 @@ const router = createBrowserRouter([
       { path: '/password-success', element: <PasswordSuccess /> },
       { path: '/contact', element: <Contact /> },
       { path: '/profile', element: <Profile /> },
-      { path: '/notifications', element: <Notifications /> }
+      { path: '/notifications', element: <Notifications /> },
+      { path: "/students", element: <StartupGuide /> }
     ],
   },
   {
