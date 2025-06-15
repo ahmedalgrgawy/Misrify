@@ -29,12 +29,20 @@ const productSchema = new mongoose.Schema({
         required: [true, "Price is required"],
         min: [0, "Price cannot be negative"],
     },
-    colors: {
-        type: [String],
-    },
-    sizes: {
-        type: [String],
-    },
+    colors: [
+        {
+            type: String,
+            enum: ["Red", "Green", "Blue", "Black", "White", "Yellow", "Pink", "Purple", "Orange", "Gray"],
+            // required: [true, "Color is required"],
+        }
+    ],
+    sizes: [
+        {
+            type: String,
+            enum: ["XS", "S", "M", "L", "XL", "XXL"],
+            // required: [true, "Size is required"],
+        }
+    ],
     imgUrl: {
         type: String,
     },

@@ -214,45 +214,48 @@ export const deleteProduct = async (req, res, next) => {
     const { id } = req.params;
     const user = req.user;
 
-    // if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
-
     const product = await Product.findById(id).populate("category").populate("brand");
 
     if (!product) {
-        return next(new AppError("Product Not Found", 404))
+        return next(new AppError("Product Not Found", 404));
     }
 
     if (user.role === 'merchant') {
         if (product.brand.owner.toString() !== user._id.toString()) {
-            return next(new AppError("You Are Not Authorized To Delete This Product", 401))
+            return next(new AppError("You Are Not Authorized To Delete This Product", 401));
         }
     }
 
-    // await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
+    // Delete all comments for each review and then delete the reviews
+    if (product.reviews.length > 0) {
+        for (const reviewId of product.reviews) {
+            const review = await Review.findById(reviewId);
+            if (review && Array.isArray(review.comments)) {
+                await Comment.deleteMany({ _id: { $in: review.comments } });
+            }
+            await Review.deleteOne({ _id: reviewId });
+        }
+    }
 
-    product.reviews.map(async (singleReview) => {
+    // Delete the product
+    await Product.deleteOne({ _id: id });
 
-        await Review.findById(singleReview).comments.map(async (singleComment) => {
-            await Comment.deleteOne({ _id: singleComment });
-        })
+    // Fetch brand merchant for notification
+    if (product.brand) {
+        const brandMerchant = await Brand.findById(product.brand).populate("owner");
 
-        await Review.deleteOne({ _id: singleReview });
-    })
+        // Create notification
+        await Notification.create({
+            receivers: [brandMerchant.owner._id],
+            sender: "Misrify Store",
+            content: `Product ${product.name} has been deleted by ${user.name}`,
+            type: "product",
+            isRead: false,
+        });
+    }
 
-    await product.deleteOne();
-
-    const brandMerchant = await Brand.findById(product.brand).populate("owner");
-
-    await Notification.create({
-        receivers: [brandMerchant.owner._id], // Changed to receivers array
-        sender: "Misrify Store", // Updated to Misrify Store
-        content: `Product ${product.name} has been deleted by ${user.name}`, // Changed to content
-        type: "product",
-        isRead: false,
-    })
-
-    res.status(200).json({ success: true, message: "Product Deleted Successfully" })
-}
+    res.status(200).json({ success: true, message: "Product Deleted Successfully" });
+};
 
 // <<<<<<<<<<<<<<<<< Merchant Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getMerchantProducts = async (req, res, next) => {
