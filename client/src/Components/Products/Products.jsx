@@ -125,8 +125,8 @@ const Products = () => {
       description: product?.description || "",
       quantityInStock: product?.quantityInStock || 0,
       price: product?.price || 0,
-      colors: product?.colors?.join(", ") || "",
-      sizes: product?.sizes?.join(", ") || "",
+      colors: Array.isArray(product?.colors) ? product.colors.join(", ") : "",
+      sizes: Array.isArray(product?.sizes) ? product.sizes.join(", ") : "",
       isDiscounted: product?.isDiscounted || false,
       discountAmount: product?.discountAmount || 0,
       imgUrl: product?.imgUrl || "",
@@ -140,8 +140,6 @@ const Products = () => {
     setFormData({
       name: "",
       categoryId: "",
-      //Test here >>>>>>>>>>>>>>
-      // brandId: userRole === "merchant" && user?.brand?._id ? user.brand._id : "",
       brandId: userRole === "merchant" && user?.brand?._id ? user.brand._id : "",
       description: "",
       quantityInStock: 0,
@@ -161,7 +159,7 @@ const Products = () => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
@@ -201,23 +199,21 @@ const Products = () => {
         description: formData.description,
         quantityInStock: Number(formData.quantityInStock),
         price: Number(formData.price),
-        colors: formData.colors.split(",").map(c => c.trim()),
-        sizes: formData.sizes.split(",").map(s => s.trim()),
+        colors: formData.colors ? formData.colors.split(",").map((c) => c.trim()).filter((c) => c) : [],
+        sizes: formData.sizes ? formData.sizes.split(",").map((s) => s.trim()).filter((s) => s) : [],
         isDiscounted: formData.isDiscounted,
         discountAmount: Number(formData.discountAmount),
         imgUrl: formData.imgUrl,
       };
 
-      console.log(dataToSend);
-
-
       if (actionType === "edit") {
         const action = userRole === "merchant" ? editMerchantProduct : editProduct;
-        const resultAction = dispatch(action({
-          productId: selectedProduct._id,
-          updatedData: dataToSend
-        }));
-        // unwrap() will throw an error if the thunk was rejected
+        const resultAction = dispatch(
+          action({
+            productId: selectedProduct._id,
+            updatedData: dataToSend,
+          })
+        );
         unwrapResult(resultAction);
 
         setSuccess("Product updated successfully");
@@ -228,15 +224,11 @@ const Products = () => {
         } else {
           dispatch(getAllProducts());
         }
-
       } else {
         const action = userRole === "merchant" ? createMerchantProduct : createProduct;
-        console.log("data" + dataToSend);
-
         const resultAction = dispatch(action(dataToSend));
-        console.log(resultAction);
-
         unwrapResult(resultAction);
+
         setSuccess("Product created successfully");
         setShowCreateModal(false);
         if (userRole === "merchant") {
@@ -252,16 +244,15 @@ const Products = () => {
       setIsSubmitting(false);
     }
   };
-  // Test Here >>>>>>>>>>>>
+
   const getBrandNameById = (id) => {
     if (brandsLoading) return "Loading brand...";
-    const brand = brands.find((b) => b.owner === id);
+    const brand = brands.find((b) => b._id === id);
     return brand ? brand.name : "Brand not found";
   };
 
-  let displayBrandName = userRole === "merchant" ? getBrandNameById(user.id) : "";
-
   const arrProducts = Array.isArray(products) ? products : [];
+
   const renderProductModal = (actionType) => {
     const isEdit = actionType === "edit";
     const title = isEdit ? "Edit Product" : "Create New Product";
@@ -325,8 +316,6 @@ const Products = () => {
                 </label>
                 <input
                   name="brandId"
-                  // Test here >>>>>>>>
-                  // value={displayBrandName}
                   value={getBrandNameById(formData.brandId)}
                   readOnly
                   className="w-full p-2 border border-gray-300 rounded-md"
@@ -365,7 +354,6 @@ const Products = () => {
                 className="w-full p-2 border border-gray-300 rounded-md"
                 onChange={handleFormChange}
                 required
-                rows={3}
               />
             </div>
 
@@ -529,7 +517,6 @@ const Products = () => {
                   >
                     <td className="py-4 px-6 w-16 h-16 box-content flex justify-center">
                       <img
-                        // src={product.image || productImg}
                         src={product?.imgUrl || productImg}
                         alt={product.name}
                         className="w-16 h-16 rounded-xl"
@@ -552,18 +539,18 @@ const Products = () => {
                     </td>
                     <td>
                       <div className="py-4 px-6 flex justify-evenly items-center">
-                        {product.colors && product.colors.length > 0 ? (
+                        {Array.isArray(product.colors) && product.colors.length > 0 ? (
                           product.colors.map((color, i) => (
                             <span
                               key={i}
                               className={`w-5 h-5 rounded-full ${{
-                                red: "bg-red-500",
-                                green: "bg-green-500",
-                                blue: "bg-blue-500",
-                                Navy: "bg-indigo-900",
-                                Teal: "bg-teal-500",
-                                Orange: "bg-orange-500",
-                              }[color] || "bg-gray-500"
+                                  red: "bg-red-500",
+                                  green: "bg-green-500",
+                                  blue: "bg-blue-500",
+                                  Navy: "bg-indigo-900",
+                                  Teal: "bg-teal-500",
+                                  Orange: "bg-orange-500",
+                                }[color] || "bg-gray-500"
                                 } transition duration-300 transform hover:scale-125`}
                             ></span>
                           ))
