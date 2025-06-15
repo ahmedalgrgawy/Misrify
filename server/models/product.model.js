@@ -32,7 +32,7 @@ const productSchema = new mongoose.Schema({
     colors: [
         {
             type: String,
-            enum: ["Red", "Green", "Blue", "Black", "White", "Yellow", "Pink", "Purple", "Orange", "Gray"],
+            // enum: ["Red", "Green", "Blue", "Black", "White", "Yellow", "Pink", "Purple", "Orange", "Gray"],
             // required: [true, "Color is required"],
         }
     ],

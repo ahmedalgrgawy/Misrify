@@ -206,6 +206,9 @@ const Products = () => {
         imgUrl: formData.imgUrl,
       };
 
+      console.log(dataToSend);
+
+
       if (actionType === "edit") {
         const action = userRole === "merchant" ? editMerchantProduct : editProduct;
         const resultAction = dispatch(
@@ -504,7 +507,8 @@ const Products = () => {
                 <th className="py-4 px-6 text-center">Brand</th>
                 <th className="py-4 px-6 text-center">Price</th>
                 <th className="py-4 px-6 text-center">Quantity</th>
-                <th className="py-4 px-6 text-center">Available Color</th>
+                <th className="py-4 px-6 text-center">Colors</th>
+                <th className="py-4 px-6 text-center">Sizes</th>
                 <th className="py-4 px-6 text-center">Action</th>
               </tr>
             </thead>
@@ -561,6 +565,13 @@ const Products = () => {
                         )}
                       </div>
                     </td>
+                    <td className="py-4 px-6 text-main-blue text-center">
+                      {Array.isArray(product.sizes) && product.sizes.length > 0 ? (
+                        product.sizes.join(", ")
+                      ) : (
+                        "No sizes provided"
+                      )}
+                    </td>
                     <td>
                       <div className="py-4 px-6 text-center space-x-4 flex justify-center items-center">
                         <button
@@ -587,7 +598,7 @@ const Products = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center text-title-blue py-4">
+                  <td colSpan="9" className="text-center text-title-blue py-4">
                     No Products found
                   </td>
                 </tr>
