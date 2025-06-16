@@ -20,6 +20,11 @@ import { RxGrid } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { getMerchantOrderStats, getProductsAvgRatings, getSalesGrowth, getStockLevelsProducts }
   from "../../features/merchantAnalyticsSlice";
+  import {
+    getOrdersSales,
+    getPlatformStats,
+    getTotalUsers,
+  } from "./../../features/adminAnalyticsSlice";
 // import features from admin analytics slice >>>>>>>>>>
 
 const Analytics = () => {
@@ -28,6 +33,8 @@ const Analytics = () => {
   const userRole = useSelector((state) => state.auth.user?.role);
   const adminAnalytics = useSelector((state) => state.adminAnalytics);
   const [showTooltip, setShowTooltip] = useState(true);
+
+  // static Data used
   const [xData, setXData] = useState([
     "JAN",
     "FEB",
@@ -42,35 +49,30 @@ const Analytics = () => {
     "NOV",
     "DEC",
   ]);
-  const [yData, setYData] = useState([0, 1000, 2000, 3000, 4000, 5000]);
+  const [yData, setYData] = useState([
+    0, 100000, 200000, 300000, 400000, 500000, 600000, 700000, 800000,
+  ]);
   const [dataChart, setDataChart] = useState([
-    2500, 3200, 2000, 2900, 4000, 3100, 3900, 3500, 3500, 2500, 2000, 3850,
+    350000, 320000, 480000, 550000, 500000, 420000, 380000, 450000, 600000,
+    720000, 780000, 850000,
   ]);
   const [activePeriod, setActivePeriod] = useState("Monthly");
-
+  
+  const xLabelsMiniCharts = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  
+  const ordersMiniChartData = [150, 180, 160, 200, 190, 220, 210];
+  const brandsMiniChartData = [50, 55, 48, 60, 58, 62, 59];
+  const productsMiniChartData = [80, 85, 75, 90, 88, 92, 87];
+  const usersMiniChartData = [200, 210, 190, 230, 220, 250, 240];
+  const totalSalesMiniChartData = [8500, 9200, 8800, 10500, 10300, 11000, 9800];
+  const categoriesMiniChartData = [10, 12, 11, 13, 12, 14, 13];
+  
   const handleTooltipChange = (event) => {
     setShowTooltip(event.target.checked);
   };
-  const uData = [4000, 3000, 2000, 2780, 1890, 2390, 3490];
-  const xLabels = [
-    "Page A",
-    "Page B",
-    "Page C",
-    "Page D",
-    "Page E",
-    "Page F",
-    "Page G",
-  ];
-  // Change this part to match the admin ,distruct here the admin's object >>>>>>>>>>>>>
-  const {
-    ordersCount,
-    productsCount,
-    brandsCount,
-    categoriesCount,
-    usersCount,
-    totalSales,
-    growthStats,
-  } = userRole === "admin" ? adminAnalytics || {} : {}
+
+  const { platformStats, ordersSales, TotalUsers } =
+    userRole === "admin" ? adminAnalytics || {} : {};
 
   const merchantAnalytics = useSelector((state) => state.merchantAnalytics);
   const {
@@ -78,8 +80,7 @@ const Analytics = () => {
     salesGrowth: merchantSalesGrowth,
     stockLevels: merchantStockLevels,
     productRatings: merchantProductRatings,
-    loading
-  } = userRole === "merchant" ? merchantAnalytics || {} : {};
+    adminL  } = userRole === "merchant" ? merchantAnalytics || {} : {};
 
   // Merchant stock levels for products
   useEffect(() => {
@@ -196,13 +197,41 @@ const Analytics = () => {
         data: [65, 35],
         backgroundColor: ["#2B3D5B", "#A5D8FF"],
         borderWidth: 0,
-        cutout: "80%",
-        circumference: 270,
-        rotation: 225,
+        cutout: "90%",
+        circumference: 300,
+        rotation: 210,
+        borderRadius:20
       },
     ],
   };
   const options = {
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
+  };
+
+  const datach2 = {
+    labels: ["Active", "Inactive", "Offline"], // Updated labels
+    datasets: [
+      {
+        data: [513, 741, 121], // Updated data from image
+        backgroundColor: ["#2B3D5B", "#D1D5DB", "#A5D8FF"], // Updated colors (assuming D1D5DB for inactive)
+        borderWidth: 0,
+        cutout: "65%",
+        circumference: 210,
+        rotation: 255,
+        borderRadius: 3,
+      },
+    ],
+  };
+  const optionsch2 = {
     plugins: {
       legend: {
         display: false,
@@ -227,10 +256,9 @@ const Analytics = () => {
           ]);
         } else if (userRole === "admin") {
           await Promise.all([
-            dispatch(getAllProducts()),
-            dispatch(getAllBrands()),
-            dispatch(getAllCategories()),
-            dispatch(getAdminAnalytics()), // add here admin analytics actions >>>>>>>>>>
+            dispatch(getPlatformStats()),
+            dispatch(getOrdersSales()),
+            dispatch(getTotalUsers()), // add here admin analytics actions >>>>>>>>>>
           ]);
         }
       } catch (err) {
@@ -268,15 +296,17 @@ const Analytics = () => {
             <div className="px-4 py-3.5 rounded-2xl bg-white ">
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="p-3 text-[#0AC400] bg-[#B3FFBB99] rounded-full w-fit">
-                    <LuPackageOpen className="text-3xl" />
+                  <div className="p-2.5 text-[#0AC400] bg-[#B3FFBB99] rounded-full w-fit">
+                    <LuPackageOpen className="text-2xl" />
                   </div>
                   <p className="my-4 text-[#6E7786] text-sm font-semibold">
                     Orders Number
                   </p>
 
                   <h3 className="text-sm font-normal text-[#6E7786]">
-                    <span className="text-2xl font-bold text-[#0B172A]">1,756</span>
+                    <span className="text-2xl font-bold text-[#0B172A] me-1.5">
+                      {ordersSales.totalOrders}
+                    </span>
                     orders
                   </h3>
                 </div>
@@ -299,7 +329,7 @@ const Analytics = () => {
                       height: 0,
                       position: "none",
                       scaleType: "point",
-                      data: xLabels,
+                      data: xLabelsMiniCharts,
                     },
                   ]}
                   yAxis={[
@@ -310,7 +340,7 @@ const Analytics = () => {
                   ]}
                   series={[
                     {
-                      data: uData,
+                      data: ordersMiniChartData,
                       type: "line",
                       label: "uv",
                       area: true,
@@ -325,7 +355,13 @@ const Analytics = () => {
                     },
                   }}
                 >
-                  <linearGradient id="Gradient1" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <linearGradient
+                    id="Gradient1"
+                    x1="0%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
                     <stop offset="0" stopColor="rgba(10, 196, 0, 0)" />
                     <stop offset="1" stopColor="rgba(10, 196, 0, 0.6)" />
                   </linearGradient>
@@ -338,15 +374,17 @@ const Analytics = () => {
             <div className="px-4 py-3.5 rounded-2xl bg-white ">
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="py-1 px-3 text-[#9333EA] bg-[#F3E8FF] rounded-full w-fit">
-                    <p className="text-3xl font-bold">B</p>
+                  <div className="py-1.5 px-3.5 text-[#9333EA] bg-[#F3E8FF] rounded-full w-fit">
+                    <p className="text-2xl font-bold">B</p>
                   </div>
                   <p className="my-4 text-[#6E7786] text-sm font-semibold">
                     Brands Number
                   </p>
 
                   <h3 className="text-sm font-normal text-[#6E7786]">
-                    <span className="text-2xl font-bold text-[#0B172A]">2,421</span>
+                    <span className="text-2xl font-bold text-[#0B172A] me-1.5">
+                      {platformStats.totalBrands}
+                    </span>
                     brands
                   </h3>
                 </div>
@@ -369,7 +407,7 @@ const Analytics = () => {
                       height: 0,
                       position: "none",
                       scaleType: "point",
-                      data: xLabels,
+                      data: xLabelsMiniCharts,
                     },
                   ]}
                   yAxis={[
@@ -380,7 +418,7 @@ const Analytics = () => {
                   ]}
                   series={[
                     {
-                      data: uData,
+                      data: brandsMiniChartData,
                       type: "line",
                       label: "uv",
                       area: true,
@@ -395,7 +433,13 @@ const Analytics = () => {
                     },
                   }}
                 >
-                  <linearGradient id="Gradient2" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <linearGradient
+                    id="Gradient2"
+                    x1="0%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
                     <stop offset="0" stopColor="rgba(147, 51, 234, 0)" />
                     <stop offset="1" stopColor="rgba(147, 51, 234, 0.6)" />
                   </linearGradient>
@@ -408,15 +452,17 @@ const Analytics = () => {
             <div className="px-4 py-3.5 rounded-2xl bg-white ">
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="p-3 text-[#D97706] bg-[#FEF3C7] rounded-full w-fit">
-                    <RxGrid className="text-3xl" />
+                  <div className="p-2.5 text-[#D97706] bg-[#FEF3C7] rounded-full w-fit">
+                    <RxGrid className="text-2xl" />
                   </div>
                   <p className="my-4 text-[#6E7786] text-sm font-semibold">
                     Products Number
                   </p>
 
                   <h3 className="text-sm font-normal text-[#6E7786]">
-                    <span className="text-2xl font-bold text-[#0B172A]">1,012</span>
+                    <span className="text-2xl font-bold text-[#0B172A] me-1.5">
+                      {platformStats.totalProducts}
+                    </span>
                     products
                   </h3>
                 </div>
@@ -439,7 +485,7 @@ const Analytics = () => {
                       height: 0,
                       position: "none",
                       scaleType: "point",
-                      data: xLabels,
+                      data: xLabelsMiniCharts,
                     },
                   ]}
                   yAxis={[
@@ -450,7 +496,7 @@ const Analytics = () => {
                   ]}
                   series={[
                     {
-                      data: uData,
+                      data: productsMiniChartData,
                       type: "line",
                       label: "uv",
                       area: true,
@@ -465,7 +511,13 @@ const Analytics = () => {
                     },
                   }}
                 >
-                  <linearGradient id="Gradient3" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <linearGradient
+                    id="Gradient3"
+                    x1="0%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
                     <stop offset="0" stopColor="rgba(217, 119, 6, 0)" />
                     <stop offset="1" stopColor="rgba(217, 119, 6, 0.6)" />
                   </linearGradient>
@@ -478,15 +530,17 @@ const Analytics = () => {
             <div className="px-4 py-3.5 rounded-2xl bg-white ">
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="p-3 text-[#2563EB] bg-[#DBEAFE] rounded-full w-fit">
-                    <IoIosPeople className="text-3xl" />
+                  <div className="p-2.5 text-[#2563EB] bg-[#DBEAFE] rounded-full w-fit">
+                    <IoIosPeople className="text-2xl" />
                   </div>
                   <p className="my-4 text-[#6E7786] text-sm font-semibold">
                     Users Number
                   </p>
 
                   <h3 className="text-sm font-normal text-[#6E7786]">
-                    <span className="text-2xl font-bold text-[#0B172A]">2,714</span>
+                    <span className="text-2xl font-bold text-[#0B172A] me-1.5">
+                      {TotalUsers.totalUsers}
+                    </span>
                     users
                   </h3>
                 </div>
@@ -509,7 +563,7 @@ const Analytics = () => {
                       height: 0,
                       position: "none",
                       scaleType: "point",
-                      data: xLabels,
+                      data: xLabelsMiniCharts,
                     },
                   ]}
                   yAxis={[
@@ -520,7 +574,7 @@ const Analytics = () => {
                   ]}
                   series={[
                     {
-                      data: uData,
+                      data: usersMiniChartData,
                       type: "line",
                       label: "uv",
                       area: true,
@@ -535,7 +589,13 @@ const Analytics = () => {
                     },
                   }}
                 >
-                  <linearGradient id="Gradient4" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <linearGradient
+                    id="Gradient4"
+                    x1="0%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
                     <stop offset="0" stopColor="rgba(37, 99, 235, 0)" />
                     <stop offset="1" stopColor="rgba(37, 99, 235, 0.6)" />
                   </linearGradient>
@@ -548,16 +608,16 @@ const Analytics = () => {
             <div className="px-4 py-3.5 rounded-2xl bg-white ">
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="p-3 text-[#0AC400] bg-[#B3FFBB99] rounded-full w-fit">
-                    <BsCurrencyDollar className="text-3xl" />
+                  <div className="p-2.5 text-[#0AC400] bg-[#B3FFBB99] rounded-full w-fit">
+                    <BsCurrencyDollar className="text-2xl" />
                   </div>
                   <p className="my-4 text-[#6E7786] text-sm font-semibold">
                     Total Sales
                   </p>
 
                   <h3 className="text-sm font-normal text-[#6E7786]">
-                    <span className="text-2xl font-bold text-[#0B172A]">
-                      $212,714
+                    <span className="text-2xl font-bold text-[#0B172A] me-1.5">
+                      {ordersSales.totalMoneyPaid.toFixed(0)} EGP
                     </span>
                     revenue
                   </h3>
@@ -581,7 +641,7 @@ const Analytics = () => {
                       height: 0,
                       position: "none",
                       scaleType: "point",
-                      data: xLabels,
+                      data: xLabelsMiniCharts,
                     },
                   ]}
                   yAxis={[
@@ -592,7 +652,7 @@ const Analytics = () => {
                   ]}
                   series={[
                     {
-                      data: uData,
+                      data: totalSalesMiniChartData,
                       type: "line",
                       label: "uv",
                       area: true,
@@ -607,7 +667,13 @@ const Analytics = () => {
                     },
                   }}
                 >
-                  <linearGradient id="Gradient" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <linearGradient
+                    id="Gradient"
+                    x1="0%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
                     <stop offset="0" stopColor="rgba(10, 196, 0, 0)" />
                     <stop offset="1" stopColor="rgba(10, 196, 0, 0.6)" />
                   </linearGradient>
@@ -620,15 +686,17 @@ const Analytics = () => {
             <div className="px-4 py-3.5 rounded-2xl bg-white ">
               <div className="flex justify-between">
                 <div className="flex flex-col">
-                  <div className="p-3 text-[#DB2777] bg-[#FCE7F3] rounded-full w-fit">
-                    <FaTags className="text-3xl" />
+                  <div className="p-2.5 text-[#DB2777] bg-[#FCE7F3] rounded-full w-fit">
+                    <FaTags className="text-2xl" />
                   </div>
                   <p className="my-4 text-[#6E7786] text-sm font-semibold">
                     Categories Number
                   </p>
 
                   <h3 className="text-sm font-normal text-[#6E7786]">
-                    <span className="text-2xl font-bold text-[#0B172A]">95 </span>
+                    <span className="text-2xl font-bold text-[#0B172A] me-1.5">
+                      {platformStats.totalCategories}
+                    </span>
                     Categories
                   </h3>
                 </div>
@@ -651,7 +719,7 @@ const Analytics = () => {
                       height: 0,
                       position: "none",
                       scaleType: "point",
-                      data: xLabels,
+                      data: xLabelsMiniCharts,
                     },
                   ]}
                   yAxis={[
@@ -662,7 +730,7 @@ const Analytics = () => {
                   ]}
                   series={[
                     {
-                      data: uData,
+                      data: categoriesMiniChartData,
                       type: "line",
                       label: "uv",
                       area: true,
@@ -677,7 +745,13 @@ const Analytics = () => {
                     },
                   }}
                 >
-                  <linearGradient id="Gradient6" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <linearGradient
+                    id="Gradient6"
+                    x1="0%"
+                    y1="100%"
+                    x2="0%"
+                    y2="0%"
+                  >
                     <stop offset="0" stopColor="rgba(219, 39, 119, 0)" />
                     <stop offset="1" stopColor="rgba(219, 39, 119, 0.6)" />
                   </linearGradient>
@@ -687,163 +761,198 @@ const Analytics = () => {
               </div>
             </div>
           </div>
-          <div className="flex bg-[#F8F9FF] rounded-lg overflow-hidden items-center my-5">
-            <button
-              onClick={() => {
-                setXData(["SAT", "SUN", "MON", "TUE", "WED", "THU", "FRI"]);
-                setYData([
-                  0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100,
-                ]);
-                setDataChart([500, 900, 600, 900, 1000, 700, 1000]);
-                setActivePeriod("Weekly");
+          <div className=" rounded-2xl bg-white my-5 p-8 font-inter">
+            <div className="flex justify-between mb-6">
+              <div>
+                <p className="text-[#6E7786] text-lg">Sales 2025</p>
+
+                <h3 className="flex items-center gap-2 text-[#6E7786]">
+                  <span className="font-bold text-3xl text-[#1E1B39] ">
+                    EGP 1.2M
+                  </span>
+                  <span className="text-[#04CE00] flex items-center gap-1 text-sm">
+                    <div className="w-2.5 h-2.5 bg-[#04CE00] rounded-full"></div>
+                    1.3%
+                  </span>
+                  VS LAST YEAR
+                </h3>
+              </div>
+
+              <div className="flex bg-[#F8F9FF] rounded-lg overflow-hidden items-center">
+                <button
+                  onClick={() => {
+                    setXData(["SAT", "SUN", "MON", "TUE", "WED", "THU", "FRI"]);
+                    setYData([0, 5000, 10000, 15000, 20000, 25000]);
+                    setDataChart([
+                      8000, 12000, 18000, 22000, 24000, 20000, 15000,
+                    ]);
+                    setActivePeriod("Weekly");
+                  }}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${
+                    activePeriod === "Weekly"
+                      ? "font-medium text-white bg-title-blue"
+                      : ""
+                  }`}
+                >
+                  Weekly
+                </button>
+                <button
+                  onClick={() => {
+                    setXData([
+                      "JAN",
+                      "FEB",
+                      "MAR",
+                      "APR",
+                      "MAY",
+                      "JUN",
+                      "JUL",
+                      "AUG",
+                      "SEP",
+                      "OCT",
+                      "NOV",
+                      "DEC",
+                    ]);
+                    setYData([
+                      0, 100000, 200000, 300000, 400000, 500000, 600000, 700000,
+                      800000,
+                    ]);
+                    setDataChart([
+                      350000, 320000, 480000, 550000, 500000, 420000, 380000,
+                      450000, 600000, 720000, 780000, 850000,
+                    ]);
+                    setActivePeriod("Monthly");
+                  }}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${
+                    activePeriod === "Monthly"
+                      ? "font-medium text-white bg-title-blue"
+                      : ""
+                  }`}
+                >
+                  Monthly
+                </button>
+                <button
+                  onClick={() => {
+                    setXData([
+                      "2018",
+                      "2019",
+                      "2020",
+                      "2021",
+                      "2022",
+                      "2023",
+                      "2024",
+                      "2025",
+                    ]);
+                    setYData([0, 1000000, 2000000, 3000000, 4000000, 5000000]);
+                    setDataChart([
+                      1500000, 1800000, 3300000, 4500000, 4900000, 5400000,
+                      6000000, 6900000,
+                    ]);
+                    setActivePeriod("Annually");
+                  }}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${
+                    activePeriod === "Annually"
+                      ? "font-medium text-white bg-title-blue"
+                      : ""
+                  }`}
+                >
+                  Annually
+                </button>
+              </div>
+            </div>
+            <LineChart
+              xAxis={[
+                {
+                  offset: 25,
+                  labelOffset: 1, // Adjust this value
+                  disableTicks: true,
+                  disableLine: true,
+                  scaleType: "point",
+                  data: xData,
+                  valueFormatter: (x) => x,
+                },
+              ]}
+              yAxis={[
+                {
+                  offset: 30,
+                  disableTicks: true,
+                  disableLine: true,
+                  position: "right",
+                  data: yData,
+                  valueFormatter: (value) => {
+                    if (
+                      activePeriod === "Monthly" ||
+                      activePeriod === "Annually"
+                    ) {
+                      // Format to K (thousands) or M (millions) for EGP
+                      if (value >= 1000000) {
+                        return `${(value / 1000000).toFixed(1)}M`;
+                      } else if (value >= 1000) {
+                        return `${(value / 1000).toFixed(0)}K`;
+                      }
+                    }
+                    return `${value}`; // For weekly, display as is with EGP prefix
+                  },
+                },
+              ]}
+              grid={{ horizontal: true }}
+              series={[
+                {
+                  curve: "natural",
+                  data: dataChart,
+                  area: true,
+                  showMark: false,
+                  color: "url(#Gradient7)",
+                  valueFormatter: (value) => `EGP ${value.toLocaleString()}`,
+                },
+              ]}
+              slotProps={{
+                tooltip: {
+                  sx: {
+                    [`& .${chartsTooltipClasses.labelCell}`]: {
+                      display: "none",
+                    },
+                    [`& .${chartsTooltipClasses.paper}`]: {
+                      color: "white !important",
+                      backgroundColor: "#15253F",
+                      borderRadius: "8px",
+                    },
+                    [`& .${chartsTooltipClasses.valueCell}`]: {
+                      color: "white !important",
+                      fontWeight: "semibold",
+                    },
+                  },
+                },
               }}
-              className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Weekly"
-                ? "font-medium text-white bg-title-blue"
-                : ""
-                }`}
-            >
-              Weekly
-            </button>
-            <button
-              onClick={() => {
-                setXData([
-                  "JAN",
-                  "FEB",
-                  "MAR",
-                  "APR",
-                  "MAY",
-                  "JUN",
-                  "JUL",
-                  "AUG",
-                  "SEP",
-                  "OCT",
-                  "NOV",
-                  "DEC",
-                ]);
-                setYData([0, 1000, 2000, 3000, 4000, 5000]);
-                setDataChart([
-                  2500, 3200, 2000, 2900, 4000, 3100, 3900, 3500, 3500, 2500,
-                  2000, 3850,
-                ]);
-                setActivePeriod("Monthly");
+              sx={{
+                [`& .${lineElementClasses.root}`]: {
+                  stroke: "rgba(21, 37, 63)",
+                  strokeWidth: 3,
+                },
               }}
-              className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Monthly"
-                ? "font-medium text-white bg-title-blue"
-                : ""
-                }`}
+              height={300}
             >
-              Monthly
-            </button>
-            <button
-              onClick={() => {
-                setXData([
-                  "2018",
-                  "2019",
-                  "2020",
-                  "2021",
-                  "2022",
-                  "2023",
-                  "2024",
-                  "2025",
-                ]);
-                setYData([0, 10000, 20000, 30000, 40000, 50000, 60000, 70000]);
-                setDataChart([
-                  25000, 32000, 20000, 29000, 40000, 31000, 39000, 35000,
-                ]);
-                setActivePeriod("Annually");
-              }}
-              className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Annually"
-                ? "font-medium text-white bg-title-blue"
-                : ""
-                }`}
-            >
-              Annually
-            </button>
-          </div>
-          <LineChart
-            xAxis={[
-              {
-                offset: 25,
-                labelOffset: 1, // Adjust this value
-                disableTicks: true,
-                disableLine: true,
-                scaleType: "point",
-                data: xData,
-                valueFormatter: (x) => x,
-              },
-            ]}
-            yAxis={[
-              {
-                offset: 30,
-                disableTicks: true,
-                disableLine: true,
-                position: "right",
-                data: yData,
-                valueFormatter: (value) => {
-                  if (activePeriod === "Monthly") {
-                    return `${value / 1000}K`;
-                  } else if (activePeriod === "Weekly") {
-                    return `${value}`;
-                  } else if (activePeriod === "Annually") {
-                    return `${value / 1000}K`;
+              <Stack direction="row">
+                <FormControlLabel
+                  value="end"
+                  control={
+                    <Switch
+                      checked={showTooltip}
+                      onChange={handleTooltipChange}
+                    />
                   }
-                },
-              },
-            ]}
-            grid={{ horizontal: true }}
-            series={[
-              {
-                curve: "natural",
-                data: dataChart,
-                area: true,
-                showMark: false,
-                color: "url(#Gradient7)",
-                valueFormatter: (value) => `$${value} Sales`,
-              },
-            ]}
-            slotProps={{
-              tooltip: {
-                sx: {
-                  [`& .${chartsTooltipClasses.labelCell}`]: {
-                    display: "none",
-                  },
-                  [`& .${chartsTooltipClasses.paper}`]: {
-                    color: "white !important",
-                    backgroundColor: "#15253F",
-                    borderRadius: "8px",
-                  },
-                  [`& .${chartsTooltipClasses.valueCell}`]: {
-                    color: "white !important",
-                    fontWeight: "semibold",
-                  },
-                },
-              },
-            }}
-            sx={{
-              [`& .${lineElementClasses.root}`]: {
-                stroke: "rgba(21, 37, 63)",
-                strokeWidth: 3,
-              },
-            }}
-            height={300}
-          >
-            <Stack direction="row">
-              <FormControlLabel
-                value="end"
-                control={
-                  <Switch checked={showTooltip} onChange={handleTooltipChange} />
-                }
-                label="showTooltip"
-                labelPlacement="end"
-              />
-            </Stack>
-            <linearGradient id="Gradient7" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0" stopColor="rgba(21, 37, 63, 0)" />
-              <stop offset="1" stopColor="rgba(21, 37, 63, 0.6)" />
-            </linearGradient>
-            <AreaPlot />
-            <LinePlot />
-          </LineChart>
+                  label="showTooltip"
+                  labelPlacement="end"
+                />
+              </Stack>
+              <linearGradient id="Gradient7" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0" stopColor="rgba(21, 37, 63, 0)" />
+                <stop offset="1" stopColor="rgba(21, 37, 63, 0.6)" />
+              </linearGradient>
+              <AreaPlot />
+              <LinePlot />
+            </LineChart>
+          </div>
+
         </>
       )}
 
@@ -878,12 +987,21 @@ const Analytics = () => {
                 ) : (
                   <>
                     <BarChart
-                      xAxis={[{ scaleType: 'band', data: merchantStockLevels.map(p => p.name) }]}
-                      series={[{
-                        data: merchantStockLevels.map(p => p.quantityInStock),
-                        label: 'Stock Quantity',
-                        color: '#b8f2bc',
-                      }]}
+                      xAxis={[
+                        {
+                          scaleType: "band",
+                          data: merchantStockLevels.map((p) => p.name),
+                        },
+                      ]}
+                      series={[
+                        {
+                          data: merchantStockLevels.map(
+                            (p) => p.quantityInStock
+                          ),
+                          label: "Stock Quantity",
+                          color: "#b8f2bc",
+                        },
+                      ]}
                       width={350}
                       height={200}
                     />
@@ -914,7 +1032,11 @@ const Analytics = () => {
                 </p>
               </div>
               <div className="mt-3 flex justify-center">
-                {error && <Typography color="error">{error.message || error}</Typography>}
+                {error && (
+                  <Typography color="error">
+                    {error.message || error}
+                  </Typography>
+                )}
                 {loading ? (
                   <Typography>Loading...</Typography>
                 ) : (
@@ -962,16 +1084,28 @@ const Analytics = () => {
                 </p>
               </div>
               <div className="mt-3 flex justify-center">
-                {error && <Typography color="error">{error.message || error}</Typography>}
+                {error && (
+                  <Typography color="error">
+                    {error.message || error}
+                  </Typography>
+                )}
                 {loading ? (
                   <Typography>Loading...</Typography>
                 ) : (
                   <>
                     <BarChart
-                      xAxis={[{ scaleType: 'band', data: orderMonths }]}
+                      xAxis={[{ scaleType: "band", data: orderMonths }]}
                       series={[
-                        { data: totalOrders, label: 'Orders', color: '#f4c6e0' },
-                        { data: totalRevenue, label: 'Revenue', color: '#e1478c' }
+                        {
+                          data: totalOrders,
+                          label: "Orders",
+                          color: "#f4c6e0",
+                        },
+                        {
+                          data: totalRevenue,
+                          label: "Revenue",
+                          color: "#e1478c",
+                        },
                       ]}
                       width={350}
                       height={200}
@@ -991,12 +1125,14 @@ const Analytics = () => {
                     ${(total2025 / 1000).toFixed(1)}k
                   </span>
                   <span
-                    className={`flex items-center gap-1 text-sm ${growthRate >= 0 ? "text-[#04CE00]" : "text-[#DC2626]"
-                      }`}
+                    className={`flex items-center gap-1 text-sm ${
+                      growthRate >= 0 ? "text-[#04CE00]" : "text-[#DC2626]"
+                    }`}
                   >
                     <div
-                      className={`w-2.5 h-2.5 rounded-full ${growthRate >= 0 ? "bg-[#04CE00]" : "bg-[#DC2626]"
-                        }`}
+                      className={`w-2.5 h-2.5 rounded-full ${
+                        growthRate >= 0 ? "bg-[#04CE00]" : "bg-[#DC2626]"
+                      }`}
                     ></div>
                     {growthRate}%
                   </span>
@@ -1014,15 +1150,17 @@ const Analytics = () => {
             </div>
 
             <LineChart
-              xAxis={[{
-                scaleType: "band",
-                data: salesXData,
-                valueFormatter: (val) => val,
-                disableTicks: true,
-                disableLine: true,
-                offset: 25,
-                labelOffset: 1,
-              }]}
+              xAxis={[
+                {
+                  scaleType: "band",
+                  data: salesXData,
+                  valueFormatter: (val) => val,
+                  disableTicks: true,
+                  disableLine: true,
+                  offset: 25,
+                  labelOffset: 1,
+                },
+              ]}
               yAxis={[
                 {
                   offset: 30,
@@ -1071,44 +1209,115 @@ const Analytics = () => {
               <AreaPlot />
               <LinePlot />
             </LineChart>
-
           </div>
         </>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-6">
-        <div className="px-5 py-3.5 rounded-2xl bg-white">
-          <p className="text-dark-grey text-base">Statistics</p>
-          <h3 className="text-lg font-bold text-main-blue mt-2">Yearly income</h3>
-          <hr className="my-3" />
-          <Box position="relative" width={200} height={200} mx="auto">
-            <Doughnut data={data} options={options} />
-            <Box
-              position="absolute"
-              top="50%"
-              left="50%"
-              sx={{ transform: "translate(-50%, -50%)", textAlign: "center" }}
-            >
-              <Typography variant="body2" color="textSecondary">
-                Total income
-              </Typography>
-              <Typography variant="h6" fontWeight="semibold" className="text-main-blue">
-                $50,000 EGP
-              </Typography>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 gap-x-14 font-inter">
+        <div className="rounded-2xl bg-white p-8">
+          <div className="pb-2.5 border-b-2 border-[#E5E5EF]">
+            <p className="text-[#9291A5] text-lg">Statistics</p>
+            <p className="text-title-blue text-xl font-bold">Yearly income</p>
+          </div>
+          <div className="mt-5">
+            <Box position="relative" width={240} height={200} mx="auto">
+              <Doughnut data={data} options={options} />
+              <Box
+                position="absolute"
+                top="50%"
+                left="50%"
+                sx={{ transform: "translate(-50%, -25%)", textAlign: "center" }}
+              >
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  className="!font-inter !font-normal !text-base"
+                >
+                  Total income
+                </Typography>
+                <Typography
+                  variant="h6"
+                  fontWeight="semibold"
+                  className="!text-main-blue !font-inter !font-bold !text-xl"
+                >
+                  750K EGP
+                </Typography>
+              </Box>
             </Box>
-          </Box>
-          <Box className="flex justify-around mt-4 text-sm">
-            <div className="flex gap-2">
-              <span className="text-main-blue text-xl font-bold">●</span>
-              <span className="text-second-grey text-lg font-normal">Salary</span>
-              <span className="text-main-blue text-lg font-semibold">65%</span>
-            </div>
-            <div className="flex gap-2">
-              <span className="text-[#A5D8FF] text-xl font-bold">●</span>
-              <span className="text-second-grey text-lg font-normal">Investments</span>
-              <span className="text-main-blue text-lg font-semibold">35%</span>
-            </div>
-          </Box>
+            <Box className="flex flex-wrap w-full justify-around mt-5 text-sm">
+              <div className="flex items-center">
+                <span className="bg-main-blue w-3 h-3 rounded-full me-0.5"></span>
+                <span className="text-second-grey text-base font-normal">
+                  Salary
+                  <span className="text-main-blue font-medium ms-1">65%</span>
+                </span>
+              </div>
+              <div className="flex items-center">
+                <span className="bg-[#A5D8FF] w-3 h-3 rounded-full me-0.5"></span>
+                <span className="text-second-grey text-base font-normal">
+                  Investments
+                  <span className="text-main-blue font-medium ms-1">35%</span>
+                </span>
+              </div>
+            </Box>
+          </div>
+        </div>
+        <div className="rounded-2xl bg-white p-8">
+          <div className="pb-2.5 border-b-2 border-[#E5E5EF]">
+            <p className="text-[#9291A5] text-lg">Statistics</p>
+            <p className="text-title-blue text-xl font-bold">Total viewers</p>
+          </div>
+          <div className="mt-5">
+            <Box position="relative" width={250} height={200} mx="auto">
+              <Doughnut data={datach2} options={optionsch2} />
+              <Box
+                position="absolute"
+                top="50%"
+                left="50%"
+                sx={{
+                  transform: "translate(-50%, 0%)",
+                  textAlign: "center",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  className="!text-[#615E83] !text-lg"
+                >
+                  Total Count
+                </Typography>
+                <Typography
+                  variant="h6"
+                  className="!text-main-blue !font-inter !font-bold !text-4xl"
+                >
+                  1,375
+                </Typography>
+              </Box>
+            </Box>
+            <Box className="flex justify-around w-full flex-wrap text-sm border-t-2 pt-5 border-[#E5E5EF]">
+              <div className="flex items-center">
+                <span className="bg-main-blue w-3 h-3 rounded-full me-0.5"></span>
+                <span className="text-second-grey text-base font-normal">
+                  Active
+                  <span className="text-main-blue font-medium ms-1">513</span>
+                </span>
+              </div>
+              <div className="flex items-center">
+                <span className="bg-gray-400 w-3 h-3 rounded-full me-0.5"></span>
+                <span className="text-second-grey text-base font-normal">
+                  Inactive
+                  <span className="text-main-blue font-medium ms-1">741</span>
+                </span>
+              </div>
+              <div className="flex items-center">
+                <span className="bg-[#A5D8FF] w-3 h-3 rounded-full me-0.5"></span>
+                <span className="text-second-grey text-base font-normal">
+                  Offline
+                  <span className="text-main-blue font-medium ms-1">121</span>
+                </span>
+              </div>
+            </Box>
+          </div>
         </div>
       </div>
     </div>

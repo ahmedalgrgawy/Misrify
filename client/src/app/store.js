@@ -9,18 +9,19 @@ import ProfileReducer from "../features/profileSlice";
 import MessageReducer from "../features/messageSlice";
 import NotificationReducer from "../features/notificationSlice"
 import merchantAnalyticsReducer from "../features/merchantAnalyticsSlice"
-
+import adminAnalyticsReduce from "../features/adminAnalyticsSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     user: userReducer,
     products: productsReducer,
-    merchantProducts:merchantProductsReducer,
+    merchantProducts: merchantProductsReducer,
     Categories: CategoryReducer,
     Brands: BrandReducer,
     Profile: ProfileReducer,
-    messages:MessageReducer,
-    notifications:NotificationReducer,
-    merchantAnalytics:merchantAnalyticsReducer,
+    messages: MessageReducer,
+    notifications: NotificationReducer,
+    merchantAnalytics: merchantAnalyticsReducer,
+    adminAnalytics: adminAnalyticsReduce,
   },
 });  
