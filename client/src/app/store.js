@@ -8,6 +8,8 @@ import BrandReducer from "../features/brandSlice";
 import ProfileReducer from "../features/profileSlice";
 import MessageReducer from "../features/messageSlice";
 import NotificationReducer from "../features/notificationSlice"
+import merchantAnalyticsReducer from "../features/merchantAnalyticsSlice"
+
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -19,5 +21,6 @@ export const store = configureStore({
     Profile: ProfileReducer,
     messages:MessageReducer,
     notifications:NotificationReducer,
+    merchantAnalytics:merchantAnalyticsReducer,
   },
 });  
