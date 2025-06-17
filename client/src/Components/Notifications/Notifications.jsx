@@ -89,7 +89,7 @@ const Notifications = () => {
         )}
       </div>
 
-      <div className="flex flex-col gap-5 p-6 w-full max-w-4xl">
+      <div className="flex flex-col gap-5 p-6 w-full min-h-72 max-w-4xl">
         {notifications.length === 0 ? (
           <div className="p-12 bg-white rounded-lg shadow-lg text-center border-2 border-gray-100 max-w-2xl mx-auto">
             <h4 className="text-2xl font-semibold text-main-blue mb-4">
