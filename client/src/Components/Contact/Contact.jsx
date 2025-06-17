@@ -44,6 +44,10 @@ const Contact = () => {
             newErrors.message = 'Message is required';
         }
 
+        if (formData.message.length < 10) {
+            newErrors.message = 'Message must be at least 10 characters long';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -64,17 +68,17 @@ const Contact = () => {
         e.preventDefault();
 
         if (!validateForm()) {
-            toast.error("Please fix the form errors", {
-              position: "bottom-right",
-              autoClose: 2000,
-              hideProgressBar: false,
-              closeOnClick: false,
-              pauseOnHover: true,
-              draggable: false,
-              progress: undefined,
-              theme: "dark",
-              transition: Flip,
-            });
+            // toast.error("Please fix the form errors", {
+            //     position: "bottom-right",
+            //     autoClose: 2000,
+            //     hideProgressBar: false,
+            //     closeOnClick: false,
+            //     pauseOnHover: true,
+            //     draggable: false,
+            //     progress: undefined,
+            //     theme: "dark",
+            //     transition: Flip,
+            // });
             return;
         }
 
@@ -89,17 +93,17 @@ const Contact = () => {
                 message: formData.message
             });
 
-            toast.success('Message sent successfully!',{
-                  position: "bottom-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
-                  closeOnClick: false,
-                  pauseOnHover: true,
-                  draggable: false,
-                  progress: undefined,
-                  theme: "dark",
-                  transition: Flip,
-                });
+            toast.success('Message sent successfully!', {
+                position: "bottom-right",
+                autoClose: 2000,
+                hideProgressBar: false,
+                closeOnClick: false,
+                pauseOnHover: true,
+                draggable: false,
+                progress: undefined,
+                theme: "dark",
+                transition: Flip,
+            });
             setFormData({
                 firstName: '',
                 lastName: '',
@@ -109,17 +113,17 @@ const Contact = () => {
             });
             setErrors({});
         } catch (error) {
-            toast.error('Failed to send message',{
-                  position: "bottom-right",
-                  autoClose: 2000,
-                  hideProgressBar: false,
-                  closeOnClick: false,
-                  pauseOnHover: true,
-                  draggable: false,
-                  progress: undefined,
-                  theme: "dark",
-                  transition: Flip,
-                });
+            // toast.error(newErrors.message, {
+            //     position: "bottom-right",
+            //     autoClose: 2000,
+            //     hideProgressBar: false,
+            //     closeOnClick: false,
+            //     pauseOnHover: true,
+            //     draggable: false,
+            //     progress: undefined,
+            //     theme: "dark",
+            //     transition: Flip,
+            // });
             console.error('API error:', error);
         } finally {
             setIsSubmitting(false);
