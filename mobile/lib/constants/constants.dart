@@ -22,6 +22,6 @@ const Kfoundation = Color(0xff121111);
 double height = 825.h;
 double width = 375.w;
 
-const String appBaseUrl = "https://0a37-154-183-0-163.ngrok-free.app/api";
+const String appBaseUrl = "http://10.0.2.2:5000/api";
 // local ip  IPv4 Address. . . . . . . . . . . : 172.24.128.1
 
