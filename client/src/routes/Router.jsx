@@ -22,6 +22,7 @@ import Profile from './../Pages/Profile/Profile';
 import Messages from '../Components/Messages/Messages';
 import Notifications from '../Components/Notifications/Notifications';
 import StartupGuide from '../Pages/Students/StartupGuide';
+import RequestedProducts from '../Components/Products/RequestedProducts';
 
 const router = createBrowserRouter([
   {
@@ -54,6 +55,7 @@ const router = createBrowserRouter([
       { path: 'categories', element: <Categories /> },
       { path: 'support', element: <Support /> },
       { path: 'messages', element: <Messages /> },
+      { path: 'requested-products', element: <RequestedProducts /> },
     ]
   },
   {

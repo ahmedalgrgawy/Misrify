@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaTachometerAlt, FaBoxOpen, FaUsers, FaHeadset, FaClipboardList, FaCog, FaPowerOff, FaRegUserCircle } from "react-icons/fa";
+import { FaTachometerAlt, FaBoxOpen, FaUsers, FaHeadset, FaClipboardList, FaCog, FaPowerOff, FaRegUserCircle, FaBox } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { logoutUser } from "../../features/authSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -54,6 +54,19 @@ const Sidebar = () => {
 
                     {userRole === "admin" && (
                         <>
+                            <NavLink
+                                to="requested-products"
+                                className={({ isActive }) =>
+                                    `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition ${isActive
+                                        ? "bg-title-blue text-white"
+                                        : "text-title-blue hover:bg-bg-second"
+                                    }`
+                                }
+                            >
+                                <FaBox className="text-xl" />
+                                <span className="text-sm font-medium">Requested Products</span>
+                            </NavLink>
+
                             <NavLink
                                 to="categories"
                                 className={({ isActive }) =>

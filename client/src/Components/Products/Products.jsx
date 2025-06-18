@@ -21,13 +21,6 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import productImg from "../../assets/product.png";
 import Resizer from "react-image-file-resizer";
 
-// Expected types for key state slices:
-// - brands: Array<{ _id: string, name: string, owner: { _id: string } }>
-// - categories: Array<{ _id: string, name: string }>
-// - products: Array<{ _id: string, name: string, category: { _id: string, name: string }, brand: { _id: string, name: string }, price: number, quantityInStock: number, colors: string[], sizes: string[], imgUrl: string, isDiscounted: boolean, discountAmount: number }>
-// - user: { _id: string, role: 'admin' | 'merchant', brand?: { _id: string } }
-
-// Predefined color palette (name and hex for display)
 const colorPalette = [
   { name: "red", hex: "#EF4444" },
   { name: "green", hex: "#22C55E" },
@@ -43,7 +36,6 @@ const colorPalette = [
   { name: "gray", hex: "#6B7280" },
 ];
 
-// Map color names to Tailwind classes for table display
 const colorClassMap = {
   red: "bg-red-500",
   green: "bg-green-500",
@@ -124,7 +116,7 @@ const Products = () => {
       }
     };
     fetchData();
-  }, [dispatch, userRole, isSubmitting]);
+  }, [dispatch, userRole, isSubmitting, user]);
 
   const handleDeleteClick = (productId) => {
     setProductToDelete(productId);
@@ -334,6 +326,9 @@ const Products = () => {
       } else {
         const action = userRole === "merchant" ? createMerchantProduct : createProduct;
         await unwrapResult(dispatch(action(dataToSend)));
+        if (userRole === "merchant") {
+          setSuccess("Product Requested successfully");
+        }
         setSuccess("Product created successfully");
         setShowCreateModal(false);
       }
@@ -681,7 +676,9 @@ const Products = () => {
                 <th className="py-4 px-6 text-center">Image</th>
                 <th className="py-4 px-6 text-center">Product Name</th>
                 <th className="py-4 px-6 text-center">Category</th>
-                <th className="py-4 px-6 text-center">Brand</th>
+                <th className="py-4 px-6 text-center">
+                  {userRole === "merchant" ? "Approved" : "Brand"}
+                </th>
                 <th className="py-4 px-6 text-center">Price</th>
                 <th className="py-4 px-6 text-center">Quantity</th>
                 <th className="py-4 px-6 text-center">Colors</th>
@@ -696,7 +693,7 @@ const Products = () => {
                     key={product._id}
                     className={index % 2 !== 0 ? "bg-[#F9F9FF]" : ""}
                   >
-                    <td className="py-4 px-6 w-16 h-16 box-content flex justify-center">
+                    <td className="py-4 px-6 w-16 h-16 mx-auto box-content flex justify-center">
                       <img
                         src={product?.imgUrl || productImg}
                         alt={product.name}
@@ -710,7 +707,7 @@ const Products = () => {
                       {product.category?.name || "N/A"}
                     </td>
                     <td className="py-4 px-6 text-main-blue text-center">
-                      {product.brand?.name || "N/A"}
+                      {userRole === "merchant" ? (product.isApproved ? "Yes" : "No") : product.brand?.name || "N/A"}
                     </td>
                     <td className="py-4 px-6 text-main-blue text-center">
                       ${product.price.toFixed(2)}
