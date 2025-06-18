@@ -1,6 +1,6 @@
 import AppError from "../errors/AppError.js";
-import Cart from "../models/Cart.model.js";
-import CartItem from "../models/CartItem.model.js";
+import Cart from "../models/cart.model.js";
+import CartItem from "../models/cartItem.model.js";
 import Product from "../models/product.model.js";
 
 export const getCart = async (req, res, next) => {

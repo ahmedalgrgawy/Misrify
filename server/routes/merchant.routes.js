@@ -5,7 +5,7 @@ import { createProduct, deleteProduct, editProduct, getMerchantProducts } from '
 import { validate } from '../services/validate.service.js';
 import { createProductSchema, editProductSchema } from '../validators/productValidator.js';
 import { createComment } from '../controllers/comment.controllers.js';
-import { getStockLevel, getProductsWithAvgRatings, getMerchantOrdersStats, getSalesGrowth} from '../controllers/merchantAnalytics.controllers.js';
+import { getStockLevel, getProductsWithAvgRatings, getMerchantOrdersStats, getSalesGrowth, getMerchantOrderTrends, getMerchantSalesTrends } from '../controllers/merchantAnalytics.controllers.js';
 
 const router = express.Router()
 
@@ -26,6 +26,11 @@ router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute)
 router.get("/products-with-ratings", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getProductsWithAvgRatings))
 router.get("/merchant-orders-stats", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getMerchantOrdersStats));
 router.get("/sales-growth", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getSalesGrowth));
-
+router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute), getStockLevel);
+router.get("/products-with-ratings", catchAsync(protectedRoute), catchAsync(merchantRoute), getProductsWithAvgRatings);
+router.get("/merchant-orders-stats", catchAsync(protectedRoute), catchAsync(merchantRoute), getMerchantOrdersStats);
+router.get("/sales-growth", catchAsync(protectedRoute), catchAsync(merchantRoute), getSalesGrowth);
+router.get("/sales-trends", catchAsync(protectedRoute), catchAsync(merchantRoute), getMerchantSalesTrends);
+router.get("/order-trends", catchAsync(protectedRoute), catchAsync(merchantRoute), getMerchantOrderTrends)
 
 export default router;

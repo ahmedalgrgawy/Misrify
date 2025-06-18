@@ -40,6 +40,21 @@ wrapRoutes(app)
 
 app.use(errorHandler);
 
+import cron from "node-cron";
+import User from './models/user.model.js';
+import { updateAdminAnalytics } from './controllers/adminAnalytics.controllers.js';
+import { updateMerchantAnalytics } from './controllers/merchantAnalytics.controllers.js';
+;
+
+// Daily at midnight
+cron.schedule("0 0 * * *", async () => {
+    await updateAdminAnalytics();
+    const merchants = await User.find({ role: "merchant" }).select("_id");
+    for (const merchant of merchants) {
+        await updateMerchantAnalytics(merchant._id);
+    }
+});
+
 app.listen(port, () => {
     console.log('Server Running in ' + process.env.NODE_ENV + 'Environment on port ' + port);
     connectDb()

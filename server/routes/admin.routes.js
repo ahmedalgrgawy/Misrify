@@ -12,9 +12,10 @@ import { createCategorySchema } from '../validators/categoryValidator.js'
 import { createProductSchema, editProductSchema } from '../validators/productValidator.js'
 import { deleteComment } from '../controllers/comment.controllers.js'
 import { createTeamMemberSchema, updateTeamMemberSchema } from '../validators/teamValidator.js';
-import {createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember} from "../controllers/team.controllers.js";
+import { createTeamMember, getAllTeamMembers, getTeamMemberById, updateTeamMember, deleteTeamMember } from "../controllers/team.controllers.js";
 import { getAllMessages } from "../controllers/contact.controllers.js";
-import { getPlatformStats,  getOrdersAndSales,  getTotalUsers, getLoginStats} from "../controllers/adminAnalytics.controllers.js";
+import { getPlatformStats, getOrdersAndSales, getTotalUsers, getLoginStats, getMiniChartData } from "../controllers/adminAnalytics.controllers.js";
+import { getTotalViewers, getYearlyIncome } from '../controllers/merchantAnalytics.controllers.js'
 
 const router = express.Router()
 
@@ -83,4 +84,11 @@ router.get("/orders-sales", catchAsync(protectedRoute), catchAsync(adminRoute), 
 router.get("/total-users", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getTotalUsers));
 router.get("/login-stats", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getLoginStats));
 
+router.get("/platform-stats", catchAsync(protectedRoute), catchAsync(adminRoute), getPlatformStats);
+router.get("/orders-sales", catchAsync(protectedRoute), catchAsync(adminRoute), getOrdersAndSales);
+router.get("/total-users", catchAsync(protectedRoute), catchAsync(adminRoute), getTotalUsers);
+router.get("/mini-chart-data", catchAsync(protectedRoute), catchAsync(adminRoute), getMiniChartData);
+
+router.get("/yearly-income", catchAsync(protectedRoute), getYearlyIncome);
+router.get("/total-viewers", catchAsync(protectedRoute), getTotalViewers);
 export default router;
