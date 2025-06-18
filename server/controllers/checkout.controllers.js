@@ -109,7 +109,6 @@ export const getOrderById = async (req, res, next) => {
 }
 
 // ... earlier code above remains unchanged
-
 export const placeOrder = async (req, res, next) => {
   const {
     orderItems,
@@ -162,12 +161,15 @@ export const placeOrder = async (req, res, next) => {
     }
   }
 
-  let discountedTotal = totalPrice;
+  // ✅ Apply coupon after adding shipping
+  const totalBeforeCoupon = totalPrice + shippingFee;
+  let finalTotal = totalBeforeCoupon;
+
   if (couponDiscount > 0) {
-    discountedTotal = totalPrice * (1 - couponDiscount / 100);
+    finalTotal = totalBeforeCoupon * (1 - couponDiscount / 100);
   }
 
-  const finalPrice = Math.round((discountedTotal + shippingFee) * 100) / 100;
+  const finalPrice = Math.round(finalTotal * 100) / 100;
 
   const trackCode = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 

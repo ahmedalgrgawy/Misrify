@@ -104,7 +104,7 @@ class NotificationsScreen extends StatelessWidget {
         if (controller.notifications.isEmpty) {
           return Center(
             child: ReusableText(
-              text: "No notifications available.",
+              text: "No notifications.",
               style: appStyle(16, kGray, FontWeight.w500),
             ),
           );
