@@ -86,14 +86,18 @@ const Analytics = () => {
   useEffect(() => {
     const fetchStockLevelsData = async () => {
       try {
-        await dispatch(getStockLevelsProducts()).unwrap();
+        if (userRole === "merchant") {
+          await dispatch(getStockLevelsProducts()).unwrap();
+        } else {
+          return;
+        }
       } catch (err) {
         console.error(err);
         setError(err);
       }
     }
     fetchStockLevelsData();
-  }, [dispatch]);
+  }, [dispatch, userRole]);
 
   const totalStock = Array.isArray(merchantStockLevels)
     ? merchantStockLevels.reduce((sum, product) => sum + product.quantityInStock, 0)
@@ -103,14 +107,18 @@ const Analytics = () => {
   useEffect(() => {
     const fetchRatings = async () => {
       try {
-        await dispatch(getProductsAvgRatings()).unwrap();
+        if (userRole === "merchant") {
+          await dispatch(getProductsAvgRatings()).unwrap();
+        } else {
+          return;
+        }
       } catch (err) {
-        console.error("Failed to load product ratings:", err);
+        // console.error("Failed to load product ratings:", err);
         setError(err);
       }
     };
     fetchRatings();
-  }, [dispatch]);
+  }, [dispatch, userRole]);
 
   // Note for backend>>>>>>>>>> dummy data to show values instead of null
   const productData = [
@@ -128,14 +136,18 @@ const Analytics = () => {
   useEffect(() => {
     const fetchOrderStats = async () => {
       try {
-        await dispatch(getMerchantOrderStats()).unwrap();
+        if (userRole === "merchant") {
+          await dispatch(getMerchantOrderStats()).unwrap();
+        } else {
+          return;
+        }
       } catch (err) {
         console.error("Failed to load merchant order stats:", err);
         setError(err);
       }
     };
     fetchOrderStats();
-  }, [dispatch]);
+  }, [dispatch, userRole]);
 
   // Dummy data for orders
   const orderData = [
