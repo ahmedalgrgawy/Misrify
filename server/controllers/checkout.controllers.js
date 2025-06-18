@@ -115,49 +115,57 @@ export const placeOrder = async (req, res, next) => {
         shippingMethod,
         coupon,
     } = req.body;
-
+if (!shippingAddress || shippingAddress.trim() === '') {
+  return next(new AppError('Shipping address is required', 400));
+}
+if (!shippingMethod || shippingMethod.trim() === '') {
+  return next(new AppError('Shipping method is required', 400));
+}
     const orderItemsIds = [];
     let totalPrice = 0;
 
     for (const item of orderItems) {
-        const product = await Product.findById(item.product);
+  const product = await Product.findById(item.product);
 
-        if (!product) {
-            return next(new AppError("Product is not found", 404))
-        }
+  if (!product) {
+    return next(new AppError("Product is not found", 404));
+  }
 
-        // Add inventory check if needed
-        if (product.quantityInStock < item.quantity) {
-            return next(new AppError(`Insufficient stock for ${product.name}`, 400))
-        }
+  if (item.quantity <= 0) {
+    return next(new AppError("Invalid quantity for product", 400));
+  }
 
-        // Create order item
-        const orderItem = await OrderItem.create({
-            product: item.product,
-            quantity: item.quantity,
-            color: item.color,
-            size: item.size,
-            price: product.price * item.quantity,
-            // total: item.price * item.quantity
-        });
+  if (product.quantityInStock < item.quantity) {
+    return next(new AppError(`Insufficient stock for ${product.name}`, 400));
+  }
 
-        orderItemsIds.push(orderItem._id);
-        totalPrice += product.price * item.quantity
-    }
+  // Create order item
+  const orderItem = await OrderItem.create({
+    product: item.product,
+    quantity: item.quantity,
+    color: item.color,
+    size: item.size,
+    price: product.price * item.quantity,
+  });
+
+  orderItemsIds.push(orderItem._id);
+  totalPrice += product.price * item.quantity;
+}
 
     // Apply coupon if provided
     let finalPrice = totalPrice;
-    let appliedCoupon = null;
+   let appliedCoupon = null;
 
-    if (coupon) {
-        const couponDb = await Coupon.findOne({ code: coupon });
-        if (couponDb && couponDb.isActive) {
-            finalPrice = totalPrice * (1 - couponDb.discount / 100);
-            appliedCoupon = couponDb._id;
-            couponDb.isActive = false;
-            await couponDb.save()
-        }
-    }
+if (coupon) {
+  const couponDb = await Coupon.findOne({ code: coupon, isActive: true });
+  if (!couponDb) {
+    return next(new AppError('Invalid or inactive coupon', 400));
+  }
+  finalPrice = totalPrice * (1 - couponDb.discount / 100);
+  appliedCoupon = couponDb._id;
+  couponDb.isActive = false;
+  await couponDb.save();
+}
 
     // Generate tracking code
     const trackCode = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
