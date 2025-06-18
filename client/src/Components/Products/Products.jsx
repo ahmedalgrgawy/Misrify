@@ -20,6 +20,7 @@ import { Tooltip } from "react-tooltip";
 import { unwrapResult } from "@reduxjs/toolkit";
 import productImg from "../../assets/product.png";
 import Resizer from "react-image-file-resizer";
+import { get } from "mongoose";
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -195,7 +196,7 @@ const Products = () => {
       const dataToSend = {
         name: formData.name,
         categoryId: formData.categoryId,
-        brandId: formData.brandId,
+        brandId: user.role === "merchant" ? getBrandNameByOwnerId(user._id)._id : formData.brandId,
         description: formData.description,
         quantityInStock: Number(formData.quantityInStock),
         price: Number(formData.price),
@@ -207,7 +208,6 @@ const Products = () => {
       };
 
       console.log(dataToSend);
-
 
       if (actionType === "edit") {
         const action = userRole === "merchant" ? editMerchantProduct : editProduct;
@@ -248,10 +248,10 @@ const Products = () => {
     }
   };
 
-  const getBrandNameById = (id) => {
+  const getBrandNameByOwnerId = (id) => {
     if (brandsLoading) return "Loading brand...";
-    const brand = brands.find((b) => b._id === id);
-    return brand ? brand.name : "Brand not found";
+    const brand = brands.find((b) => b.owner._id === id);
+    return brand || "Brand not found";
   };
 
   const arrProducts = Array.isArray(products) ? products : [];
@@ -319,7 +319,7 @@ const Products = () => {
                 </label>
                 <input
                   name="brandId"
-                  value={getBrandNameById(formData.brandId)}
+                  value={getBrandNameByOwnerId(user._id).name || ""}
                   readOnly
                   className="w-full p-2 border border-gray-300 rounded-md"
                 />
@@ -548,13 +548,13 @@ const Products = () => {
                             <span
                               key={i}
                               className={`w-5 h-5 rounded-full ${{
-                                  red: "bg-red-500",
-                                  green: "bg-green-500",
-                                  blue: "bg-blue-500",
-                                  Navy: "bg-indigo-900",
-                                  Teal: "bg-teal-500",
-                                  Orange: "bg-orange-500",
-                                }[color] || "bg-gray-500"
+                                red: "bg-red-500",
+                                green: "bg-green-500",
+                                blue: "bg-blue-500",
+                                Navy: "bg-indigo-900",
+                                Teal: "bg-teal-500",
+                                Orange: "bg-orange-500",
+                              }[color] || "bg-gray-500"
                                 } transition duration-300 transform hover:scale-125`}
                             ></span>
                           ))
