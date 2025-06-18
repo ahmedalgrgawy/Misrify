@@ -1,0 +1,28 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.graduation_project1.app-mergeDebugResources-30:/values-night-v31/values-night-v31.xml",
+            "map": [
+                {
+                    "source": "E:\\Graduation-Project\\mobile\\android\\app\\src\\main\\res\\values-night-v31\\styles.xml",
+                    "from": {
+                        "startLines": "3,15",
+                        "startColumns": "4,4",
+                        "startOffsets": "172,885",
+                        "endLines": "8,17",
+                        "endColumns": "12,12",
+                        "endOffsets": "529,1049"
+                    },
+                    "to": {
+                        "startLines": "2,8",
+                        "startColumns": "4,4",
+                        "startOffsets": "55,417",
+                        "endLines": "7,10",
+                        "endColumns": "12,12",
+                        "endOffsets": "412,581"
+                    }
+                }
+            ]
+        }
+    ]
+}

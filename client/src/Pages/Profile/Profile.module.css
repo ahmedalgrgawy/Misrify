@@ -1,0 +1,8 @@
+.backG {
+  background: linear-gradient(
+    340deg,
+    rgba(21, 37, 63, 0.96) 46.42%,
+    rgba(21, 37, 63, 0.81) 64.42%,
+    rgba(21, 37, 63, 0.9) 91.69%
+  );
+}

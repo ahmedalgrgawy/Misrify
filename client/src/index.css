@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+    --white: #FFFFFF;
+    --bg-main: #EBEBEF;
+    --light-grey: #DDDEE5;
+    --second-grey: #C3C3C3;
+    --dark-grey: #6E7786;
+    --main-blue: #2B3D5B;
+    --title-blue: #15253F;
+    --dark-blue: #081120;
+    --bg-footer: #0b172a;
+
+}
+
+.input-field {
+    width: 100%;
+    background-color: var(--bg-main);
+    color: var(--title-blue);
+    border-bottom: 1px solid var(--second-grey);
+    padding: 0.25rem 0.5rem;
+    margin-bottom: 0.5rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    color: var(--dark-grey);
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: var(--dark-grey);
+}
+
+.input-field:hover {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+@font-face {
+    font-family: 'Jaro';
+    src: url('./assets/fonts/Jaro/Jaro_24pt-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
