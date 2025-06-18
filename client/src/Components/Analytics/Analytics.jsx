@@ -20,12 +20,11 @@ import { RxGrid } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import { getMerchantOrderStats, getProductsAvgRatings, getSalesGrowth, getStockLevelsProducts }
   from "../../features/merchantAnalyticsSlice";
-  import {
-    getOrdersSales,
-    getPlatformStats,
-    getTotalUsers,
-  } from "./../../features/adminAnalyticsSlice";
-// import features from admin analytics slice >>>>>>>>>>
+import {
+  getOrdersSales,
+  getPlatformStats,
+  getTotalUsers,
+} from "./../../features/adminAnalyticsSlice";
 
 const Analytics = () => {
   const dispatch = useDispatch();
@@ -57,16 +56,16 @@ const Analytics = () => {
     720000, 780000, 850000,
   ]);
   const [activePeriod, setActivePeriod] = useState("Monthly");
-  
+
   const xLabelsMiniCharts = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  
+
   const ordersMiniChartData = [150, 180, 160, 200, 190, 220, 210];
   const brandsMiniChartData = [50, 55, 48, 60, 58, 62, 59];
   const productsMiniChartData = [80, 85, 75, 90, 88, 92, 87];
   const usersMiniChartData = [200, 210, 190, 230, 220, 250, 240];
   const totalSalesMiniChartData = [8500, 9200, 8800, 10500, 10300, 11000, 9800];
   const categoriesMiniChartData = [10, 12, 11, 13, 12, 14, 13];
-  
+
   const handleTooltipChange = (event) => {
     setShowTooltip(event.target.checked);
   };
@@ -80,7 +79,8 @@ const Analytics = () => {
     salesGrowth: merchantSalesGrowth,
     stockLevels: merchantStockLevels,
     productRatings: merchantProductRatings,
-    adminL  } = userRole === "merchant" ? merchantAnalytics || {} : {};
+    loading
+  } = userRole === "merchant" ? merchantAnalytics || {} : {};
 
   // Merchant stock levels for products
   useEffect(() => {
@@ -123,22 +123,6 @@ const Analytics = () => {
   const productNames = productData.map((p) => p.name);
   const avgRatings = productData.map((p) => p.averageRating);
   const totalReviews = productData.map((p) => p.totalReviews);
-
-  // Untill backend adding values 
-  // const productData = Array.isArray(merchantProductRatings)
-  //   ? merchantProductRatings.map((p) => ({
-  //     name: p.name,
-  //     averageRating:
-  //       typeof p.averageRating === "number"
-  //         ? p.averageRating
-  //         : p.totalReviews > 0
-  //           ? 1
-  //           : 0
-  //   }))
-  //   : dummyProductRatings;
-
-  // const avgRatingsData = productData.map((p) => p.averageRating);
-  // const productNames = productData.map((p) => p.name);
 
   //Merchant Order Stats
   useEffect(() => {
@@ -200,7 +184,7 @@ const Analytics = () => {
         cutout: "90%",
         circumference: 300,
         rotation: 210,
-        borderRadius:20
+        borderRadius: 20
       },
     ],
   };
@@ -258,7 +242,7 @@ const Analytics = () => {
           await Promise.all([
             dispatch(getPlatformStats()),
             dispatch(getOrdersSales()),
-            dispatch(getTotalUsers()), // add here admin analytics actions >>>>>>>>>>
+            dispatch(getTotalUsers()),
           ]);
         }
       } catch (err) {
@@ -617,7 +601,7 @@ const Analytics = () => {
 
                   <h3 className="text-sm font-normal text-[#6E7786]">
                     <span className="text-2xl font-bold text-[#0B172A] me-1.5">
-                      {ordersSales.totalMoneyPaid.toFixed(0)} EGP
+                      {ordersSales?.totalMoneyPaid?.toFixed(0)} EGP
                     </span>
                     revenue
                   </h3>
@@ -788,11 +772,10 @@ const Analytics = () => {
                     ]);
                     setActivePeriod("Weekly");
                   }}
-                  className={`px-4 py-2.5 text-sm rounded-lg ${
-                    activePeriod === "Weekly"
-                      ? "font-medium text-white bg-title-blue"
-                      : ""
-                  }`}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Weekly"
+                    ? "font-medium text-white bg-title-blue"
+                    : ""
+                    }`}
                 >
                   Weekly
                 </button>
@@ -822,11 +805,10 @@ const Analytics = () => {
                     ]);
                     setActivePeriod("Monthly");
                   }}
-                  className={`px-4 py-2.5 text-sm rounded-lg ${
-                    activePeriod === "Monthly"
-                      ? "font-medium text-white bg-title-blue"
-                      : ""
-                  }`}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Monthly"
+                    ? "font-medium text-white bg-title-blue"
+                    : ""
+                    }`}
                 >
                   Monthly
                 </button>
@@ -849,11 +831,10 @@ const Analytics = () => {
                     ]);
                     setActivePeriod("Annually");
                   }}
-                  className={`px-4 py-2.5 text-sm rounded-lg ${
-                    activePeriod === "Annually"
-                      ? "font-medium text-white bg-title-blue"
-                      : ""
-                  }`}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Annually"
+                    ? "font-medium text-white bg-title-blue"
+                    : ""
+                    }`}
                 >
                   Annually
                 </button>
@@ -1125,14 +1106,12 @@ const Analytics = () => {
                     ${(total2025 / 1000).toFixed(1)}k
                   </span>
                   <span
-                    className={`flex items-center gap-1 text-sm ${
-                      growthRate >= 0 ? "text-[#04CE00]" : "text-[#DC2626]"
-                    }`}
+                    className={`flex items-center gap-1 text-sm ${growthRate >= 0 ? "text-[#04CE00]" : "text-[#DC2626]"
+                      }`}
                   >
                     <div
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        growthRate >= 0 ? "bg-[#04CE00]" : "bg-[#DC2626]"
-                      }`}
+                      className={`w-2.5 h-2.5 rounded-full ${growthRate >= 0 ? "bg-[#04CE00]" : "bg-[#DC2626]"
+                        }`}
                     ></div>
                     {growthRate}%
                   </span>
