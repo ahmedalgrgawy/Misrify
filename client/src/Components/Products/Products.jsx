@@ -15,12 +15,49 @@ import {
 import { getAllBrands } from "../../features/brandSlice";
 import { getAllCategories } from "../../features/categorySlice";
 import { TailSpin } from "react-loader-spinner";
-import { FaEdit, FaTrashAlt, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrashAlt, FaPlus, FaTimes } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 import { unwrapResult } from "@reduxjs/toolkit";
 import productImg from "../../assets/product.png";
 import Resizer from "react-image-file-resizer";
-import { get } from "mongoose";
+
+// Expected types for key state slices:
+// - brands: Array<{ _id: string, name: string, owner: { _id: string } }>
+// - categories: Array<{ _id: string, name: string }>
+// - products: Array<{ _id: string, name: string, category: { _id: string, name: string }, brand: { _id: string, name: string }, price: number, quantityInStock: number, colors: string[], sizes: string[], imgUrl: string, isDiscounted: boolean, discountAmount: number }>
+// - user: { _id: string, role: 'admin' | 'merchant', brand?: { _id: string } }
+
+// Predefined color palette (name and hex for display)
+const colorPalette = [
+  { name: "red", hex: "#EF4444" },
+  { name: "green", hex: "#22C55E" },
+  { name: "blue", hex: "#3B82F6" },
+  { name: "navy", hex: "#1E3A8A" },
+  { name: "teal", hex: "#14B8A6" },
+  { name: "orange", hex: "#F97316" },
+  { name: "yellow", hex: "#EAB308" },
+  { name: "purple", hex: "#A855F7" },
+  { name: "pink", hex: "#EC4899" },
+  { name: "black", hex: "#111827" },
+  { name: "white", hex: "#FFFFFF" },
+  { name: "gray", hex: "#6B7280" },
+];
+
+// Map color names to Tailwind classes for table display
+const colorClassMap = {
+  red: "bg-red-500",
+  green: "bg-green-500",
+  blue: "bg-blue-500",
+  navy: "bg-indigo-900",
+  teal: "bg-teal-500",
+  orange: "bg-orange-500",
+  yellow: "bg-yellow-500",
+  purple: "bg-purple-500",
+  pink: "bg-pink-500",
+  black: "bg-gray-900",
+  white: "bg-white border border-gray-300",
+  gray: "bg-gray-500",
+};
 
 const Products = () => {
   const dispatch = useDispatch();
@@ -40,7 +77,7 @@ const Products = () => {
     description: "",
     quantityInStock: 0,
     price: 0,
-    colors: "",
+    colors: [], // Array of color names (e.g., ["red", "blue"])
     sizes: "",
     isDiscounted: false,
     discountAmount: 0,
@@ -87,7 +124,7 @@ const Products = () => {
       }
     };
     fetchData();
-  }, [dispatch, userRole]);
+  }, [dispatch, userRole, isSubmitting]);
 
   const handleDeleteClick = (productId) => {
     setProductToDelete(productId);
@@ -99,9 +136,9 @@ const Products = () => {
   const handleConfirmDelete = async () => {
     try {
       if (userRole === "merchant") {
-        dispatch(deleteMerchantProduct(productToDelete));
+        await unwrapResult(dispatch(deleteMerchantProduct(productToDelete)));
       } else {
-        dispatch(deleteProduct(productToDelete));
+        await unwrapResult(dispatch(deleteProduct(productToDelete)));
       }
       setSuccess("Product deleted successfully");
       if (userRole === "merchant") {
@@ -110,7 +147,7 @@ const Products = () => {
         dispatch(getAllProducts());
       }
     } catch (err) {
-      setError("Failed to delete product. Please try again.");
+      setError(err.message || "Failed to delete product. Please try again.");
     } finally {
       setShowDeleteModal(false);
       setProductToDelete(null);
@@ -126,7 +163,7 @@ const Products = () => {
       description: product?.description || "",
       quantityInStock: product?.quantityInStock || 0,
       price: product?.price || 0,
-      colors: Array.isArray(product?.colors) ? product.colors.join(", ") : "",
+      colors: Array.isArray(product?.colors) ? product.colors : [],
       sizes: Array.isArray(product?.sizes) ? product.sizes.join(", ") : "",
       isDiscounted: product?.isDiscounted || false,
       discountAmount: product?.discountAmount || 0,
@@ -145,7 +182,7 @@ const Products = () => {
       description: "",
       quantityInStock: 0,
       price: 0,
-      colors: "",
+      colors: [],
       sizes: "",
       isDiscounted: false,
       discountAmount: 0,
@@ -162,6 +199,15 @@ const Products = () => {
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
+  };
+
+  const toggleColor = (colorName) => {
+    setFormData((prev) => {
+      const newColors = prev.colors.includes(colorName)
+        ? prev.colors.filter((c) => c !== colorName)
+        : [...prev.colors, colorName];
+      return { ...prev, colors: newColors };
+    });
   };
 
   const onFileChange = async (e) => {
@@ -187,61 +233,117 @@ const Products = () => {
     }
   };
 
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError("Product name is required.");
+      return false;
+    }
+    if (!formData.categoryId) {
+      setError("Category is required.");
+      return false;
+    }
+    if (userRole === "admin") {
+      if (!formData.brandId) {
+        setError("Brand is required.");
+        return false;
+      }
+    }
+    if (!formData.description.trim()) {
+      setError("Description is required.");
+      return false;
+    }
+    if (formData.price <= 0) {
+      setError("Price must be greater than 0.");
+      return false;
+    }
+    if (formData.quantityInStock < 0) {
+      setError("Quantity cannot be negative.");
+      return false;
+    }
+    if (formData.isDiscounted && formData.discountAmount <= 0) {
+      setError("Discount amount must be greater than 0 when discounted is checked.");
+      return false;
+    }
+    // Validate colors
+    if (formData.colors.length > 0) {
+      const invalidColor = formData.colors.find(
+        (c) => !colorPalette.some((p) => p.name === c)
+      );
+      if (invalidColor) {
+        setError("Invalid color selected. Please choose from the palette.");
+        return false;
+      }
+      const uniqueColors = new Set(formData.colors);
+      if (uniqueColors.size !== formData.colors.length) {
+        setError("Duplicate colors are not allowed.");
+        return false;
+      }
+    }
+    // Validate sizes
+    if (formData.sizes) {
+      const sizesArray = formData.sizes.split(",").map((s) => s.trim()).filter((s) => s);
+      if (sizesArray.some((s) => !/^[a-zA-Z0-9\s]+$/.test(s))) {
+        setError("Sizes must contain only letters, numbers, and spaces (e.g., S, M, L).");
+        return false;
+      }
+    }
+    return true;
+  };
+
   const handleFormSubmit = async (e, actionType) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError(null);
 
+    if (!validateForm()) {
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
+      const sizesArray = formData.sizes
+        ? formData.sizes.split(",").map((s) => s.trim()).filter((s) => s)
+        : [];
+
       const dataToSend = {
-        name: formData.name,
+        name: formData.name.trim(),
         categoryId: formData.categoryId,
-        brandId: user.role === "merchant" ? getBrandNameByOwnerId(user._id)._id : formData.brandId,
-        description: formData.description,
+        brandId: userRole === "merchant" ? getBrandNameByOwnerId(user._id)._id : formData.brandId,
+        description: formData.description.trim(),
         quantityInStock: Number(formData.quantityInStock),
         price: Number(formData.price),
-        colors: formData.colors ? formData.colors.split(",").map((c) => c.trim()).filter((c) => c) : [],
-        sizes: formData.sizes ? formData.sizes.split(",").map((s) => s.trim()).filter((s) => s) : [],
+        colors: formData.colors,
+        sizes: sizesArray,
         isDiscounted: formData.isDiscounted,
         discountAmount: Number(formData.discountAmount),
         imgUrl: formData.imgUrl,
       };
 
-      console.log(dataToSend);
-
       if (actionType === "edit") {
         const action = userRole === "merchant" ? editMerchantProduct : editProduct;
-        const resultAction = dispatch(
-          action({
-            productId: selectedProduct._id,
-            updatedData: dataToSend,
-          })
+        await unwrapResult(
+          dispatch(
+            action({
+              productId: selectedProduct._id,
+              updatedData: dataToSend,
+            })
+          )
         );
-        unwrapResult(resultAction);
-
         setSuccess("Product updated successfully");
         setShowEditModal(false);
-
-        if (userRole === "merchant") {
-          dispatch(getMerchantProducts());
-        } else {
-          dispatch(getAllProducts());
-        }
       } else {
         const action = userRole === "merchant" ? createMerchantProduct : createProduct;
-        const resultAction = dispatch(action(dataToSend));
-        unwrapResult(resultAction);
-
+        await unwrapResult(dispatch(action(dataToSend)));
         setSuccess("Product created successfully");
         setShowCreateModal(false);
-        if (userRole === "merchant") {
-          dispatch(getMerchantProducts());
-        } else {
-          dispatch(getAllProducts());
-        }
+      }
+
+      if (userRole === "merchant") {
+        dispatch(getMerchantProducts());
+      } else {
+        dispatch(getAllProducts());
       }
     } catch (err) {
-      console.error("Failed to submit form:", err);
       setError(err.message || "Operation failed. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -249,9 +351,9 @@ const Products = () => {
   };
 
   const getBrandNameByOwnerId = (id) => {
-    if (brandsLoading) return "Loading brand...";
-    const brand = brands.find((b) => b.owner._id === id);
-    return brand || "Brand not found";
+    if (brandsLoading) return { name: "Loading brand...", _id: "" };
+    const brand = brands.find((b) => b.owner?._id === id);
+    return brand || { name: "Brand not found", _id: "" };
   };
 
   const arrProducts = Array.isArray(products) ? products : [];
@@ -263,152 +365,219 @@ const Products = () => {
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50">
-        <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-lg">
-          <h2 className="text-xl font-bold text-title-blue mb-6">{title}</h2>
-          <form onSubmit={(e) => handleFormSubmit(e, actionType)} className="space-y-4">
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Product Image
-              </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={onFileChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
+        <div className="bg-white p-6 rounded-xl shadow-xl w-full max-w-2xl relative">
+          <button
+            type="button"
+            onClick={() => (isEdit ? setShowEditModal(false) : setShowCreateModal(false))}
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+            aria-label="Close modal"
+          >
+            <FaTimes size={20} />
+          </button>
+          <h2 className="text-2xl font-semibold text-title-blue mb-4">{title}</h2>
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-200">
+              {error}
             </div>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Product Name
-              </label>
-              <input
-                name="name"
-                value={formData.name}
-                placeholder="Product Name"
-                className="w-full p-2 border border-gray-300 rounded-md"
-                onChange={handleFormChange}
-                required
-              />
+          )}
+          <form onSubmit={(e) => handleFormSubmit(e, actionType)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Image
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={onFileChange}
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  aria-label="Upload product image"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Product Name
+                </label>
+                <input
+                  name="name"
+                  value={formData.name}
+                  placeholder="Enter product name"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                  onChange={handleFormChange}
+                  required
+                  aria-required="true"
+                />
+              </div>
             </div>
 
-            {userRole === "admin" && (
-              <div className="mb-4">
+            <div className="grid grid-cols-2 gap-4">
+              {userRole === "admin" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Brand
+                  </label>
+                  <select
+                    name="brandId"
+                    value={formData.brandId}
+                    onChange={handleFormChange}
+                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
+                    required
+                    aria-required="true"
+                  >
+                    <option value="">Select Brand</option>
+                    {brands.map((brand) => (
+                      <option key={brand._id} value={brand._id}>
+                        {brand.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              {userRole === "merchant" && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Brand
+                  </label>
+                  <input
+                    name="brandId"
+                    value={getBrandNameByOwnerId(user._id).name}
+                    readOnly
+                    className="w-full p-2 border border-gray-300 rounded-md text-sm bg-gray-50"
+                    aria-readonly="true"
+                  />
+                </div>
+              )}
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Brand
+                  Category
                 </label>
                 <select
-                  name="brandId"
-                  value={formData.brandId}
+                  name="categoryId"
+                  value={formData.categoryId}
                   onChange={handleFormChange}
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   required
+                  aria-required="true"
                 >
-                  <option value="">Select Brand</option>
-                  {brands.map((brand) => (
-                    <option key={brand._id} value={brand._id}>
-                      {brand.name}
+                  <option value="">Select Category</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat._id}>
+                      {cat.name}
                     </option>
                   ))}
                 </select>
               </div>
-            )}
-            {userRole === "merchant" && (
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Brand
-                </label>
-                <input
-                  name="brandId"
-                  value={getBrandNameByOwnerId(user._id).name || ""}
-                  readOnly
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                />
-              </div>
-            )}
-
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Category
-              </label>
-              <select
-                name="categoryId"
-                value={formData.categoryId}
-                onChange={handleFormChange}
-                className="w-full p-2 border border-gray-300 rounded-md"
-                required
-              >
-                <option value="">Select Category</option>
-                {categories.map((cat) => (
-                  <option key={cat._id} value={cat._id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
             </div>
 
-            <div className="mb-4">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description
               </label>
-              <input
+              <textarea
                 name="description"
                 value={formData.description}
-                placeholder="Description"
-                className="w-full p-2 border border-gray-300 rounded-md"
+                placeholder="Enter product description"
+                className="w-full p-2 border border-gray-300 rounded-md text-sm resize-none"
                 onChange={handleFormChange}
                 required
+                rows={3}
+                aria-required="true"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Price ($)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Price ($)
+                </label>
                 <input
                   type="number"
                   name="price"
                   value={formData.price}
-                  placeholder="Price"
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter price"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   onChange={handleFormChange}
                   min="0"
                   step="0.01"
                   required
+                  aria-required="true"
                 />
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Quantity</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Quantity
+                </label>
                 <input
                   type="number"
                   name="quantityInStock"
                   value={formData.quantityInStock}
-                  placeholder="Stock Quantity"
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter stock quantity"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   onChange={handleFormChange}
                   min="0"
                   required
+                  aria-required="true"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Colors (comma separated)</label>
-                <input
-                  name="colors"
-                  value={formData.colors}
-                  placeholder="red, blue, green"
-                  className="w-full p-2 border border-gray-300 rounded-md"
-                  onChange={handleFormChange}
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Colors
+                </label>
+                <div className="grid grid-cols-6 gap-2 mb-2">
+                  {colorPalette.map((color) => (
+                    <button
+                      key={color.name}
+                      type="button"
+                      onClick={() => toggleColor(color.name)}
+                      className={`w-8 h-8 rounded-full border-2 ${formData.colors.includes(color.name)
+                        ? "border-main-blue ring-2 ring-main-blue"
+                        : "border-gray-300"
+                        } focus:outline-none focus:ring-2 focus:ring-main-blue`}
+                      style={{ backgroundColor: color.hex }}
+                      title={color.name}
+                      aria-label={`Select ${color.name}`}
+                    ></button>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {formData.colors.map((colorName, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full"
+                    >
+                      <span
+                        className="w-3 h-3 rounded-full mr-1"
+                        style={{
+                          backgroundColor: colorPalette.find((c) => c.name === colorName)?.hex,
+                        }}
+                      ></span>
+                      {colorName}
+                      <button
+                        type="button"
+                        onClick={() => toggleColor(colorName)}
+                        className="ml-1 text-gray-500 hover:text-red-600"
+                        aria-label={`Remove ${colorName}`}
+                      >
+                        <FaTimes size={10} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
               </div>
               <div>
-                <label className="block text-sm text-gray-600 mb-1">Sizes (comma separated)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Sizes (comma separated)
+                </label>
                 <input
                   name="sizes"
                   value={formData.sizes}
-                  placeholder="S, M, L, XL"
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="e.g., S, M, L, XL"
+                  className="w-full p-2 border border-gray-300 rounded-md text-sm"
                   onChange={handleFormChange}
+                  aria-label="Enter sizes"
                 />
               </div>
             </div>
@@ -420,21 +589,28 @@ const Products = () => {
                   name="isDiscounted"
                   checked={formData.isDiscounted}
                   onChange={handleFormChange}
-                  className="mr-2"
+                  className="h-4 w-4 text-main-blue border-gray-300 rounded focus:ring-main-blue"
+                  aria-label="Apply discount"
                 />
-                <label>Is Discounted?</label>
+                <label className="ml-2 text-sm font-medium text-gray-700">
+                  Apply Discount
+                </label>
               </div>
               {formData.isDiscounted && (
                 <div className="w-1/2">
-                  <label className="block text-sm text-gray-600 mb-1">Discount Amount</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Discount Amount ($)
+                  </label>
                   <input
                     type="number"
                     name="discountAmount"
                     value={formData.discountAmount}
-                    placeholder="Discount Amount"
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    placeholder="Enter discount"
+                    className="w-full p-2 border border-gray-300 rounded-md text-sm"
                     onChange={handleFormChange}
                     min="0"
+                    step="0.01"
+                    aria-label="Discount amount"
                   />
                 </div>
               )}
@@ -443,17 +619,18 @@ const Products = () => {
             <div className="flex justify-end gap-4 pt-4">
               <button
                 type="button"
-                onClick={() =>
-                  isEdit ? setShowEditModal(false) : setShowCreateModal(false)}
-                className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md"
+                onClick={() => (isEdit ? setShowEditModal(false) : setShowCreateModal(false))}
+                className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 shadow-sm disabled:opacity-50 text-sm font-medium"
                 disabled={isSubmitting}
+                aria-label="Cancel"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg disabled:opacity-50"
+                className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-300 shadow-sm disabled:opacity-50 text-sm font-medium"
                 disabled={isSubmitting}
+                aria-label={submitText}
               >
                 {isSubmitting ? (
                   <span className="flex items-center justify-center">
@@ -483,12 +660,12 @@ const Products = () => {
         </button>
       </div>
       {error && (
-        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+        <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-lg border border-red-200">
           {error}
         </div>
       )}
       {success && (
-        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-lg">
+        <div className="mb-4 p-4 bg-green-50 text-green-600 rounded-lg border border-green-200">
           {success}
         </div>
       )}
@@ -523,7 +700,7 @@ const Products = () => {
                       <img
                         src={product?.imgUrl || productImg}
                         alt={product.name}
-                        className="w-16 h-16 rounded-xl"
+                        className="w-16 h-16 rounded-xl object-cover"
                       />
                     </td>
                     <td className="py-4 px-6 text-main-blue text-center">
@@ -547,20 +724,12 @@ const Products = () => {
                           product.colors.map((color, i) => (
                             <span
                               key={i}
-                              className={`w-5 h-5 rounded-full ${{
-                                red: "bg-red-500",
-                                green: "bg-green-500",
-                                blue: "bg-blue-500",
-                                Navy: "bg-indigo-900",
-                                Teal: "bg-teal-500",
-                                Orange: "bg-orange-500",
-                              }[color] || "bg-gray-500"
-                                } transition duration-300 transform hover:scale-125`}
+                              className={`w-5 h-5 rounded-full ${colorClassMap[color] || "bg-gray-500"} transition duration-300 transform hover:scale-125`}
                             ></span>
                           ))
                         ) : (
                           <span className="text-main-blue text-center">
-                            No colors provided
+                            No colors
                           </span>
                         )}
                       </div>
@@ -569,7 +738,7 @@ const Products = () => {
                       {Array.isArray(product.sizes) && product.sizes.length > 0 ? (
                         product.sizes.join(", ")
                       ) : (
-                        "No sizes provided"
+                        "No sizes"
                       )}
                     </td>
                     <td>
@@ -580,6 +749,7 @@ const Products = () => {
                           data-tooltip-id="Edit"
                           data-tooltip-content="Edit"
                           data-tooltip-place="bottom"
+                          aria-label="Edit product"
                         >
                           <FaEdit />
                         </button>
@@ -589,6 +759,7 @@ const Products = () => {
                           data-tooltip-place="bottom"
                           data-tooltip-id="Delete"
                           data-tooltip-content="Delete"
+                          aria-label="Delete product"
                         >
                           <FaTrashAlt />
                         </button>
@@ -615,13 +786,15 @@ const Products = () => {
                 <div className="flex justify-end gap-4">
                   <button
                     onClick={() => setShowDeleteModal(false)}
-                    className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md"
+                    className="bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 shadow-sm text-sm font-medium"
+                    aria-label="Cancel deletion"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleConfirmDelete}
-                    className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-500 shadow-lg"
+                    className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition duration-300 shadow-sm text-sm font-medium"
+                    aria-label="Confirm deletion"
                   >
                     Delete
                   </button>
