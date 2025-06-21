@@ -10,6 +10,9 @@ export const createBrandSchema = Joi.object({
     ownerId: Joi.string().required().messages({
         "string.empty": "Owner is required",
     }),
+    imgUrl: Joi.string().optional().messages({
+        "string.empty": "Image URL is optional",
+    }),
 })
 
 export const editBrandSchema = Joi.object({
@@ -18,5 +21,8 @@ export const editBrandSchema = Joi.object({
     }),
     description: Joi.string().optional().messages({
         "string.empty": "There is No Description Provided",
+    }),
+    imgUrl: Joi.string().optional().messages({
+        "string.empty": "Image URL is optional",
     }),
 })

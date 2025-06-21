@@ -16,82 +16,80 @@ export const getBrands = async (req, res, next) => {
 }
 
 export const createBrand = async (req, res, next) => {
+    const { ownerId, name, description, imgUrl } = req.body;
+    const normalizedName = name.toLowerCase();
 
-    const { ownerId, name, description } = req.body;
-    name.toLowerCase();
-
-    const isBrandExist = await Brand.findOne({ name });
+    const isBrandExist = await Brand.findOne({ name: normalizedName });
 
     if (isBrandExist) {
-        return next(new AppError("Brand already exists", 400))
+        return next(new AppError("Brand already exists", 400));
     }
 
     const doesOwnerAlreadyHaveBrand = await Brand.findOne({ owner: ownerId });
 
     if (doesOwnerAlreadyHaveBrand) {
-        return next(new AppError("Owner already has a brand", 400))
+        return next(new AppError("Owner already has a brand", 400));
     }
 
-    const brand = new Brand({ name, description, owner: ownerId });
+    const brand = new Brand({ name: normalizedName, description, owner: ownerId, imgUrl });
 
     await brand.save();
 
     await Notification.create({
-        receivers: [ownerId], // Changed from receiver to receivers array
-        sender: "Misrify Store", // Set sender to "Misrify Store"
-        content: `Brand ${name} has been created`, // Changed from message to content
+        receivers: [ownerId],
+        sender: "Misrify Store",
+        content: `Brand ${name} has been created`,
         type: "brand",
         isRead: false,
     });
 
-    res.status(201).json({ success: true, message: "Brand Created Successfully" })
-}
+    res.status(201).json({ success: true, message: "Brand created successfully" });
+};
 
 export const editBrand = async (req, res, next) => {
     const brandId = req.params.id;
-    const { name, description } = req.body;
+    const { name, description, imgUrl } = req.body;
 
     if (!brandId) {
-        return next(new AppError("Brand ID is required", 400))
+        return next(new AppError("Brand ID is required", 400));
     }
 
     const brand = await Brand.findById(brandId);
 
     if (!brand) {
-        return next(new AppError("Brand not found", 404))
+        return next(new AppError("Brand not found", 404));
     }
 
     const owner = await User.findById(brand.owner);
 
-    brand.name = name || brand.name;
+    brand.name = name ? name.toLowerCase() : brand.name;
     brand.description = description || brand.description;
+    brand.imgUrl = imgUrl || brand.imgUrl;
 
     await brand.save();
 
     await Notification.create({
-        title: "Brand Updated",
-        message: `Brand ${name} has been updated`,
-        receivers: [owner._id], // Changed from receiver to receivers array
-        sender: "Misrify Store", // Set sender to "Misrify Store"
-        content: `Brand ${name} has been updated`, // Changed from message to content
+        receivers: [owner._id],
+        sender: "Misrify Store",
+        content: `Brand ${brand.name} has been updated`,
         type: "brand",
         isRead: false,
-    })
+    });
 
-    res.status(200).json({ success: true, message: "Brand updated successfully", brand })
-}
+    res.status(200).json({ success: true, message: "Brand updated successfully", brand });
+};
 
 export const deleteBrand = async (req, res, next) => {
     const brandId = req.params.id;
 
     if (!brandId) {
-        return next(new AppError("Brand ID is required", 400))
+        return next(new AppError("Brand ID is required", 400));
     }
 
     const brand = await Brand.findById(brandId);
 
     if (!brand) {
-        return next(new AppError("Brand not found", 404))
+        return next(new AppError("Brand not found", 404));
     }
 
     const owner = await User.findById(brand.owner);
@@ -99,14 +97,12 @@ export const deleteBrand = async (req, res, next) => {
     await brand.deleteOne();
 
     await Notification.create({
-        title: "Brand Deleted",
-        message: `Brand ${brand.name} has been deleted`,
-        receivers: [owner._id], // Changed from receiver to receivers array
-        sender: "Misrify Store", // Set sender to "Misrify Store"
-        content: `Brand ${brand.name} has been deleted`, // Changed from message to content
+        receivers: [owner._id],
+        sender: "Misrify Store",
+        content: `Brand ${brand.name} has been deleted`,
         type: "brand",
         isRead: false,
-    })
+    });
 
-    res.status(200).json({ success: true, message: "Brand deleted successfully" })
-}
+    res.status(200).json({ success: true, message: "Brand deleted successfully" });
+};

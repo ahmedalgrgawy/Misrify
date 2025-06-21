@@ -34,8 +34,9 @@ import { getAllMerchants } from "../../features/userSlice";
 import "react-toastify/dist/ReactToastify.css";
 import { Flip, ToastContainer, toast } from "react-toastify";
 import { Tooltip } from "react-tooltip";
-import categoriesImg from "../../assets/categories.jpeg";//just for pictures / deleted if there picture returned from backend
-import brandsImg from "../../assets/brands.jpeg";//just for pictures / deleted if there picture returned from backend
+import Resizer from "react-image-file-resizer";
+import brandImg from "../../assets/brands.jpeg";
+import categoryImg from "../../assets/categories.jpeg";
 
 const Categories = () => {
   const dispatch = useDispatch();
@@ -56,11 +57,12 @@ const Categories = () => {
     [arrBrands]
   );
 
+
   // Create State
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
-  const [newCategory, setNewCategory] = useState({ name: "", description: "" });
+  const [newCategory, setNewCategory] = useState({ name: "", description: "", imgUrl: "" });
   const [showAddBrandModal, setShowAddBrandModal] = useState(false);
-  const [newBrand, setNewBrand] = useState({ name: "", description: "" });
+  const [newBrand, setNewBrand] = useState({ name: "", description: "", imgUrl: "", ownerId: "" });
 
   // Delete State
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -71,63 +73,103 @@ const Categories = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [itemToEdit, setItemToEdit] = useState(null);
   const [itemType, setItemType] = useState("");
+  const [editData, setEditData] = useState({ name: "", description: "", imgUrl: "" });
 
   const handleEditItem = (itemId, type) => {
-    setItemToEdit(itemId);
-    setItemType(type);
-    setShowEditModal(true);
+    const item = type === "category"
+      ? arrCategories.find((cat) => cat._id === itemId)
+      : arrBrands.find((brand) => brand._id === itemId);
+
+    if (item) {
+      setEditData({
+        name: item.name,
+        description: item.description || "",
+        imgUrl: item.imgUrl || "",
+      });
+      setItemToEdit(itemId);
+      setItemType(type);
+      setShowEditModal(true);
+    }
   };
 
   const handleCancelEdit = () => {
     setShowEditModal(false);
     setItemToEdit(null);
     setItemType("");
+    setEditData({ name: "", description: "", imgUrl: "" });
+  };
+
+  const handleEditImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      Resizer.imageFileResizer(
+        file,
+        300,
+        300,
+        "JPEG",
+        80,
+        0,
+        (uri) => {
+          setEditData((prev) => ({ ...prev, imgUrl: uri }));
+        },
+        "base64"
+      );
+    }
   };
 
   const handleConfirmEdit = () => {
-    const updatedData =
-      itemType === "category"
-        ? { name: newCategory.name }
-        : { name: newBrand.name };
+    const updatedData = {
+      name: editData.name,
+      description: editData.description,
+      imgUrl: editData.imgUrl,
+    };
 
     if (itemType === "category") {
       if (!updatedData.name.trim()) {
-        showToast("the category name is required ❗", "error");
+        showToast("The category name is required ❗", "error");
         return;
-      } else if (categoriesNames.includes(updatedData.name)) {
+      } else if (categoriesNames.includes(updatedData.name) && updatedData.name !== arrCategories.find(cat => cat._id === itemToEdit).name) {
         showToast("This name is already used ❗ Try another one", "error");
         return;
       }
 
       dispatch(editCategory({ categoryId: itemToEdit, updatedData }))
+        .unwrap()
         .then(() => {
+          dispatch(getAllCategories());
           setShowEditModal(false);
           setItemToEdit(null);
           setItemType("");
-          showToast("the category has been updated 👍", "success");
+          setEditData({ name: "", description: "", imgUrl: "" });
+          showToast("The category has been updated 👍", "success");
         })
         .catch((err) => {
-          showToast("there is something wrong 👎", "error");
+          showToast("There is something wrong 👎", "error");
           console.error("Error editing category:", err);
         });
     } else if (itemType === "brand") {
       if (!updatedData.name.trim()) {
-        showToast("the Brand name is required ❗", "error");
+        showToast("The Brand name is required ❗", "error");
         return;
-      } else if (brandsNames.includes(updatedData.name)) {
+      } else if (brandsNames.includes(updatedData.name) && updatedData.name !== arrBrands.find(brand => brand._id === itemToEdit).name) {
         showToast("This name is already used ❗ Try another one", "error");
         return;
       }
 
+      console.log(updatedData);
+
       dispatch(editBrand({ brandId: itemToEdit, updatedData }))
+        .unwrap()
         .then(() => {
+          dispatch(getAllBrands());
           setShowEditModal(false);
           setItemToEdit(null);
           setItemType("");
-          showToast("the brand has been updated 👍", "success");
+          setEditData({ name: "", description: "", imgUrl: "" });
+          showToast("The brand has been updated 👍", "success");
         })
         .catch((err) => {
-          showToast("there is something wrong 👎", "error");
+          showToast("There is something wrong 👎", "error");
           console.error("Error editing brand:", err);
         });
     }
@@ -153,26 +195,64 @@ const Categories = () => {
   const handleConfirmDelete = () => {
     if (categoryToDelete) {
       dispatch(deleteCategory(categoryToDelete))
+        .unwrap()
         .then(() => {
           setShowDeleteModal(false);
           setCategoryToDelete(null);
-          showToast("the category has been deleted 🗑", "success");
+          showToast("The category has been deleted 🗑", "success");
         })
         .catch((err) => {
-          showToast("there is something wrong 👎", "error");
+          showToast("There is something wrong 👎", "error");
           console.error("Error deleting category:", err);
         });
     } else if (brandToDelete) {
       dispatch(deleteBrand(brandToDelete))
+        .unwrap()
         .then(() => {
           setShowDeleteModal(false);
           setBrandToDelete(null);
-          showToast("the brand has been deleted 🗑", "success");
+          showToast("The brand has been deleted 🗑", "success");
         })
         .catch((err) => {
-          showToast("there is something wrong 👎", "error");
+          showToast("There is something wrong 👎", "error");
           console.error("Error deleting brand:", err);
         });
+    }
+  };
+
+  const handleCategoryImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      Resizer.imageFileResizer(
+        file,
+        300,
+        300,
+        "JPEG",
+        80,
+        0,
+        (uri) => {
+          setNewCategory((prev) => ({ ...prev, imgUrl: uri }));
+        },
+        "base64"
+      );
+    }
+  };
+
+  const handleBrandImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      Resizer.imageFileResizer(
+        file,
+        300,
+        300,
+        "JPEG",
+        80,
+        0,
+        (uri) => {
+          setNewBrand((prev) => ({ ...prev, imgUrl: uri }));
+        },
+        "base64"
+      );
     }
   };
 
@@ -203,6 +283,7 @@ const Categories = () => {
       transition: Flip,
     });
   };
+
   return (
     <div className="p-6 bg-bg-second font-montserrat">
       {/* Header */}
@@ -258,7 +339,7 @@ const Categories = () => {
       <SwiperSection
         title="Categories"
         data={arrCategories}
-        type="Categories"
+        type="category"
         onEdit={(itemId) => handleEditItem(itemId, "category")}
         onDelete={handleDeleteCategory}
       />
@@ -318,18 +399,31 @@ const Categories = () => {
             <div className="flex flex-col gap-4">
               <input
                 type="text"
-                placeholder={`${itemType === "category" ? "Category" : "Brand"
-                  } Name`}
-                value={
-                  itemType === "category" ? newCategory.name : newBrand.name
-                }
+                placeholder={`${itemType === "category" ? "Category" : "Brand"} Name`}
+                value={editData.name}
                 onChange={(e) =>
-                  itemType === "category"
-                    ? setNewCategory({ ...newCategory, name: e.target.value })
-                    : setNewBrand({ ...newBrand, name: e.target.value })
+                  setEditData({ ...editData, name: e.target.value })
                 }
                 className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               />
+              <input
+                type="text"
+                placeholder="Description"
+                value={editData.description}
+                onChange={(e) =>
+                  setEditData({ ...editData, description: e.target.value })
+                }
+                className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+              />
+              <div className="flex flex-col gap-2">
+                <label className="text-dark-grey font-semibold">Change Image (optional)</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleEditImageUpload}
+                  className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+                />
+              </div>
               <div className="flex justify-end gap-4 mt-4">
                 <button
                   onClick={handleCancelEdit}
@@ -378,9 +472,21 @@ const Categories = () => {
                 }
                 className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
               />
+              <div className="flex flex-col gap-2">
+                <label className="text-dark-grey font-semibold">Upload Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCategoryImageUpload}
+                  className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+                />
+              </div>
               <div className="flex justify-end gap-4 mt-4">
                 <button
-                  onClick={() => setShowAddCategoryModal(false)}
+                  onClick={() => {
+                    setShowAddCategoryModal(false);
+                    setNewCategory({ name: "", description: "", imgUrl: "" });
+                  }}
                   className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md"
                 >
                   Cancel
@@ -388,36 +494,31 @@ const Categories = () => {
                 <button
                   onClick={() => {
                     if (!newCategory.name.trim()) {
-                      showToast("the Category name is required ❗", "error");
+                      showToast("The Category name is required ❗", "error");
                       return;
                     } else if (categoriesNames.includes(newCategory.name)) {
-                      showToast(
-                        "This name is already used ❗ Try another one",
-                        "error"
-                      );
+                      showToast("This name is already used ❗ Try another one", "error");
                       return;
                     } else if (!newCategory.description.trim()) {
                       showToast("Category description is required ❗", "error");
                       return;
                     }
 
+                    console.log(newCategory);
+
                     dispatch(createCategory(newCategory))
                       .unwrap()
                       .then(() => {
                         dispatch(getAllCategories());
                         setShowAddCategoryModal(false);
-                        setNewCategory({ name: "", description: "" });
-
+                        setNewCategory({ name: "", description: "", imgUrl: "" });
                         setTimeout(() => {
-                          showToast(
-                            "the category has been created 👍",
-                            "success"
-                          );
+                          showToast("The category has been created 👍", "success");
                         }, 0);
                       })
                       .catch((err) => {
                         setTimeout(() => {
-                          showToast("there is something wrong 👎", "error");
+                          showToast("There is something wrong 👎", "error");
                         }, 0);
                         console.error("Error creating category:", err);
                       });
@@ -472,16 +573,27 @@ const Categories = () => {
                   <option
                     key={merchant._id}
                     value={merchant._id}
-                    className="bg-second text-dark-grey"
+                    className="bg-white text-dark-grey"
                   >
                     {merchant.name}
                   </option>
                 ))}
               </select>
-
+              <div className="flex flex-col gap-2">
+                <label className="text-dark-grey font-semibold">Upload Image</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleBrandImageUpload}
+                  className="border border-light-grey rounded-md text-dark-blue py-2 px-3 mb-2 focus:outline-none hover:shadow transition"
+                />
+              </div>
               <div className="flex justify-end gap-4 mt-4">
                 <button
-                  onClick={() => setShowAddBrandModal(false)}
+                  onClick={() => {
+                    setShowAddBrandModal(false);
+                    setNewBrand({ name: "", description: "", ownerId: "", imgUrl: "" });
+                  }}
                   className="bg-bg-main text-dark-grey py-2 px-4 rounded-lg hover:bg-light-grey transition duration-500 shadow-md"
                 >
                   Cancel
@@ -492,28 +604,30 @@ const Categories = () => {
                       showToast("Brand name is required ❗", "error");
                       return;
                     } else if (brandsNames.includes(newBrand.name)) {
-                      showToast(
-                        "This name is already used ❗ Try another one",
-                        "error"
-                      );
+                      showToast("This name is already used ❗ Try another one", "error");
                       return;
                     } else if (!newBrand.description.trim()) {
                       showToast("Brand description is required ❗", "error");
                       return;
+                    } else if (!newBrand.ownerId) {
+                      showToast("Please select a merchant ❗", "error");
+                      return;
                     }
+
+                    console.log(newBrand);
 
                     dispatch(createBrand(newBrand))
                       .unwrap()
                       .then(() => {
                         dispatch(getAllBrands());
                         setShowAddBrandModal(false);
-                        setNewBrand({ name: "", description: "" });
+                        setNewBrand({ name: "", description: "", ownerId: "", imgUrl: "" });
                         setTimeout(() => {
-                          showToast("the brand has been created 👍", "success");
+                          showToast("The brand has been created 👍", "success");
                         }, 0);
                       })
                       .catch((err) => {
-                        showToast(err, "error");
+                        showToast(err.message || "Error creating brand", "error");
                       });
                   }}
                   className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg"
@@ -564,8 +678,8 @@ const SummaryCard = ({ icon, label, value, color }) => {
 };
 
 const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
-  const navNext = `.swiper-${title}-next`;
-  const navPrev = `.swiper-${title}-prev`;
+  const navNext = `.swiper-button-${title.toLowerCase()}-next`;
+  const navPrev = `.swiper-button-${title.toLowerCase()}-prev`;
 
   return (
     <div className="mb-10">
@@ -573,7 +687,7 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
         modules={[Navigation, Pagination]}
         breakpoints={{
           0: { slidesPerView: 1, spaceBetween: 20 },
-          768: { slidesPerView: 2, spaceBetween: 30 },
+          768: { slidesPerView: 2, spaceBetween: 25 },
           1280: { slidesPerView: 3, spaceBetween: 30 },
         }}
         navigation={{ nextEl: navNext, prevEl: navPrev }}
@@ -584,12 +698,12 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
           data.map((item) => (
             <SwiperSlide
               key={item._id}
-              className="w-80 bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-lg transition-all duration-300"
+              className="w-80 bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
             >
               <img
-                src={item.image === "category" ? categoriesImg : brandsImg} //just for pictures / changed to (item.image) if there picture returned from backend
+                src={item.imgUrl || (type === "category" ? categoryImg : brandImg)}
                 alt={item.name}
-                className="h-full w-full object-cover bg-[#d9d9d9]"
+                className="h-56 w-full object-cover bg-gray-200"
               />
               <div className="p-4">
                 <h6 className="font-bold text-main-blue text-xl mb-3">
@@ -615,9 +729,9 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
                     <button
                       onClick={() => onDelete(item._id)}
                       className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110"
-                      data-tooltip-place="bottom"
                       data-tooltip-id="Delete"
                       data-tooltip-content="Delete"
+                      data-tooltip-place="bottom"
                     >
                       <FaTrashAlt />
                     </button>
@@ -634,23 +748,23 @@ const SwiperSection = ({ title, data, type, onEdit, onDelete }) => {
       </Swiper>
       <div className="flex justify-between">
         <button
-          className={`swiper-${title}-prev text-2xl text-main-blue hover:text-title-blue transition duration-300 transform hover:scale-110`}
+          className={`swiper-button-${title.toLowerCase()}-prev text-2xl text-main-blue hover:bg-gray-200 rounded-full p-2 transition duration-300 transform hover:scale-110`}
         >
           <FaArrowLeft />
         </button>
         <button
-          className={`swiper-${title}-next text-2xl text-main-blue hover:text-title-blue transition duration-300 transform hover:scale-110`}
+          className={`swiper-button-${title.toLowerCase()}-next text-2xl text-main-blue hover:bg-gray-200 rounded-full p-2 transition duration-300 transform hover:scale-110`}
         >
           <FaArrowRight />
         </button>
       </div>
       <Tooltip
         id="Edit"
-        className="!z-50 !py-1 !px-2 !bg-title-blue !rounded-md"
+        className="!z-[1000] !py-1 !px-2 !bg-title-blue rounded-md text-white"
       />
       <Tooltip
         id="Delete"
-        className="!z-50 !py-1 !px-2 !bg-red-600 !rounded-md"
+        className="!z-[1000] !py-1 !px-2 !bg-red-600 rounded-md text-white"
       />
     </div>
   );

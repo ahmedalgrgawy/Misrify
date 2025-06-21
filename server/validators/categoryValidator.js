@@ -11,4 +11,8 @@ export const createCategorySchema = Joi.object({
         "string.empty": "Description cannot be empty",
         "any.required": "Description is required"
     }),
+    imgUrl: Joi.string().optional().messages({
+        "string.base": "Image URL must be a string",
+        "string.empty": "Image URL can be empty"
+    })
 })
