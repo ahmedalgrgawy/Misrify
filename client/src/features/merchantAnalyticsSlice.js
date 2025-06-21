@@ -40,9 +40,9 @@ export const getMerchantOrderStats = createAsyncThunk(
 
 export const getSalesGrowth = createAsyncThunk(
   "merchantAnalytics/getSalesGrowth",
-  async (_, { rejectWithValue }) => {
+  async ({ period = "monthly" }, { rejectWithValue }) => {
     try {
-      const res = await axiosInstance.get("/merchant/sales-growth");
+      const res = await axiosInstance.get(`/merchant/sales-growth?period=${period}`);
       return res.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
