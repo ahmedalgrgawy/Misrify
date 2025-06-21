@@ -5,6 +5,8 @@ import moment from "moment";
 import MerchantAnalytics from "../models/merchantAnalytics.model.js";
 import mongoose from "mongoose";
 import Brand from "../models/brand.model.js";
+import User from "../models/user.model.js";
+import OrderItem from "../models/orderItem.model.js";
 
 export const getStockLevel = async (req, res, next) => {
 
@@ -704,6 +706,132 @@ export const getMerchantOrderTrends = async (req, res, next) => {
   } catch (error) {
     console.error("Error in getMerchantOrderTrends:", error.message);
     next(error);
+  }
+};
+
+export const getMerchantOrders = async (req, res, next) => {
+  try {
+    const merchantId = req.user._id;
+
+    const orders = await Order.aggregate([
+      {
+        $lookup: {
+          from: "brands",
+          let: { merchantId: merchantId },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$owner", "$$merchantId"] },
+              },
+            },
+            { $project: { _id: 1 } },
+          ],
+          as: "merchantBrands",
+        },
+      },
+      {
+        $lookup: {
+          from: "products",
+          let: { brandIds: "$merchantBrands._id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $in: ["$brand", "$$brandIds"] },
+              },
+            },
+            { $project: { _id: 1, name: 1, price: 1, imgUrl: 1 } },
+          ],
+          as: "merchantProducts",
+        },
+      },
+      { $unwind: "$orderItems" },
+      {
+        $lookup: {
+          from: "orderitems",
+          let: { orderItemId: "$orderItems", productIds: "$merchantProducts._id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$_id", "$$orderItemId"] },
+                    { $in: ["$product", "$$productIds"] },
+                  ],
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "products",
+                localField: "product",
+                foreignField: "_id",
+                as: "product",
+              },
+            },
+            { $unwind: "$product" },
+            {
+              $project: {
+                _id: 1,
+                quantity: 1,
+                price: 1,
+                product: {
+                  _id: "$product._id",
+                  name: "$product.name",
+                  price: "$product.price",
+                  imgUrl: "$product.imgUrl",
+                },
+              },
+            },
+          ],
+          as: "orderItemDetails",
+        },
+      },
+      {
+        $match: {
+          "orderItemDetails.0": { $exists: true },
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          trackCode: { $first: "$trackCode" },
+          status: { $first: "$status" },
+          createdAt: { $first: "$createdAt" },
+          orderItems: { $push: "$orderItemDetails" },
+        },
+      },
+      { $unwind: "$orderItems" },
+      { $unwind: "$orderItems" }, // Double unwind to access nested array
+      {
+        $group: {
+          _id: "$_id",
+          trackCode: { $first: "$trackCode" },
+          status: { $first: "$status" },
+          createdAt: { $first: "$createdAt" },
+          orderItems: { $push: "$orderItems" },
+          totalPrice: {
+            $sum: { $multiply: ["$orderItems.quantity", "$orderItems.price"] },
+          },
+        },
+      },
+      { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          _id: 1,
+          trackCode: 1,
+          status: 1,
+          createdAt: 1,
+          totalPrice: 1,
+          orderItems: 1,
+          user: { name: "$user.name", email: "$user.email" },
+        },
+      },
+    ]);
+
+    res.status(200).json({ success: true, orders });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: "Server Error" });
   }
 };
 

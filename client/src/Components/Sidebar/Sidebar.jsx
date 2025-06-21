@@ -1,9 +1,9 @@
-import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FaTachometerAlt, FaBoxOpen, FaUsers, FaHeadset, FaClipboardList, FaCog, FaPowerOff, FaRegUserCircle, FaBox } from "react-icons/fa";
 import { IoNotifications } from "react-icons/io5";
 import { logoutUser } from "../../features/authSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { FaBagShopping } from "react-icons/fa6";
 
 const Sidebar = () => {
     const dispatch = useDispatch();
@@ -124,18 +124,32 @@ const Sidebar = () => {
                     )}
 
                     {userRole === "merchant" && (
-                        <NavLink
-                            to="support"
-                            className={({ isActive }) =>
-                                `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition ${isActive
-                                    ? "bg-title-blue text-white"
-                                    : "text-title-blue hover:bg-bg-second"
-                                }`
-                            }
-                        >
-                            <FaHeadset className="text-xl" />
-                            <span className="text-sm font-medium">Help & Support</span>
-                        </NavLink>
+                        <>
+                            <NavLink
+                                to="orders"
+                                className={({ isActive }) =>
+                                    `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition ${isActive
+                                        ? "bg-title-blue text-white"
+                                        : "text-title-blue hover:bg-bg-second"
+                                    }`
+                                }
+                            >
+                                <FaBagShopping className="text-xl" />
+                                <span className="text-sm font-medium">Orders</span>
+                            </NavLink>
+                            <NavLink
+                                to="support"
+                                className={({ isActive }) =>
+                                    `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition ${isActive
+                                        ? "bg-title-blue text-white"
+                                        : "text-title-blue hover:bg-bg-second"
+                                    }`
+                                }
+                            >
+                                <FaHeadset className="text-xl" />
+                                <span className="text-sm font-medium">Help & Support</span>
+                            </NavLink>
+                        </>
                     )}
                 </nav>
             </div>
