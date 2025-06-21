@@ -1,0 +1,17 @@
+# Dirsearch started Wed Jun 11 02:49:22 2025 as: /usr/lib/python3/dist-packages/dirsearch/dirsearch.py -u http://localhost:5173
+
+200   302B   http://localhost:5173/.flac
+200   301B   http://localhost:5173/.gif
+200     1KB  http://localhost:5173/.gitignore
+200   301B   http://localhost:5173/.ico
+200   301B   http://localhost:5173/.jpg
+200   302B   http://localhost:5173/.jpeg
+200   301B   http://localhost:5173/.mp3
+200   301B   http://localhost:5173/.pdf
+200   301B   http://localhost:5173/.png
+200   301B   http://localhost:5173/.txt
+404     0B   http://localhost:5173/favicon.ico
+200     2KB  http://localhost:5173/package
+200     1KB  http://localhost:5173/package.json
+200   241KB  http://localhost:5173/package-lock.json
+200    14B   http://localhost:5173/README.md
