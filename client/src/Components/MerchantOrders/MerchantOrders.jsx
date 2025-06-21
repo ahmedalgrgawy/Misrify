@@ -56,7 +56,7 @@ export const MerchantOrders = () => {
                                         <td className="py-4 px-6 text-main-blue text-center">
                                             <div className="flex flex-col items-center gap-1">
                                                 <span
-                                                    className={`px-2 py-1 rounded-full ${order.status === "delivered"
+                                                    className={`px-2 py-1 rounded-full ${order.status === "paid"
                                                         ? "bg-green-100 text-green-600"
                                                         : order.status === "shipped"
                                                             ? "bg-blue-100 text-blue-600"

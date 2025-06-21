@@ -9,7 +9,8 @@ import ProfileReducer from "../features/profileSlice";
 import MessageReducer from "../features/messageSlice";
 import NotificationReducer from "../features/notificationSlice"
 import merchantAnalyticsReducer from "../features/merchantAnalyticsSlice"
-import adminAnalyticsReduce from "../features/adminAnalyticsSlice";
+import adminAnalyticsReducer from "../features/adminAnalyticsSlice";
+import merchantReviewsReducer from '../features/merchantReviewsSlice';
 export const store = configureStore({
   reducer: {
     auth: authReducer,
@@ -22,6 +23,7 @@ export const store = configureStore({
     messages: MessageReducer,
     notifications: NotificationReducer,
     merchantAnalytics: merchantAnalyticsReducer,
-    adminAnalytics: adminAnalyticsReduce,
+    adminAnalytics: adminAnalyticsReducer,
+    merchantReviews: merchantReviewsReducer
   },
 });  
