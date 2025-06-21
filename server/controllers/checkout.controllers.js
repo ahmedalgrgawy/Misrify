@@ -654,6 +654,8 @@ export const initializePayment = async (req, res, next) => {
 export const handlePaymentCallback = async (req, res, next) => {
     const { id: transactionId, order: paymobOrderId, success } = req.body;
 
+    let points = 0;
+
     // Validate required parameters
     if (!paymobOrderId || !transactionId || success === undefined) {
         return next(new AppError('Missing required Paymob parameters', 400));
@@ -696,6 +698,13 @@ export const handlePaymentCallback = async (req, res, next) => {
                 return next(new AppError('Order is not in a payable state', 400));
             }
             orderDoc.status = 'paid';
+
+            points = calculatePoints(orderDoc.totalPrice);
+            const user = await User.findById(orderDoc.user, null, { session });
+
+            user.points = (user.points || 0) + points;
+            await user.save({ session });
+
             await orderDoc.save({ session });
         }
 
@@ -708,6 +717,7 @@ export const handlePaymentCallback = async (req, res, next) => {
             message: isPaymentSuccessful
                 ? 'Payment processed successfully'
                 : 'Payment failed and recorded',
+            points
         });
     } catch (error) {
         await session.abortTransaction();
