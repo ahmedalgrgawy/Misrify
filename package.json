@@ -48,18 +48,25 @@
     "supertest": "^7.1.1"
   },
   "jest": {
-  "testEnvironment": "node",
-  "testMatch": ["**/__tests__/**/*.test.js"],
-  "coverageDirectory": "coverage",
-  "transform": {
-    "^.+\\.js$": "babel-jest"
-  },
-  "moduleNameMapper": {
-    "\\.(css|less|scss|sass)$": "identity-obj-proxy"
-  },
-  "setupFilesAfterEnv": ["./server/__tests__/setup.js"],
-  "clearMocks": true,
-  "resetMocks": true,
-  "restoreMocks": true
-}
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "setupFilesAfterEnv": [
+      "./server/__tests__/setup.js"
+    ],
+    "clearMocks": true,
+    "resetMocks": true,
+    "restoreMocks": true,
+    "coveragePathIgnorePatterns": [
+      "/coverage/"
+    ]
+  }
 }
