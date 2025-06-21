@@ -67,14 +67,10 @@ FetchHook useFetchProfile() {
       print("Profile fetch status: ${response.statusCode}");
 
       if (response.statusCode == 200 && decoded['success'] == true) {
-<<<<<<< HEAD
-        profile.value = ProfileModel.fromJson(decoded);
-=======
         final model = ProfileModel.fromJson(decoded);
         profile.value = model;
         box.write(
             'userImg', model.user.imgUrl); // ✅ Write image to storage here
->>>>>>> clean-branch
       } else if (response.statusCode == 401 && !isRetrying) {
         await refreshTokenAndRetry();
       } else {

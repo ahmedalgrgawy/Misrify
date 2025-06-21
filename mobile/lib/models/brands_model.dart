@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import 'package:meta/meta.dart';
-=======
->>>>>>> clean-branch
 import 'dart:convert';
 
 BransModel bransModelFromJson(String str) =>

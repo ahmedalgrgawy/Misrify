@@ -171,8 +171,6 @@ class Product {
         updatedAt: item.updatedAt,
         v: item.v,
       );
-<<<<<<< HEAD
-=======
 
   Product copyWith({
     String? id,
@@ -223,7 +221,6 @@ extension SafeProduct on Product {
       reviews: reviews,
     );
   }
->>>>>>> clean-branch
 }
 
 class Brand {

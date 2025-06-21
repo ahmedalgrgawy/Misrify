@@ -42,13 +42,8 @@ class CartController extends GetxController {
         Get.snackbar(
           'Cart Cleared',
           resData['message'] ?? 'Your cart is now empty.',
-<<<<<<< HEAD
-          colorText: kLightWhite,
-          backgroundColor: kLightBlue,
-=======
           colorText: KTextColor,
           backgroundColor: Kbackground,
->>>>>>> clean-branch
           icon: const Icon(Icons.delete_outline, color: kLightWhite),
         );
         await refreshCartCount();
@@ -99,11 +94,7 @@ class CartController extends GetxController {
     final accessToken = box.read('token');
     if (accessToken == null) return;
 
-<<<<<<< HEAD
-    final url = Uri.parse('$appBaseUrl/user/getCart');
-=======
     final url = Uri.parse('$appBaseUrl/user/cart');
->>>>>>> clean-branch
     final headers = {
       'Content-Type': 'application/json',
       'Cookie': 'accessToken=$accessToken',
@@ -113,14 +104,6 @@ class CartController extends GetxController {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-<<<<<<< HEAD
-        final List<dynamic> items = data['cart']['cartItems'];
-        final totalQuantity = items.fold<int>(
-          0,
-          (sum, item) => sum + (item['quantity'] as int? ?? 1),
-        );
-        itemCount.value = totalQuantity;
-=======
 
         if (data['cart'] != null && data['cart']['cartItems'] != null) {
           final List<dynamic> items = data['cart']['cartItems'];
@@ -134,7 +117,6 @@ class CartController extends GetxController {
         }
       } else {
         itemCount.value = 0; // fallback for API error
->>>>>>> clean-branch
       }
     } catch (e) {
       debugPrint('❌ Failed to refresh cart count: $e');
@@ -217,16 +199,6 @@ class CartController extends GetxController {
 
       if (response.statusCode == 200) {
         final resData = jsonDecode(response.body);
-<<<<<<< HEAD
-        Get.snackbar(
-          'Added to cart',
-          resData['message'] ?? 'Updated successfully',
-          colorText: kLightWhite,
-          backgroundColor: kLightBlue,
-          icon: const Icon(Icons.check_circle_outline, color: kLightWhite),
-        );
-        await refreshCartCount();
-=======
         await refreshCartCount();
 
         Get.snackbar(
@@ -236,7 +208,6 @@ class CartController extends GetxController {
           backgroundColor: Kbackground,
           icon: const Icon(Icons.check_circle_outline, color: KTextColor),
         );
->>>>>>> clean-branch
       } else if (response.statusCode == 401 && !isRetrying) {
         await refreshTokenAndRetry(
           productId: productId,

@@ -9,26 +9,17 @@ import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/common/shimmers/foodlist_shimmer.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/cart_controller.dart';
-<<<<<<< HEAD
-import 'package:graduation_project1/hooks/fetch_cart.dart';
-import 'package:graduation_project1/hooks/fetch_all_products.dart';
-import 'package:graduation_project1/models/cart_response.dart';
-=======
 import 'package:graduation_project1/controllers/coupon_controller.dart';
 import 'package:graduation_project1/hooks/fetch_cart.dart';
 import 'package:graduation_project1/hooks/fetch_all_products.dart';
 import 'package:graduation_project1/models/cart_response.dart';
 import 'package:graduation_project1/hooks/fetch_all_orders.dart';
 
->>>>>>> clean-branch
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/auth/login_redirect.dart';
 import 'package:graduation_project1/views/cart/widgets/cart_tile.dart';
 import 'package:graduation_project1/views/entrypoint.dart';
-<<<<<<< HEAD
-=======
 import 'package:graduation_project1/views/orders/confirm_order_screen.dart';
->>>>>>> clean-branch
 
 class CartScreen extends HookWidget {
   final bool fromAppBar;
@@ -38,15 +29,11 @@ class CartScreen extends HookWidget {
   Widget build(BuildContext context) {
     final hookResult = useFetchcart();
     final productsHook = useFetchAllProducts();
-<<<<<<< HEAD
-    final cartController = Get.put(CartController());
-=======
     final cartController = Get.find<CartController>();
     final ordersHook = useFetchOrders();
     final hasOrders = ordersHook.data?.isNotEmpty ?? false;
 
     final CouponController couponController = Get.put(CouponController());
->>>>>>> clean-branch
 
     final cart = hookResult.data;
     final allProducts = productsHook.data ?? [];
@@ -113,144 +100,6 @@ class CartScreen extends HookWidget {
           : sum,
     );
 
-<<<<<<< HEAD
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-              child: Row(
-                children: [
-                  if (fromAppBar)
-                    GestureDetector(
-                      onTap: () => Get.back(),
-                      child: const Icon(Icons.arrow_back_ios, color: kDarkBlue),
-                    ),
-                  if (fromAppBar) const SizedBox(width: 10),
-                  ReusableText(
-                    text: 'Shopping Cart',
-                    style: appStyle(18, kDarkBlue, FontWeight.w600),
-                  ),
-                ],
-              ),
-            ),
-            if (isLoading)
-              const Expanded(child: FoodsListShimmer())
-            else if (enrichedCartItems.isEmpty)
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 35.0, vertical: 40),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * .33,
-                        child: Image.asset(
-                          'assets/banners/cart.png',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                      ReusableText(
-                        text: 'Your Cart is Empty!',
-                        style: appStyle(20, kDarkBlue, FontWeight.w600),
-                        align: TextAlign.center,
-                      ),
-                      SizedBox(height: 20.h),
-                      ReusableText(
-                        text:
-                            'Tap add to Cart button to start adding your items',
-                        style: appStyle(12, kDarkBlue, FontWeight.w400),
-                        align: TextAlign.center,
-                      ),
-                      SizedBox(height: 20.h),
-                      CustomButton(
-                        onTap: () => Get.offAll(() => MainScreen()),
-                        btnColor: Colors.white,
-                        text: 'Add to Cart',
-                        textcolor: kDarkBlue,
-                        btnWidth: 300,
-                        btnHeight: 60,
-                        borderColor: kDarkBlue,
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else
-              Expanded(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20.w, vertical: 4.h),
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton.icon(
-                          onPressed: () => _showClearAllSheet(context, refetch),
-                          icon: const Icon(Icons.delete_outline,
-                              color: Colors.red),
-                          label: Text(
-                            "Clear All",
-                            style: appStyle(14, Colors.red, FontWeight.w500),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: ListView.builder(
-                        key: ValueKey(enrichedCartItems.length),
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        itemCount: enrichedCartItems.length,
-                        itemBuilder: (context, i) {
-                          final item = enrichedCartItems[i];
-                          return CartTile(
-                            item: item,
-                            refetch: () async => await refetch!(),
-                          );
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: 20.w, vertical: 45.h),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _buildPriceRow(
-                              'Subtotal :', '\$${subtotal.toStringAsFixed(2)}'),
-                          _buildPriceRow('Shipping Fee :', '\$0.00'),
-                          _buildPriceRow('Discount :',
-                              '-\$${discount.toStringAsFixed(2)}'),
-                          const Divider(height: 25, thickness: 1),
-                          _buildPriceRow(
-                            'Total :',
-                            '\$${(subtotal - discount).toStringAsFixed(2)}',
-                            bold: true,
-                          ),
-                          const SizedBox(height: 12),
-                          CustomButton(
-                            onTap: () {
-                              // TODO: Add checkout logic
-                            },
-                            btnColor: kLightBlue,
-                            text: 'Checkout',
-                            textcolor: Colors.white,
-                            btnWidth: double.infinity,
-                            btnHeight: 55,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-          ],
-        ),
-=======
     final shippingFee = hasOrders ? 60.0 : 0.0;
     final totalBeforeCoupon = subtotal - discount + shippingFee;
 
@@ -336,13 +185,10 @@ class CartScreen extends HookWidget {
             borderColor: kDarkBlue,
           ),
         ],
->>>>>>> clean-branch
       ),
     );
   }
 
-<<<<<<< HEAD
-=======
   Widget _buildCartContent(
       BuildContext context,
       List<CartItem> items,
@@ -443,7 +289,6 @@ class CartScreen extends HookWidget {
     );
   }
 
->>>>>>> clean-branch
   Widget _buildPriceRow(String label, String value, {bool bold = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

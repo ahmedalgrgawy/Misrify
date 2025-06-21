@@ -107,18 +107,11 @@ class _ContactUsScreenState extends State<ContactUsScreen> {
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Card(
-<<<<<<< HEAD
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      elevation: 4,
-=======
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       elevation: 2,
->>>>>>> clean-branch
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(

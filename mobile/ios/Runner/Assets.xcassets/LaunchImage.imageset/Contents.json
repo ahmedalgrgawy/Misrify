@@ -6,8 +6,6 @@
       "scale" : "1x"
     },
     {
-<<<<<<< HEAD
-=======
       "appearances" : [
         {
           "appearance" : "luminosity",
@@ -19,17 +17,11 @@
       "scale" : "1x"
     },
     {
->>>>>>> clean-branch
       "filename" : "LaunchImage@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-<<<<<<< HEAD
-      "filename" : "LaunchImage@3x.png",
-      "idiom" : "universal",
-      "scale" : "3x"
-=======
       "appearances" : [
         {
           "appearance" : "luminosity",
@@ -55,7 +47,6 @@
       "filename" : "LaunchImageDark@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
->>>>>>> clean-branch
     }
   ],
   "info" : {

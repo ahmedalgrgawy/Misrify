@@ -45,10 +45,6 @@ class CustomNavBar extends StatelessWidget {
                 final iconIndex = index == 2
                     ? currentIndex
                     : (index == currentIndex ? 2 : index);
-<<<<<<< HEAD
-                final isCenter = index == 2;
-=======
->>>>>>> clean-branch
 
                 // Add Spacer around center index to ensure equal spacing
                 if (index == 2) {

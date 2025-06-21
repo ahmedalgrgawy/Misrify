@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-import 'dart:convert';
-=======
->>>>>>> clean-branch
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:graduation_project1/constants/constants.dart';
@@ -18,11 +14,7 @@ FetchHook useFetchFilteredProducts({
   final products = useState<List<Product>?>(null);
   final isLoading = useState<bool>(false);
   final error = useState<Exception?>(null);
-<<<<<<< HEAD
-  final apiError = useState<ApiError?>(null);
-=======
   useState<ApiError?>(null);
->>>>>>> clean-branch
 
   Future<void> fetchData() async {
     isLoading.value = true;
@@ -101,21 +93,11 @@ FetchHook useFetchProductsByCategory(String categoryId) {
           debugPrint("Product Category ID: $productCategoryId vs $categoryId");
           return productCategoryId == categoryId;
         }).toList();
-<<<<<<< HEAD
-
-        debugPrint(
-            "✅ Found ${filtered.length} related products for $categoryId");
-=======
->>>>>>> clean-branch
         products.value = filtered;
       } else {
         products.value = [];
       }
     } catch (e) {
-<<<<<<< HEAD
-      error.value = e is Exception ? e : Exception(e.toString());
-=======
->>>>>>> clean-branch
     } finally {
       isLoading.value = false;
     }

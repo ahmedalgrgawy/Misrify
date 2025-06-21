@@ -25,23 +25,15 @@ class ProfileController extends GetxController {
     if (pickedFile == null) return null;
 
     final bytes = await pickedFile.readAsBytes();
-<<<<<<< HEAD
-=======
 
->>>>>>> clean-branch
     if (bytes.lengthInBytes > 5 * 1024 * 1024) {
       Get.snackbar("Error", "Image is too large. Please choose one under 5MB.",
           backgroundColor: Colors.red, colorText: Colors.white);
       return null;
     }
 
-<<<<<<< HEAD
-    final mimeType = pickedFile.mimeType ?? 'image/jpeg';
-    return 'data:$mimeType;base64,${base64Encode(bytes)}';
-=======
     final base64Image = base64Encode(bytes);
     return 'data:image/${pickedFile.path.split('.').last};base64,$base64Image';
->>>>>>> clean-branch
   }
 
   Future<void> pickImageAndUpdateProfile({
