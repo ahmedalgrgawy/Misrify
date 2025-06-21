@@ -32,7 +32,7 @@ export const calculateDiscount = (points) => {
     return 0; // Default case (should never reach here)
 };
 
-const calculatePoints = (orderPrice) => {
+export const calculatePoints = (orderPrice) => {
     // Ensure price is a positive number
     if (typeof orderPrice !== 'number' || orderPrice < 0) {
         return 0;

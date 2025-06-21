@@ -126,7 +126,7 @@ class ProductDetailScreen extends HookWidget {
             children: [
               //image
               SizedBox(
-                height: 300,
+                height: 360,
                 width: double.infinity,
                 child: () {
                   final imgUrl = product.imgUrl;

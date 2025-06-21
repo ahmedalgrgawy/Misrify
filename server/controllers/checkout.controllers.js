@@ -11,6 +11,7 @@ import Payment from "../models/payment.model.js";
 import axios from "axios";
 import Notification from "../models/notification.model.js";
 import mongoose from "mongoose"
+import {calculatePoints} from "../utils/generators.js";
 
 
 export const getCoupons = async (req, res, next) => {
