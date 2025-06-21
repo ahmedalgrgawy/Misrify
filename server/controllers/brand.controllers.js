@@ -26,6 +26,12 @@ export const createBrand = async (req, res, next) => {
         return next(new AppError("Brand already exists", 400))
     }
 
+    const doesOwnerAlreadyHaveBrand = await Brand.findOne({ owner: ownerId });
+
+    if (doesOwnerAlreadyHaveBrand) {
+        return next(new AppError("Owner already has a brand", 400))
+    }
+
     const brand = new Brand({ name, description, owner: ownerId });
 
     await brand.save();
