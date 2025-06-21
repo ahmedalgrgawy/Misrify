@@ -32,6 +32,10 @@ class AllProductsList extends StatelessWidget {
             price: product.price.toStringAsFixed(2),
             title: product.name,
             id: product.id,
+<<<<<<< HEAD
+=======
+            image: product.imgUrl,
+>>>>>>> clean-branch
           );
         },
       ),

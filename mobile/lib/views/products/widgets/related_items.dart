@@ -14,6 +14,7 @@ class RelatedItems extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GrideLayout(
+<<<<<<< HEAD
         mainAxisspacing: 16,
         mainAxis: 275,
         crossAxiscount: 2,
@@ -21,10 +22,20 @@ class RelatedItems extends StatelessWidget {
         shrinkwrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: products.length < 2 ? products.length : 2,
+=======
+        mainAxisspacing: 10,
+        mainAxis: 260,
+        crossAxiscount: 2,
+        scrooldirection: Axis.vertical,
+        shrinkwrap: true,
+        physics: const BouncingScrollPhysics(),
+        itemCount: products.length < 4 ? products.length : 4,
+>>>>>>> clean-branch
         itemBuilder: (context, i) {
           final product = products[i];
 
           return ProductWidget(
+<<<<<<< HEAD
             onTap: () => Get.to(() => ProductDetailScreen(product: product)),
             brand: product.brand.name,
             price: product.price.toStringAsFixed(2),
@@ -33,6 +44,19 @@ class RelatedItems extends StatelessWidget {
             isDiscounted: product.isDiscounted,
             discountAmount: product.discountAmount,
             id: product.id,
+=======
+            onTap: () {
+              Get.to(() => ProductDetailScreen(product: product.copyWith()),
+                  preventDuplicates: false);
+            },
+            brand: product.brand.name,
+            price: product.price.toStringAsFixed(2),
+            title: product.name,
+            id: product.id,
+            image: product.imgUrl,
+            isDiscounted: product.isDiscounted,
+            discountAmount: product.discountAmount,
+>>>>>>> clean-branch
           );
         },
       ),

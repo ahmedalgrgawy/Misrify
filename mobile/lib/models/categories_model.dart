@@ -36,6 +36,11 @@ class Category {
   final String description;
   final DateTime createdAt;
   final DateTime updatedAt;
+<<<<<<< HEAD
+=======
+  final String? imgUrl;
+
+>>>>>>> clean-branch
   final int v;
 
   Category({
@@ -44,12 +49,20 @@ class Category {
     required this.description,
     required this.createdAt,
     required this.updatedAt,
+<<<<<<< HEAD
+=======
+    this.imgUrl,
+>>>>>>> clean-branch
     required this.v,
   });
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
         id: json["_id"]?.toString() ?? '',
         name: json["name"]?.toString() ?? '',
+<<<<<<< HEAD
+=======
+        imgUrl: json["imgUrl"],
+>>>>>>> clean-branch
         description: json["description"]?.toString() ?? '',
         createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
         updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
@@ -60,6 +73,10 @@ class Category {
 
   Map<String, dynamic> toJson() => {
         "_id": id,
+<<<<<<< HEAD
+=======
+        "imgUrl": imgUrl,
+>>>>>>> clean-branch
         "name": name,
         "description": description,
         "createdAt": createdAt.toIso8601String(),

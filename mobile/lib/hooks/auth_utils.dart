@@ -1,5 +1,8 @@
 // lib/services/auth_utils.dart
+<<<<<<< HEAD
 import 'dart:convert';
+=======
+>>>>>>> clean-branch
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/constants/constants.dart';

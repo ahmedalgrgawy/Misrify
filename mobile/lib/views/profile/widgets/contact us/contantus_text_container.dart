@@ -59,7 +59,11 @@ class ContantusTextContainer extends StatelessWidget {
               filled: true,
               hintText: hinttext,
               hintStyle: appStyle(14, kLightGray, FontWeight.w400),
+<<<<<<< HEAD
               fillColor: kLightWhite.withOpacity(0.45),
+=======
+              fillColor: Kbackground,
+>>>>>>> clean-branch
               prefixIcon: prefixIcon,
               isDense: true,
               contentPadding:

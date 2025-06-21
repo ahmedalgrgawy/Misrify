@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+import 'dart:convert';
+>>>>>>> clean-branch
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -8,17 +12,24 @@ import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/models/cart_response.dart';
 import 'package:graduation_project1/views/products/Product_page.dart';
 
+<<<<<<< HEAD
 class CartTile extends StatelessWidget {
   const CartTile({
     Key? key,
     required this.item,
     this.refetch,
   }) : super(key: key);
+=======
+class CartTile extends StatefulWidget {
+  const CartTile({Key? key, required this.item, this.refetch})
+      : super(key: key);
+>>>>>>> clean-branch
 
   final CartItem item;
   final Function()? refetch;
 
   @override
+<<<<<<< HEAD
   Widget build(BuildContext context) {
     final controller = Get.put(CartController());
     final product = item.product;
@@ -27,6 +38,39 @@ class CartTile extends StatelessWidget {
       onTap: () {
         Get.to(() => ProductDetailScreen(product: product));
       },
+=======
+  State<CartTile> createState() => _CartTileState();
+}
+
+class _CartTileState extends State<CartTile> {
+  bool isLoading = false;
+
+  Future<void> handleQuantityChange(String operation) async {
+    final controller = Get.find<CartController>();
+    setState(() => isLoading = true);
+
+    if (operation == "minus" && widget.item.quantity == 1) {
+      await controller.removeFromCart(widget.item.id);
+    } else {
+      await controller.updateCartItemQuantity(
+        cartItemId: widget.item.id,
+        operation: operation,
+      );
+    }
+
+    await controller.refreshCartCount();
+    await widget.refetch?.call();
+    if (mounted) setState(() => isLoading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = Get.put(CartController());
+    final product = widget.item.product;
+
+    return GestureDetector(
+      onTap: () => Get.to(() => ProductDetailScreen(product: product)),
+>>>>>>> clean-branch
       onLongPress: () {
         showModalBottomSheet(
           context: context,
@@ -58,10 +102,17 @@ class CartTile extends StatelessWidget {
                           padding: EdgeInsets.symmetric(horizontal: 24.w),
                         ),
                         onPressed: () async {
+<<<<<<< HEAD
                           Navigator.pop(context); // Close the sheet first
                           await controller.removeFromCart(item.id);
                           await controller.refreshCartCount();
                           await refetch?.call();
+=======
+                          Navigator.pop(context);
+                          await controller.removeFromCart(widget.item.id);
+                          await controller.refreshCartCount();
+                          await widget.refetch?.call();
+>>>>>>> clean-branch
                         },
                         child: const Text("Yes, Remove"),
                       ),
@@ -104,11 +155,45 @@ class CartTile extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12.r),
                 child: SizedBox(
                   width: 80.w,
+<<<<<<< HEAD
                   child: Image.network(
                     product.imgUrl ??
                         "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
                     fit: BoxFit.cover,
                   ),
+=======
+                  child: () {
+                    if (product.imgUrl != null &&
+                        product.imgUrl!.startsWith('data:image')) {
+                      try {
+                        final base64Str = product.imgUrl!.split(',').last;
+                        return Image.memory(
+                          base64Decode(base64Str),
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              const Icon(Icons.broken_image, size: 50),
+                        );
+                      } catch (_) {
+                        return const Icon(Icons.broken_image, size: 50);
+                      }
+                    } else if (product.imgUrl != null &&
+                        product.imgUrl!.startsWith('http')) {
+                      return Image.network(
+                        product.imgUrl!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.broken_image, size: 50),
+                      );
+                    } else {
+                      return Image.network(
+                        "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.broken_image, size: 50),
+                      );
+                    }
+                  }(),
+>>>>>>> clean-branch
                 ),
               ),
               SizedBox(width: 12.w),
@@ -118,8 +203,13 @@ class CartTile extends StatelessWidget {
                   children: [
                     ReusableText(
                       text: product.name,
+<<<<<<< HEAD
                       style: appStyle(14, Kfoundation, FontWeight.w600),
                       maxlines: 1,
+=======
+                      maxlines: 1,
+                      style: appStyle(14, Kfoundation, FontWeight.w600),
+>>>>>>> clean-branch
                     ),
                     SizedBox(height: 4.h),
                     ReusableText(
@@ -127,12 +217,19 @@ class CartTile extends StatelessWidget {
                       style: appStyle(12, Colors.grey, FontWeight.w400),
                     ),
                     SizedBox(height: 6.h),
+<<<<<<< HEAD
 
                     // ✅ Display color and size
                     Row(
                       children: [
                         if (item.color.isNotEmpty &&
                             item.color.toLowerCase() != 'default')
+=======
+                    Row(
+                      children: [
+                        if (widget.item.color.isNotEmpty &&
+                            widget.item.color.toLowerCase() != 'default')
+>>>>>>> clean-branch
                           Container(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 6.w, vertical: 2.h),
@@ -141,12 +238,21 @@ class CartTile extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4.r),
                             ),
                             child: ReusableText(
+<<<<<<< HEAD
                               text: "Color: ${item.color}",
                               style: appStyle(12, Kfoundation, FontWeight.w400),
                             ),
                           ),
                         if (item.size.isNotEmpty &&
                             item.size.toLowerCase() != 'default') ...[
+=======
+                              text: "Color: ${widget.item.color}",
+                              style: appStyle(12, Kfoundation, FontWeight.w400),
+                            ),
+                          ),
+                        if (widget.item.size.isNotEmpty &&
+                            widget.item.size.toLowerCase() != 'default') ...[
+>>>>>>> clean-branch
                           SizedBox(width: 8.w),
                           Container(
                             padding: EdgeInsets.symmetric(
@@ -156,19 +262,27 @@ class CartTile extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4.r),
                             ),
                             child: ReusableText(
+<<<<<<< HEAD
                               text: "Size: ${item.size}",
+=======
+                              text: "Size: ${widget.item.size}",
+>>>>>>> clean-branch
                               style: appStyle(12, Kfoundation, FontWeight.w400),
                             ),
                           ),
                         ],
                       ],
                     ),
+<<<<<<< HEAD
 
+=======
+>>>>>>> clean-branch
                     SizedBox(height: 10.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         ReusableText(
+<<<<<<< HEAD
                           text: "\$${item.total.toStringAsFixed(2)}",
                           style: appStyle(14, kDarkBlue, FontWeight.w600),
                         ),
@@ -218,6 +332,51 @@ class CartTile extends StatelessWidget {
                             ),
                           ],
                         )
+=======
+                          text: "EGP ${widget.item.total.toStringAsFixed(2)}",
+                          style: appStyle(14, kDarkBlue, FontWeight.w600),
+                        ),
+                        isLoading
+                            ? const SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: kGray,
+                                ),
+                              )
+                            : Row(
+                                children: [
+                                  RawMaterialButton(
+                                    onPressed: () =>
+                                        handleQuantityChange("minus"),
+                                    fillColor: Colors.white,
+                                    shape: const CircleBorder(),
+                                    constraints: BoxConstraints.tightFor(
+                                        width: 28.w, height: 28.h),
+                                    child: const Icon(Icons.remove,
+                                        color: Kfoundation, size: 18),
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  ReusableText(
+                                    text: widget.item.quantity.toString(),
+                                    style: appStyle(
+                                        14, Kfoundation, FontWeight.w600),
+                                  ),
+                                  SizedBox(width: 4.w),
+                                  RawMaterialButton(
+                                    onPressed: () =>
+                                        handleQuantityChange("add"),
+                                    fillColor: Colors.white,
+                                    shape: const CircleBorder(),
+                                    constraints: BoxConstraints.tightFor(
+                                        width: 28.w, height: 28.h),
+                                    child: const Icon(Icons.add,
+                                        color: Kfoundation, size: 18),
+                                  ),
+                                ],
+                              )
+>>>>>>> clean-branch
                       ],
                     ),
                   ],
