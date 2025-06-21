@@ -52,7 +52,7 @@ class CategoryTile extends StatelessWidget {
 
     return ListTile(
       onTap: () {
-        controller.updateCategory = category.id;
+        controller.updateCategoryId = category.id; // ✅
         controller.updateTitle = category.name;
         Get.to(() => const AllCategoryProductScreen(),
             transition: Transition.fadeIn,

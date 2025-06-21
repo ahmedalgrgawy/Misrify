@@ -19,7 +19,9 @@ import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/auth/login_redirect.dart';
 import 'package:graduation_project1/views/cart/widgets/cart_tile.dart';
 import 'package:graduation_project1/views/entrypoint.dart';
+import 'package:graduation_project1/views/home/widgets/SectionHeading.dart';
 import 'package:graduation_project1/views/orders/confirm_order_screen.dart';
+import 'package:graduation_project1/views/profile/points_screen.dart';
 
 class CartScreen extends HookWidget {
   final bool fromAppBar;
@@ -225,6 +227,14 @@ class CartScreen extends HookWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SectionHeading(
+                  title: 'Coupons',
+                  showButton: true,
+                  padd: EdgeInsets.zero,
+                  onPress: () {
+                    Get.to(PointsScreen());
+                  },
+                ),
                 TextField(
                   controller: couponController.couponTextController,
                   decoration: InputDecoration(

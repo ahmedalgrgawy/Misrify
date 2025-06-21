@@ -51,11 +51,11 @@ class CategoryWidget extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
-        if (controller.categoryValue == category.id) {
-          controller.updateCategory = '';
+        if (controller.categoryIdValue == category.id) {
+          controller.updateCategoryId = '';
           controller.updateTitle = '';
         } else {
-          controller.updateCategory = category.id;
+          controller.updateCategoryId = category.id;
           controller.updateTitle = category.name;
           Get.to(() => const AllCategoryProductScreen());
         }
@@ -72,7 +72,7 @@ class CategoryWidget extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10.r),
                 border: Border.all(
-                  color: controller.categoryValue == category.id
+                  color: controller.categoryIdValue == category.id
                       ? kNavy
                       : Colors.white,
                   width: .5.w,
