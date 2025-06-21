@@ -19,8 +19,9 @@ class AllCategoryProductScreen extends HookWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CategoryController>();
     final categoryName = controller.titleValue;
+    final categoryId = controller.categoryIdValue; // ✅ Use ID
     final sortType = useState<String>('Most Popular');
-    final hookResult = useFetchProductsByCategory(categoryName);
+    final hookResult = useFetchProductsByCategory(categoryId); // ✅ Correct ID
     final originalProducts = useState<List<Product>>([]);
     final displayedProducts = useState<List<Product>>([]);
 
@@ -39,9 +40,9 @@ class AllCategoryProductScreen extends HookWidget {
     return WillPopScope(
       onWillPop: () async {
         // ✅ Reset category state before navigating back
-        controller.updateCategory = '';
+        controller.updateCategoryId = '';
         controller.updateTitle = '';
-        return true; // Allow pop
+        return true;
       },
       child: SafeArea(
         child: Scaffold(

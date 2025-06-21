@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   }
 
   void _refetch() {
-    categoryController.updateCategory = '';
+    categoryController.updateCategoryId = '';
     categoryController.updateTitle = '';
     cartController.refreshCartCount();
     notificationsController.fetchNotifications();
@@ -85,7 +85,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
               onPress: () => Get.to(() => CategoriesScreen()),
             ),
             const CategoryList(),
-            Obx(() => categoryController.categoryValue == ''
+            Obx(() => categoryController.categoryIdValue == ''
                 ? Column(
                     children: [
                       SectionHeading(

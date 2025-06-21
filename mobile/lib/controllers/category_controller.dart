@@ -3,14 +3,15 @@
 import 'package:get/get.dart';
 
 class CategoryController extends GetxController {
-  RxString _category = ''.obs;
-  String get categoryValue => _category.value;
-  set updateCategory(String value) {
-    _category.value = value;
+  // Category ID
+  RxString _categoryId = ''.obs;
+  String get categoryIdValue => _categoryId.value;
+  set updateCategoryId(String value) {
+    _categoryId.value = value;
   }
 
+  // Category name
   RxString _title = ''.obs;
-
   String get titleValue => _title.value;
   set updateTitle(String value) {
     _title.value = value;
