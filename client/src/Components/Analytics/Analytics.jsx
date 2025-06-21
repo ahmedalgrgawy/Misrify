@@ -8,7 +8,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LuPackageOpen } from "react-icons/lu";
-import { FaTags } from "react-icons/fa6";
+import { FaDollarSign, FaTags } from "react-icons/fa6";
 import { IoIosPeople } from "react-icons/io";
 import { RxGrid } from "react-icons/rx";
 import { Link } from "react-router-dom";
@@ -33,7 +33,7 @@ const Analytics = () => {
   const dispatch = useDispatch();
   const [error, setError] = useState(null);
   const [showTooltip, setShowTooltip] = useState(true);
-  const [activePeriod, setActivePeriod] = useState("Monthly");
+  const [activePeriod, setActivePeriod] = useState("Annually");
 
   const userRole = useSelector((state) => state.auth.user?.role);
   const adminAnalytics = useSelector((state) => state.adminAnalytics);
@@ -56,8 +56,6 @@ const Analytics = () => {
     yearlyIncome: merchantYearlyIncome = {},
     loading: merchantLoading,
   } = userRole === "merchant" ? merchantAnalytics || {} : {};
-
-  console.log(salesGrowth);
 
   const yearlyIncome = userRole === "admin" ? adminYearlyIncome : merchantYearlyIncome;
   const loading = userRole === "admin" ? adminLoading : merchantLoading;
@@ -117,27 +115,6 @@ const Analytics = () => {
     fetchData();
   }, [dispatch, userRole, activePeriod]);
 
-  // Doughnut chart configurations
-  const doughnutData = {
-    labels: yearlyIncome.labels || ["Sales", "Investments"],
-    datasets: [
-      {
-        data: yearlyIncome.values || [0, 0],
-        backgroundColor: ["#2B3D5B", "#A5D8FF"],
-        borderWidth: 0,
-        cutout: "90%",
-        circumference: 300,
-        rotation: 210,
-        borderRadius: 20,
-      },
-    ],
-  };
-
-  const doughnutOptions = {
-    plugins: { legend: { display: false }, tooltip: { enabled: false } },
-    responsive: true,
-    maintainAspectRatio: false,
-  };
 
   return (
     <div>
@@ -354,6 +331,21 @@ const Analytics = () => {
                 )}
               </div>
             </div>
+            {/* Total Sales Number */}
+            <div className="px-4 py-3.5 rounded-2xl bg-white w-full flex justify-center items-center">
+              <div className="flex flex-col justify-center items-center">
+                <div className="p-2.5 text-[rgb(219,216,39)] bg-[#f4f3b1] rounded-full w-fit">
+                  <FaDollarSign className="text-2xl" />
+                </div>
+                <p className="my-4 text-[#6E7786] text-sm font-semibold mx-auto">Total Income</p>
+                <h3 className="text-sm font-normal text-[#6E7786] mx-auto">
+                  <span className="text-2xl font-bold text-[#0B172A] me-1.5">
+                    {yearlyIncome.totalIncome || 0}
+                  </span>
+                  EGP
+                </h3>
+              </div>
+            </div>
           </div>
 
           {/* Sales Chart */}
@@ -365,11 +357,40 @@ const Analytics = () => {
                   <span className="font-bold text-3xl text-[#1E1B39]">
                     EGP {(ordersSales.totalMoneyPaid || 0).toLocaleString()}
                   </span>
-                  <span className="text-[#04CE00] flex items-center gap-1 text-sm">
-                    <div className="w-2.5 h-2.5 bg-[#04CE00] rounded-full"></div>
-                    {(ordersSales.timeSeries?.length && ordersSales.timeSeries[0].totalMoneyPaid
-                      ? ((ordersSales.totalMoneyPaid - ordersSales.timeSeries[0].totalMoneyPaid) /
-                        ordersSales.timeSeries[0].totalMoneyPaid * 100).toFixed(1)
+                  <span
+                    className={`flex items-center gap-1 text-sm ${ordersSales.timeSeries?.length &&
+                      ordersSales.timeSeries[0].totalMoneyPaid
+                      ? (ordersSales.totalMoneyPaid -
+                        ordersSales.timeSeries[0].totalMoneyPaid) /
+                        ordersSales.timeSeries[0].totalMoneyPaid *
+                        100 >=
+                        0
+                        ? "text-[#04CE00]"
+                        : "text-[#DC2626]"
+                      : "text-[#04CE00]"
+                      }`}
+                  >
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full ${ordersSales.timeSeries?.length &&
+                        ordersSales.timeSeries[0].totalMoneyPaid
+                        ? (ordersSales.totalMoneyPaid -
+                          ordersSales.timeSeries[0].totalMoneyPaid) /
+                          ordersSales.timeSeries[0].totalMoneyPaid *
+                          100 >=
+                          0
+                          ? "bg-[#04CE00]"
+                          : "bg-[#DC2626]"
+                        : "bg-[#04CE00]"
+                        }`}
+                    ></div>
+                    {(ordersSales.timeSeries?.length &&
+                      ordersSales.timeSeries[0].totalMoneyPaid
+                      ? (
+                        (ordersSales.totalMoneyPaid -
+                          ordersSales.timeSeries[0].totalMoneyPaid) /
+                        ordersSales.timeSeries[0].totalMoneyPaid *
+                        100
+                      ).toFixed(1)
                       : 0)}%
                   </span>
                   VS PREVIOUS PERIOD
@@ -378,19 +399,22 @@ const Analytics = () => {
               <div className="flex bg-[#F8F9FF] rounded-lg overflow-hidden items-center">
                 <button
                   onClick={() => setActivePeriod("Weekly")}
-                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Weekly" ? "font-medium text-white bg-title-blue" : ""}`}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Weekly" ? "font-medium text-white bg-title-blue" : ""
+                    }`}
                 >
                   Weekly
                 </button>
                 <button
                   onClick={() => setActivePeriod("Monthly")}
-                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Monthly" ? "font-medium text-white bg-title-blue" : ""}`}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Monthly" ? "font-medium text-white bg-title-blue" : ""
+                    }`}
                 >
                   Monthly
                 </button>
                 <button
                   onClick={() => setActivePeriod("Annually")}
-                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Annually" ? "font-medium text-white bg-title-blue" : ""}`}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Annually" ? "font-medium text-white bg-title-blue" : ""
+                    }`}
                 >
                   Annually
                 </button>
@@ -400,21 +424,80 @@ const Analytics = () => {
               <Typography>Loading...</Typography>
             ) : (
               <LineChart
-                xAxis={[{ offset: 25, labelOffset: 1, disableTicks: true, disableLine: true, scaleType: "point", data: ordersSales.timeSeries?.map((t) => t.label) || [] }]}
-                yAxis={[{
-                  offset: 30,
-                  disableTicks: true,
-                  disableLine: true,
-                  position: "right",
-                  valueFormatter: (value) => activePeriod === "Monthly" || activePeriod === "Annually"
-                    ? (value >= 1000000 ? `${(value / 1000000).toFixed(1)}M` : `${(value / 1000).toFixed(0)}K`)
-                    : `${value.toLocaleString()}`
-                }]}
+                xAxis={[
+                  {
+                    labelOffset: 1,
+                    tickLabelStyle: { fontSize: 12, fill: "#6E7786" },
+                    scaleType: "point",
+                    data: ordersSales.timeSeries?.map((t) => t.label) || [],
+                  },
+                ]}
+                yAxis={[
+                  {
+                    tickLabelStyle: { fontSize: 12, fill: "#6E7786" },
+                    valueFormatter: (value) => `${Math.round(value)}`, // Raw EGP
+                    min: 0,
+                    max:
+                      Math.max(
+                        ...(ordersSales.timeSeries?.map((t) => t.totalMoneyPaid) || [0]),
+                        50
+                      ) * 1.2, // 20% headroom
+                    tickValues: (() => {
+                      const maxData = Math.max(
+                        ...(ordersSales.timeSeries?.map((t) => t.totalMoneyPaid) || [0]),
+                        50
+                      );
+                      const baseTicks = [50, 100, 200, 500, 1000];
+                      if (maxData > 1000) {
+                        let nextTick = 2000;
+                        const extendedTicks = [...baseTicks];
+                        while (nextTick <= maxData * 1.2) {
+                          extendedTicks.push(nextTick);
+                          nextTick = nextTick < 5000 ? nextTick * 2.5 : nextTick * 2;
+                        }
+                        return extendedTicks;
+                      }
+                      return baseTicks.filter((tick) => tick <= maxData * 1.2);
+                    })(),
+                    position: "left",
+                    margin: { left: 60 }, // Ensure space for labels
+                  },
+                ]}
                 grid={{ horizontal: true }}
-                series={[{ curve: "monotoneX", data: ordersSales.timeSeries?.map((t) => t.totalMoneyPaid) || [], area: true, showMark: false, color: "url(#Gradient7)", valueFormatter: (value) => `EGP ${value.toLocaleString()}` }]}
-                slotProps={{ tooltip: { sx: { [`& .${chartsTooltipClasses.labelCell}`]: { display: "none" }, [`& .${chartsTooltipClasses.paper}`]: { color: "white !important", backgroundColor: "#15253F", borderRadius: "8px" }, [`& .${chartsTooltipClasses.valueCell}`]: { color: "white !important", fontWeight: "semibold" } } } }}
-                sx={{ [`& .${lineElementClasses.root}`]: { stroke: "rgba(21, 37, 63)", strokeWidth: 3 } }}
+                series={[
+                  {
+                    curve: "linear",
+                    data: ordersSales.timeSeries?.map((t) => t.totalMoneyPaid) || [],
+                    area: true,
+                    showMark: false,
+                    color: "url(#Gradient7)",
+                    valueFormatter: (value) => `EGP ${value.toLocaleString()}`,
+                  },
+                ]}
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      [`& .${chartsTooltipClasses.labelCell}`]: { display: "none" },
+                      [`& .${chartsTooltipClasses.paper}`]: {
+                        color: "white !important",
+                        backgroundColor: "#15253F",
+                        borderRadius: "8px",
+                      },
+                      [`& .${chartsTooltipClasses.valueCell}`]: {
+                        color: "white !important",
+                        fontWeight: "semibold",
+                      },
+                    },
+                  },
+                }}
+                sx={{
+                  [`& .${lineElementClasses.root}`]: { stroke: "rgba(21, 37, 63)", strokeWidth: 3 },
+                  "& .MuiChartsAxis-left .MuiChartsAxis-tickLabel": {
+                    transform: "translateX(-10px)", // Adjust label position
+                  },
+                }}
                 height={300}
+                margin={{ top: 20, bottom: 30, left: 60, right: 10 }} // Adjust for y-axis labels
               >
                 <Stack direction="row">
                   <FormControlLabel
@@ -430,51 +513,13 @@ const Analytics = () => {
                 </linearGradient>
                 <AreaPlot />
                 <LinePlot />
+                {ordersSales.timeSeries?.every((t) => t.totalMoneyPaid === 0) && (
+                  <text x="50%" y="50%" textAnchor="middle" fill="rgba(0, 0, 0, 0.5)" fontSize="14">
+                    No Sales Data
+                  </text>
+                )}
               </LineChart>
             )}
-          </div>
-          <div className="grid gap-8 gap-x-14 font-inter">
-            {/* Yearly Income */}
-            <div className="rounded-2xl bg-white p-8">
-              <div className="pb-2.5 border-b-2 border-[#E5E5EF]">
-                <p className="text-[#9291A5] text-lg">Statistics</p>
-                <p className="text-title-blue text-xl font-bold">Yearly Income</p>
-              </div>
-              <div className="mt-5">
-                {loading ? (
-                  <Typography>Loading...</Typography>
-                ) : (
-                  <>
-                    <Box position="relative" width={240} height={200} mx="auto">
-                      <Doughnut data={doughnutData} options={doughnutOptions} />
-                      <Box position="absolute" top="50%" left="50%" sx={{ transform: "translate(-50%, -25%)", textAlign: "center" }}>
-                        <Typography variant="body2" color="textSecondary" className="!font-inter !font-normal !text-base">
-                          Total Income
-                        </Typography>
-                        <Typography variant="h6" fontWeight="semibold" className="!text-main-blue !font-inter !font-bold !text-xl">
-                          {yearlyIncome.totalIncome ? `${parseInt(yearlyIncome.totalIncome).toLocaleString()} EGP` : "0 EGP"}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box className="flex flex-wrap w-full justify-around mt-5 text-sm">
-                      {(doughnutData.labels || []).map((label, index) => (
-                        <div className="flex items-center" key={label}>
-                          <span className={`w-3 h-3 rounded-full me-0.5`} style={{ backgroundColor: doughnutData.datasets[0].backgroundColor[index] }}></span>
-                          <span className="text-second-grey text-base font-normal">
-                            {label}
-                            <span className="text-main-blue font-medium ms-1">
-                              {yearlyIncome.values && yearlyIncome.values.reduce((sum, val) => sum + val, 0)
-                                ? `${((yearlyIncome.values[index] / yearlyIncome.values.reduce((sum, val) => sum + val, 0)) * 100).toFixed(0)}%`
-                                : "0%"}
-                            </span>
-                          </span>
-                        </div>
-                      ))}
-                    </Box>
-                  </>
-                )}
-              </div>
-            </div>
           </div>
         </>
       )}
