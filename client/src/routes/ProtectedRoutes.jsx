@@ -6,8 +6,6 @@ const ProtectedRoute = () => {
     const location = useLocation();
     const { isAuthenticated, loading, hasCheckedAuth } = useSelector((state) => state.auth);
 
-    console.log('ProtectedRoute - state:', { isAuthenticated, loading, hasCheckedAuth });
-
     if (loading || !hasCheckedAuth) {
         return (
             <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
