@@ -126,35 +126,140 @@ export const getMerchantOrdersStats = async (req, res, next) => {
   });
 };
 
-
 export const getSalesGrowth = async (req, res, next) => {
   try {
+    const { period = "monthly" } = req.query; // weekly, monthly, annually
     const merchantId = req.user._id;
-
-    // Define date ranges
-    const startOfCurrentMonth = moment().startOf("month").toDate();
-    const endOfCurrentMonth = moment().endOf("month").toDate();
-    const startOfLastMonth = moment().subtract(1, "month").startOf("month").toDate();
-    const endOfLastMonth = moment().subtract(1, "month").endOf("month").toDate();
+    const currentYear = moment().year();
+    const startOfWeek = moment().startOf("week"); // Sunday
 
     // Find merchant's brand(s)
     const brands = await Brand.find({ owner: merchantId }).select("_id");
     if (!brands || brands.length === 0) {
+      let timeSeries;
+      if (period === "weekly") {
+        timeSeries = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => ({
+          label,
+          totalMoneyPaid: 0,
+        }));
+      } else if (period === "monthly") {
+        timeSeries = Array(4)
+          .fill()
+          .map((_, i) => ({
+            label: `Week ${i + 1}`,
+            totalMoneyPaid: 0,
+          }));
+      } else if (period === "annually") {
+        timeSeries = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
+          (label) => ({
+            label,
+            totalMoneyPaid: 0,
+          })
+        );
+      }
       return res.status(200).json({
         success: true,
         message: "No brands found for this merchant",
-        data: {
-          currentMonthTotal: 0,
-          lastMonthTotal: 0,
-          salesGrowthRate: "0.00",
-        },
+        data: { totalSales: "0.00", growthRate: "0.00", timeSeries },
       });
     }
     const brandIds = brands.map((brand) => brand._id);
 
-    // Aggregation pipeline for sales
-    const salesAggregation = (start, end) => Order.aggregate([
-      // Match orders with successful payments
+    let matchStage, groupBy, sortBy, projectLabel, fillPeriods, prevStart, prevEnd;
+
+    switch (period) {
+      case "weekly":
+        matchStage = {
+          "payment.status": "success",
+          "productDetails.brand": { $in: brandIds },
+          createdAt: {
+            $gte: startOfWeek.toDate(),
+            $lte: moment().endOf("week").toDate(),
+          },
+        };
+        groupBy = { day: { $dayOfWeek: "$createdAt" } };
+        sortBy = { "_id.day": 1 };
+        projectLabel = {
+          label: {
+            $arrayElemAt: [
+              ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+              { $subtract: ["$_id.day", 1] },
+            ],
+          },
+        };
+        fillPeriods = () =>
+          ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => ({
+            label,
+            totalMoneyPaid: 0,
+          }));
+        prevStart = moment().subtract(1, "week").startOf("week").toDate();
+        prevEnd = moment().subtract(1, "week").endOf("week").toDate();
+        break;
+      case "monthly":
+        matchStage = {
+          "payment.status": "success",
+          "productDetails.brand": { $in: brandIds },
+          createdAt: {
+            $gte: moment().startOf("month").toDate(),
+            $lte: moment().endOf("month").toDate(),
+          },
+        };
+        groupBy = {
+          week: {
+            $ceil: { $divide: [{ $dayOfMonth: "$createdAt" }, 7] },
+          },
+        };
+        sortBy = { "_id.week": 1 };
+        projectLabel = {
+          label: {
+            $concat: ["Week ", { $toString: "$_id.week" }],
+          },
+        };
+        fillPeriods = () =>
+          Array(4)
+            .fill()
+            .map((_, i) => ({
+              label: `Week ${i + 1}`,
+              totalMoneyPaid: 0,
+            }));
+        prevStart = moment().subtract(1, "month").startOf("month").toDate();
+        prevEnd = moment().subtract(1, "month").endOf("month").toDate();
+        break;
+      case "annually":
+        matchStage = {
+          "payment.status": "success",
+          "productDetails.brand": { $in: brandIds },
+          createdAt: {
+            $gte: moment().startOf("year").toDate(),
+            $lte: moment().endOf("year").toDate(),
+          },
+        };
+        groupBy = { month: { $month: "$createdAt" } };
+        sortBy = { "_id.month": 1 };
+        projectLabel = {
+          label: {
+            $arrayElemAt: [
+              ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+              { $subtract: ["$_id.month", 1] },
+            ],
+          },
+        };
+        fillPeriods = () =>
+          ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
+            (label) => ({
+              label,
+              totalMoneyPaid: 0,
+            })
+          );
+        prevStart = moment().subtract(1, "year").startOf("year").toDate();
+        prevEnd = moment().subtract(1, "year").endOf("year").toDate();
+        break;
+      default:
+        throw new Error("Invalid period");
+    }
+
+    // Aggregation pipeline for current period
+    const salesAggregation = await Order.aggregate([
       {
         $lookup: {
           from: "payments",
@@ -163,15 +268,8 @@ export const getSalesGrowth = async (req, res, next) => {
           as: "payment",
         },
       },
-      {
-        $match: {
-          "payment.status": "success",
-          createdAt: { $gte: start, $lte: end },
-        },
-      },
-      // Unwind orderItems
+      { $unwind: "$payment" },
       { $unwind: "$orderItems" },
-      // Lookup OrderItem details
       {
         $lookup: {
           from: "orderitems",
@@ -181,7 +279,6 @@ export const getSalesGrowth = async (req, res, next) => {
         },
       },
       { $unwind: "$orderItemDetails" },
-      // Lookup Product details
       {
         $lookup: {
           from: "products",
@@ -191,17 +288,87 @@ export const getSalesGrowth = async (req, res, next) => {
         },
       },
       { $unwind: "$productDetails" },
-      // Filter for merchant's brand
+      { $match: matchStage },
       {
-        $match: {
-          "productDetails.brand": { $in: brandIds },
+        $group: {
+          _id: groupBy,
+          totalMoneyPaid: {
+            $sum: {
+              $multiply: ["$orderItemDetails.quantity", "$orderItemDetails.price"],
+            },
+          },
         },
       },
-      // Calculate total sales
+      { $sort: sortBy },
+      {
+        $project: {
+          _id: 0,
+          ...projectLabel,
+          totalMoneyPaid: { $round: ["$totalMoneyPaid", 2] },
+        },
+      },
+    ]);
+
+    // Fill missing periods
+    const filledSales = fillPeriods();
+    salesAggregation.forEach((sale) => {
+      const index =
+        period === "weekly"
+          ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(sale.label)
+          : period === "monthly"
+            ? parseInt(sale.label.replace("Week ", "")) - 1
+            : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(
+              sale.label
+            );
+      if (index >= 0) {
+        filledSales[index] = sale;
+      }
+    });
+
+    // Calculate totalSales
+    const totalSales = filledSales.reduce((sum, item) => sum + item.totalMoneyPaid, 0);
+
+    // Previous period sales
+    const prevSalesAggregation = await Order.aggregate([
+      {
+        $lookup: {
+          from: "payments",
+          localField: "_id",
+          foreignField: "order",
+          as: "payment",
+        },
+      },
+      { $unwind: "$payment" },
+      { $unwind: "$orderItems" },
+      {
+        $lookup: {
+          from: "orderitems",
+          localField: "orderItems",
+          foreignField: "_id",
+          as: "orderItemDetails",
+        },
+      },
+      { $unwind: "$orderItemDetails" },
+      {
+        $lookup: {
+          from: "products",
+          localField: "orderItemDetails.product",
+          foreignField: "_id",
+          as: "productDetails",
+        },
+      },
+      { $unwind: "$productDetails" },
+      {
+        $match: {
+          "payment.status": "success",
+          "productDetails.brand": { $in: brandIds },
+          createdAt: { $gte: prevStart, $lte: prevEnd },
+        },
+      },
       {
         $group: {
           _id: null,
-          totalSales: {
+          totalMoneyPaid: {
             $sum: {
               $multiply: ["$orderItemDetails.quantity", "$orderItemDetails.price"],
             },
@@ -211,32 +378,23 @@ export const getSalesGrowth = async (req, res, next) => {
       {
         $project: {
           _id: 0,
-          totalSales: { $ifNull: ["$totalSales", 0] },
+          totalMoneyPaid: { $ifNull: ["$totalMoneyPaid", 0] },
         },
       },
     ]);
 
-    // Run aggregations concurrently
-    const [currentMonthSales, lastMonthSales] = await Promise.all([
-      salesAggregation(startOfCurrentMonth, endOfCurrentMonth),
-      salesAggregation(startOfLastMonth, endOfLastMonth),
-    ]);
-
-    // Extract totals
-    const currentMonthTotal = currentMonthSales.length > 0 ? currentMonthSales[0].totalSales : 0;
-    const lastMonthTotal = lastMonthSales.length > 0 ? lastMonthSales[0].totalSales : 0;
-    // Calculate growth rate
-    const salesGrowthRate = lastMonthTotal > 0
-      ? (((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100).toFixed(2)
-      : currentMonthTotal > 0 ? "100.00" : "0.00";
+    const lastPeriodTotal = prevSalesAggregation.length > 0 ? prevSalesAggregation[0].totalMoneyPaid : 0;
+    const growthRate = lastPeriodTotal > 0
+      ? (((totalSales - lastPeriodTotal) / lastPeriodTotal) * 100).toFixed(2)
+      : totalSales > 0 ? "100.00" : "0.00";
 
     res.status(200).json({
       success: true,
       message: "Sales growth data fetched successfully",
       data: {
-        currentMonthTotal,
-        lastMonthTotal,
-        salesGrowthRate,
+        totalSales: totalSales.toFixed(2),
+        growthRate,
+        timeSeries: filledSales, // [{ label: "Week 1", totalMoneyPaid: 1000 }, ...]
       },
     });
   } catch (error) {
@@ -244,7 +402,6 @@ export const getSalesGrowth = async (req, res, next) => {
     next(error);
   }
 };
-
 
 export const getMerchantSalesTrends = async (req, res, next) => {
   try {

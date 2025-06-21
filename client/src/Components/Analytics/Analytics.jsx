@@ -2,7 +2,6 @@ import { FormControlLabel, Stack, Switch, Typography, Box } from "@mui/material"
 import { ChartContainer, chartsTooltipClasses } from "@mui/x-charts";
 import { BarChart } from "@mui/x-charts/BarChart";
 import { LineChart, AreaPlot, LinePlot, lineElementClasses } from "@mui/x-charts/LineChart";
-import { Doughnut } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 ChartJS.register(ArcElement, Tooltip, Legend);
 import { useEffect, useState } from "react";
@@ -73,14 +72,7 @@ const Analytics = () => {
 
   const totalSales = salesGrowth.currentMonthTotal || 0;
   const growthRate = salesGrowth.salesGrowthRate || "0.00";
-  const chartLabels = [
-    moment().subtract(1, "month").format("MMM YYYY"), // Last month, e.g., "May 2025"
-    moment().format("MMM YYYY"), // Current month, e.g., "Jun 2025"
-  ];
-  const chartData = [
-    salesGrowth.lastMonthTotal || 0,
-    salesGrowth.currentMonthTotal || 0,
-  ];
+
 
   const handleTooltipChange = (event) => {
     setShowTooltip(event.target.checked);
@@ -93,7 +85,7 @@ const Analytics = () => {
           await Promise.all([
             dispatch(getMerchantOrderStats()),
             dispatch(getProductsAvgRatings()),
-            dispatch(getSalesGrowth()),
+            dispatch(getSalesGrowth({ period: activePeriod.toLowerCase() })),
             dispatch(getStockLevelsProducts()),
             dispatch(getMerchantSalesTrends({ year: new Date().getFullYear() })),
             dispatch(getMerchantOrderTrends()),
@@ -618,13 +610,18 @@ const Analytics = () => {
                 )}
               </div>
             </div>
+
           </div>
           {/* Sales Growth */}
           <div className="rounded-2xl bg-white my-5 p-8 font-inter">
             <div className="flex justify-between mb-6">
               <div>
                 <p className="text-[#6E7786] text-lg">
-                  Sales for {moment().format("MMMM YYYY")}
+                  {
+                    (activePeriod === "weekly") ? `Sales for ${moment().format("MMMM D, YYYY")} Week` :
+                      (activePeriod === "monthly") ? `Sales for ${moment().format("MMMM YYYY")}` :
+                        `Sales for ${moment().year()}`
+                  }
                 </p>
                 <h3 className="flex items-center gap-2 text-[#6E7786]">
                   <span className="font-bold text-3xl text-[#1E1B39]">
@@ -638,91 +635,136 @@ const Analytics = () => {
                       className={`w-2.5 h-2.5 rounded-full ${parseFloat(growthRate || 0) >= 0 ? "bg-[#04CE00]" : "bg-[#DC2626]"
                         }`}
                     ></div>
-                    {growthRate}%
+                    {growthRate || 0}%
                   </span>
-                  VS LAST MONTH
+                  {(activePeriod === "weekly") ? "VS LAST WEEK" :
+                    (activePeriod === "monthly") ? "VS LAST MONTH" : "VS LAST YEAR"
+                  }
                 </h3>
               </div>
               <div className="flex bg-[#F8F9FF] rounded-lg overflow-hidden items-center">
-                <button className="px-4 py-2.5 text-sm bg-title-blue rounded-lg font-medium text-white">
+                <button
+                  onClick={() => setActivePeriod("Weekly")}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Weekly" ? "font-medium text-white bg-title-blue" : ""
+                    }`}
+                >
+                  Weekly
+                </button>
+                <button
+                  onClick={() => setActivePeriod("Monthly")}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Monthly" ? "font-medium text-white bg-title-blue" : ""
+                    }`}
+                >
                   Monthly
+                </button>
+                <button
+                  onClick={() => setActivePeriod("Annually")}
+                  className={`px-4 py-2.5 text-sm rounded-lg ${activePeriod === "Annually" ? "font-medium text-white bg-title-blue" : ""
+                    }`}
+                >
+                  Annually
                 </button>
               </div>
             </div>
             {loading ? (
               <Typography>Loading...</Typography>
             ) : (
-              <BarChart
+              <LineChart
                 xAxis={[
                   {
-                    scaleType: "band",
-                    data: chartLabels,
+                    labelOffset: 1,
                     tickLabelStyle: { fontSize: 12, fill: "#6E7786" },
+                    scaleType: "point",
+                    data: salesGrowth.timeSeries?.map((t) => t.label) || [],
                   },
                 ]}
                 yAxis={[
                   {
                     tickLabelStyle: { fontSize: 12, fill: "#6E7786" },
-                    valueFormatter: (value) => `${Math.round(value)}`, // Display raw EGP
+                    valueFormatter: (value) => `${Math.round(value)}`, // Raw EGP
                     min: 0,
-                    max: Math.max(
-                      ...chartData,
-                      50 // Ensure at least 50 EGP range
-                    ) * 1.2, // 20% headroom
+                    max:
+                      Math.max(
+                        ...(salesGrowth.timeSeries?.map((t) => t.totalMoneyPaid) || [0]),
+                        50
+                      ) * 1.2, // 20% headroom
                     tickValues: (() => {
-                      const maxData = Math.max(...chartData, 50);
-                      const baseTicks = [50, 100, 200, 500, 1000]; // Initial ranges
+                      const maxData = Math.max(
+                        ...(salesGrowth.timeSeries?.map((t) => t.totalMoneyPaid) || [0]),
+                        50
+                      );
+                      const baseTicks = [50, 100, 200, 500, 1000];
                       if (maxData > 1000) {
-                        // Extend ticks dynamically
-                        let nextTick = 2000; // Start at 2000 EGP
+                        let nextTick = 2000;
                         const extendedTicks = [...baseTicks];
                         while (nextTick <= maxData * 1.2) {
                           extendedTicks.push(nextTick);
-                          nextTick = nextTick < 5000 ? nextTick * 2.5 : nextTick * 2; // e.g., 2000, 5000, 10000
+                          nextTick = nextTick < 5000 ? nextTick * 2.5 : nextTick * 2;
                         }
                         return extendedTicks;
                       }
                       return baseTicks.filter((tick) => tick <= maxData * 1.2);
                     })(),
-                    position: "right",
+                    position: "left",
+                    margin: { left: 60 }, // Ensure space for labels
                   },
                 ]}
+                grid={{ horizontal: true }}
                 series={[
                   {
-                    data: chartData,
-                    label: "Sales (EGP)",
+                    curve: "linear",
+                    data: salesGrowth.timeSeries?.map((t) => t.totalMoneyPaid) || [],
+                    area: true,
+                    showMark: false,
                     color: "url(#Gradient7)",
                     valueFormatter: (value) => `EGP ${value.toLocaleString()}`,
                   },
                 ]}
-                height={300}
-                margin={{ top: 20, bottom: 30, left: 10, right: 50 }} // Increased right margin
-                grid={{ horizontal: true }}
-                sx={{
-                  "& .MuiBarElement-root": {
-                    fill: "url(#Gradient7)",
-                  },
-                  "& .MuiChartsGrid-root": {
-                    stroke: "rgba(0, 0, 0, 0.1)",
-                    strokeDasharray: "2 2",
-                  },
-                  "& .MuiChartsAxis-right .MuiChartsAxis-tickLabel": {
-                    transform: "translateX(10px)", // Adjust label position
+                slotProps={{
+                  tooltip: {
+                    sx: {
+                      [`& .${chartsTooltipClasses.labelCell}`]: { display: "none" },
+                      [`& .${chartsTooltipClasses.paper}`]: {
+                        color: "white !important",
+                        backgroundColor: "#15253F",
+                        borderRadius: "8px",
+                      },
+                      [`& .${chartsTooltipClasses.valueCell}`]: {
+                        color: "white !important",
+                        fontWeight: "semibold",
+                      },
+                    },
                   },
                 }}
+                sx={{
+                  [`& .${lineElementClasses.root}`]: { stroke: "rgba(21, 37, 63)", strokeWidth: 3 },
+                  "& .MuiChartsAxis-left .MuiChartsAxis-tickLabel": {
+                    transform: "translateX(-10px)", // Adjust label position
+                  },
+                }}
+                height={300}
+                margin={{ top: 20, bottom: 30, left: 60, right: 10 }} // Adjust for y-axis labels
               >
-                <defs>
-                  <linearGradient id="Gradient7" x1="0%" y1="100%" x2="0%" y2="0%">
-                    <stop offset="0%" stopColor="rgba(21, 37, 63, 0)" />
-                    <stop offset="100%" stopColor="rgba(21, 37, 63, 0.6)" />
-                  </linearGradient>
-                </defs>
-                {chartData.every((v) => v === 0) && (
+                <Stack direction="row">
+                  <FormControlLabel
+                    value="end"
+                    control={<Switch checked={showTooltip} onChange={handleTooltipChange} />}
+                    label="showTooltip"
+                    labelPlacement="end"
+                  />
+                </Stack>
+                <linearGradient id="Gradient7" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0" stopColor="rgba(21, 37, 63, 0)" />
+                  <stop offset="1" stopColor="rgba(21, 37, 63, 0.6)" />
+                </linearGradient>
+                <AreaPlot />
+                <LinePlot />
+                {salesGrowth.timeSeries?.every((t) => t.totalMoneyPaid === 0) && (
                   <text x="50%" y="50%" textAnchor="middle" fill="rgba(0, 0, 0, 0.5)" fontSize="14">
                     No Sales Data
                   </text>
                 )}
-              </BarChart>
+              </LineChart>
             )}
           </div>
         </>
