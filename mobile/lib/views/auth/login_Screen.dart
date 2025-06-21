@@ -7,13 +7,19 @@ import 'package:graduation_project1/common/back_ground_container.dart';
 import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
+<<<<<<< HEAD
 import 'package:graduation_project1/constants/uidata.dart';
+=======
+>>>>>>> clean-branch
 import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
 import 'package:graduation_project1/models/login_model.dart';
 import 'package:graduation_project1/views/auth/newpassword/forgetpassword_Screen.dart';
 import 'package:graduation_project1/views/auth/register_Screen.dart';
 import 'package:graduation_project1/views/auth/widgets/email_textfield.dart';
+<<<<<<< HEAD
 import 'package:graduation_project1/views/auth/widgets/iconbutton.dart';
+=======
+>>>>>>> clean-branch
 import 'package:graduation_project1/views/auth/widgets/password_textfield.dart';
 import 'package:graduation_project1/views/entrypoint.dart';
 

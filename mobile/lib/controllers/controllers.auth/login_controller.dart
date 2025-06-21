@@ -36,12 +36,17 @@ class LoginController extends GetxController {
 
         LoginResponse data = loginResponseFromJson(response.body);
 
+<<<<<<< HEAD
         // ✅ Extract and store accessToken & refreshToken
+=======
+        // ✅ Store tokens
+>>>>>>> clean-branch
         String? rawCookie = response.headers['set-cookie'];
         if (rawCookie != null) {
           final parts = rawCookie.split(',');
           for (var part in parts) {
             if (part.contains('accessToken=')) {
+<<<<<<< HEAD
               final access = part.trim().split(';')[0]; // accessToken=...
               box.write('token', access.split('=')[1]); // Store only the token
               print('🔐 accessToken: ${box.read('token')}');
@@ -51,16 +56,37 @@ class LoginController extends GetxController {
               final refresh = part.trim().split(';')[0];
               box.write('refreshToken', refresh); // Save full: refreshToken=...
               print('🔁 refreshToken: ${box.read('refreshToken')}');
+=======
+              final access = part.trim().split(';')[0];
+              box.write('token', access.split('=')[1]);
+            }
+            if (part.contains('refreshToken=')) {
+              final refresh = part.trim().split(';')[0];
+              box.write('refreshToken', refresh);
+>>>>>>> clean-branch
             }
           }
         }
 
+<<<<<<< HEAD
         String userId = data.user.id;
         String userData = jsonEncode(data);
         box.write(userId, userData);
         box.write('userId', data.user.id);
         box.write('verification', data.user.isVerified);
 
+=======
+        // ✅ Store user info
+        String userId = data.user.id;
+        String userData = jsonEncode(data);
+        box.write(userId, userData);
+        box.write('userId', userId);
+        box.write('verification', data.user.isVerified);
+
+        // ✅ Store user profile image for AppBar
+        box.write('userImg', data.user.imgUrl);
+
+>>>>>>> clean-branch
         setLoading = false;
 
         Get.snackbar(
@@ -74,8 +100,12 @@ class LoginController extends GetxController {
           Get.to(() => const VerificationScreen(),
               transition: Transition.fade,
               duration: const Duration(milliseconds: 900));
+<<<<<<< HEAD
         }
         if (data.user.isVerified == true) {
+=======
+        } else {
+>>>>>>> clean-branch
           AuthenticationRepository.instance.screenRedirect();
         }
       } else {

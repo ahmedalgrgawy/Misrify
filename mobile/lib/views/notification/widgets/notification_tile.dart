@@ -6,7 +6,10 @@ import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/controllers/notification_controller.dart';
 import 'package:graduation_project1/models/notification_model.dart';
+<<<<<<< HEAD
 import 'package:intl/intl.dart';
+=======
+>>>>>>> clean-branch
 
 class NotificationTile extends StatelessWidget {
   const NotificationTile({super.key, required this.notification});
@@ -34,11 +37,19 @@ class NotificationTile extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: borderColor),
+<<<<<<< HEAD
         boxShadow: [
           BoxShadow(
             color: kLightGray,
             blurRadius: 6,
             offset: const Offset(0, 4),
+=======
+        boxShadow: const [
+          BoxShadow(
+            color: kLightGray,
+            blurRadius: 6,
+            offset: Offset(0, 4),
+>>>>>>> clean-branch
           ),
         ],
       ),

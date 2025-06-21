@@ -15,7 +15,10 @@ import 'package:graduation_project1/controllers/controllers.auth/registration_co
 import 'package:graduation_project1/models/registration_model.dart';
 import 'package:graduation_project1/views/auth/login_Screen.dart';
 import 'package:graduation_project1/views/auth/widgets/email_textfield.dart';
+<<<<<<< HEAD
 import 'package:graduation_project1/views/auth/widgets/iconbutton.dart';
+=======
+>>>>>>> clean-branch
 import 'package:graduation_project1/views/auth/widgets/password_textfield.dart';
 
 class RegisterScreen extends StatefulWidget {

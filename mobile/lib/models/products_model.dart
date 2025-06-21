@@ -171,6 +171,59 @@ class Product {
         updatedAt: item.updatedAt,
         v: item.v,
       );
+<<<<<<< HEAD
+=======
+
+  Product copyWith({
+    String? id,
+    String? name,
+    Brand? category,
+    Brand? brand,
+    String? description,
+    int? quantityInStock,
+    double? price,
+    List<String>? colors,
+    List<String>? sizes,
+    bool? isDiscounted,
+    int? discountAmount,
+    bool? isApproved,
+    List<Review>? reviews,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? imgUrl,
+    int? v,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      brand: brand ?? this.brand,
+      description: description ?? this.description,
+      quantityInStock: quantityInStock ?? this.quantityInStock,
+      price: price ?? this.price,
+      colors: colors ?? this.colors,
+      sizes: sizes ?? this.sizes,
+      isDiscounted: isDiscounted ?? this.isDiscounted,
+      discountAmount: discountAmount ?? this.discountAmount,
+      isApproved: isApproved ?? this.isApproved,
+      reviews: reviews ?? this.reviews,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      imgUrl: imgUrl ?? this.imgUrl,
+      v: v ?? this.v,
+    );
+  }
+}
+
+extension SafeProduct on Product {
+  Product ensureValid() {
+    return copyWith(
+      brand: brand.name.isNotEmpty ? brand : Brand.empty(),
+      category: category.name.isNotEmpty ? category : Brand.empty(),
+      reviews: reviews,
+    );
+  }
+>>>>>>> clean-branch
 }
 
 class Brand {

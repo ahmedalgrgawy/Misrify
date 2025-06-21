@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+<<<<<<< HEAD
+=======
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+>>>>>>> clean-branch
 import 'package:get/get.dart';
 import 'package:graduation_project1/common/GrideLayout.dart';
 import 'package:graduation_project1/controllers/search_products_controller.dart';
@@ -17,7 +21,11 @@ class SearchResults extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GrideLayout(
         mainAxisspacing: 20,
+<<<<<<< HEAD
         mainAxis: 260,
+=======
+        mainAxis: 0.33.sh, // ~38% of screen height
+>>>>>>> clean-branch
         crossAxiscount: 2,
         scrooldirection: Axis.vertical,
         shrinkwrap: false,
@@ -35,8 +43,12 @@ class SearchResults extends StatelessWidget {
             price: product.price.toStringAsFixed(2),
             isDiscounted: product.isDiscounted,
             discountAmount: product.discountAmount,
+<<<<<<< HEAD
             image:
                 "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
+=======
+            image: product.imgUrl,
+>>>>>>> clean-branch
           );
         },
       ),

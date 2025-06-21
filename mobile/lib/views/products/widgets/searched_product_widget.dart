@@ -7,6 +7,10 @@ import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/products/Product_page.dart';
 
+<<<<<<< HEAD
+=======
+// ignore: must_be_immutable
+>>>>>>> clean-branch
 class SearchedProductWidget extends StatelessWidget {
   SearchedProductWidget({super.key, required this.product});
   Product product;

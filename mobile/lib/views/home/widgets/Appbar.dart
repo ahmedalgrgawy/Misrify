@@ -1,9 +1,17 @@
 // ignore_for_file: must_be_immutable
 
+<<<<<<< HEAD
+=======
+import 'dart:convert';
+>>>>>>> clean-branch
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+<<<<<<< HEAD
+=======
+import 'package:get_storage/get_storage.dart';
+>>>>>>> clean-branch
 
 import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
@@ -32,8 +40,14 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
     final cartController = Get.put(CartController());
     final notificationController = Get.put(NotificationController());
+=======
+    final cartController = Get.find<CartController>();
+    final notificationController = Get.put(NotificationController());
+    final box = GetStorage();
+>>>>>>> clean-branch
 
     return Container(
       height: height ?? 80.h,
@@ -43,11 +57,38 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
+<<<<<<< HEAD
             onTap: () => Get.to(() => ProfileScreen()),
             child: CircleAvatar(
               backgroundColor: Colors.white,
               child: const Icon(Icons.person),
               radius: 15.r,
+=======
+            onTap: () => Get.to(() => const ProfileScreen()),
+            child: Builder(
+              builder: (_) {
+                final imgUrl = box.read('userImg');
+                ImageProvider? image;
+
+                if (imgUrl != null && imgUrl.toString().isNotEmpty) {
+                  if (imgUrl.toString().startsWith('data:image')) {
+                    final base64Str = imgUrl.toString().split(',').last;
+                    image = MemoryImage(base64Decode(base64Str));
+                  } else {
+                    image = NetworkImage(imgUrl.toString());
+                  }
+                }
+
+                return CircleAvatar(
+                  radius: 18.r,
+                  backgroundColor: Colors.white,
+                  backgroundImage: image,
+                  child: image == null
+                      ? const Icon(Icons.person, color: kDarkBlue)
+                      : null,
+                );
+              },
+>>>>>>> clean-branch
             ),
           ),
           ReusableText(
@@ -82,12 +123,20 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
               }),
               SizedBox(width: 7.w),
               Obx(() {
+<<<<<<< HEAD
                 final count = cartController.itemCount.value;
+=======
+                final count = cartController.count;
+>>>>>>> clean-branch
                 return InkWell(
                   onTap: () => Get.to(() => const CartScreen(fromAppBar: true)),
                   child: count > 0
                       ? Badge(
+<<<<<<< HEAD
                           label: Text('$count'),
+=======
+                          label: Text(count.toString()),
+>>>>>>> clean-branch
                           child: const Icon(
                             Icons.shopping_cart_outlined,
                             color: kBlue,

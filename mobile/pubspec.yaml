@@ -131,6 +131,7 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+<<<<<<< HEAD
 
 flutter_native_splash:
   color: "#FFFFFF"
@@ -145,3 +146,5 @@ flutter_native_splash:
     icon_background_color: "#FFFFFF"
     image_dark: assets/logo-development.png
     icon_background_color_dark: "#121212"
+=======
+>>>>>>> clean-branch
