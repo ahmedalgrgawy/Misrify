@@ -10,10 +10,7 @@ import { CLIENT_FAILURE_URL, CLIENT_SUCCESS_URL, PAYMOB_API_KEY, PAYMOB_BASE_URL
 import Payment from "../models/payment.model.js";
 import axios from "axios";
 import Notification from "../models/notification.model.js";
-<<<<<<< HEAD
-=======
 import mongoose from "mongoose"
->>>>>>> clean-branch
 
 
 export const getCoupons = async (req, res, next) => {
@@ -111,9 +108,8 @@ export const getOrderById = async (req, res, next) => {
     res.status(200).json({ message: "Order", order })
 }
 
-<<<<<<< HEAD
+// ... earlier code above remains unchanged
 export const placeOrder = async (req, res, next) => {
-
     const {
         orderItems,
         shippingAddress,
@@ -128,46 +124,55 @@ export const placeOrder = async (req, res, next) => {
         const product = await Product.findById(item.product);
 
         if (!product) {
-            return next(new AppError("Product is not found", 404))
+            return next(new AppError("Product is not found", 404));
         }
 
-        // Add inventory check if needed
         if (product.quantityInStock < item.quantity) {
-            return next(new AppError(`Insufficient stock for ${product.name}`, 400))
+            return next(new AppError(`Insufficient stock for ${product.name}`, 400));
         }
 
-        // Create order item
+        const roundedPrice = Math.round(item.price * 100) / 100;
+
         const orderItem = await OrderItem.create({
             product: item.product,
             quantity: item.quantity,
             color: item.color,
             size: item.size,
-            price: product.price * item.quantity,
-            // total: item.price * item.quantity
+            price: roundedPrice,
         });
 
         orderItemsIds.push(orderItem._id);
-        totalPrice += product.price * item.quantity
+        totalPrice += roundedPrice * item.quantity;
     }
 
-    // Apply coupon if provided
-    let finalPrice = totalPrice;
+    const hasPreviousOrders = await Order.exists({ user: req.user._id });
+    const shippingFee = hasPreviousOrders ? 60 : 0;
+
     let appliedCoupon = null;
+    let couponDiscount = 0;
 
     if (coupon) {
         const couponDb = await Coupon.findOne({ code: coupon });
         if (couponDb && couponDb.isActive) {
-            finalPrice = totalPrice * (1 - couponDb.discount / 100);
+            couponDiscount = couponDb.discount;
             appliedCoupon = couponDb._id;
             couponDb.isActive = false;
-            await couponDb.save()
+            await couponDb.save();
         }
     }
 
-    // Generate tracking code
+    // ✅ Apply coupon after adding shipping
+    const totalBeforeCoupon = totalPrice + shippingFee;
+    let finalTotal = totalBeforeCoupon;
+
+    if (couponDiscount > 0) {
+        finalTotal = totalBeforeCoupon * (1 - couponDiscount / 100);
+    }
+
+    const finalPrice = Math.round(finalTotal * 100) / 100;
+
     const trackCode = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
-    // Create the order
     const order = await Order.create({
         user: req.user._id,
         orderItems: orderItemsIds,
@@ -176,146 +181,38 @@ export const placeOrder = async (req, res, next) => {
         trackCode,
         status: "pending",
         totalPrice: finalPrice,
-        coupon: appliedCoupon
+        coupon: appliedCoupon,
     });
 
-    // Add the newly created order to the user's purchaseHistory
     await User.findByIdAndUpdate(
         req.user._id,
-        { $push: { purchaseHistory: order._id } }, // Push the order ID to purchaseHistory
+        { $push: { purchaseHistory: order._id } },
         { new: true }
     );
 
-    // Populate the order with order items for the response
     const populatedOrder = await Order.findById(order._id)
         .populate({
             path: "orderItems",
             populate: {
                 path: "product",
-            }
+            },
         })
         .populate("coupon", "code discount");
 
     await Notification.create({
-        receivers: [req.user._id], // Changed to receivers array
+        receivers: [req.user._id],
         sender: "Misrify Store",
-        content: `Order with ${order.trackCode} has been created with a Price of ${order.totalPrice}`, // Changed from message to content
+        content: `Order with ${order.trackCode} has been created with a Price of ${order.totalPrice}`,
         type: "order",
         isRead: false,
-    })
+    });
 
     res.status(201).json({
         success: true,
-        order: populatedOrder
+        order: populatedOrder,
     });
-}
-=======
-// ... earlier code above remains unchanged
-export const placeOrder = async (req, res, next) => {
-  const {
-    orderItems,
-    shippingAddress,
-    shippingMethod,
-    coupon,
-  } = req.body;
-
-  const orderItemsIds = [];
-  let totalPrice = 0;
-
-  for (const item of orderItems) {
-    const product = await Product.findById(item.product);
-
-    if (!product) {
-      return next(new AppError("Product is not found", 404));
-    }
-
-    if (product.quantityInStock < item.quantity) {
-      return next(new AppError(`Insufficient stock for ${product.name}`, 400));
-    }
-
-    const roundedPrice = Math.round(item.price * 100) / 100;
-
-    const orderItem = await OrderItem.create({
-      product: item.product,
-      quantity: item.quantity,
-      color: item.color,
-      size: item.size,
-      price: roundedPrice,
-    });
-
-    orderItemsIds.push(orderItem._id);
-    totalPrice += roundedPrice * item.quantity;
-  }
-
-  const hasPreviousOrders = await Order.exists({ user: req.user._id });
-  const shippingFee = hasPreviousOrders ? 60 : 0;
-
-  let appliedCoupon = null;
-  let couponDiscount = 0;
-
-  if (coupon) {
-    const couponDb = await Coupon.findOne({ code: coupon });
-    if (couponDb && couponDb.isActive) {
-      couponDiscount = couponDb.discount;
-      appliedCoupon = couponDb._id;
-      couponDb.isActive = false;
-      await couponDb.save();
-    }
-  }
-
-  // ✅ Apply coupon after adding shipping
-  const totalBeforeCoupon = totalPrice + shippingFee;
-  let finalTotal = totalBeforeCoupon;
-
-  if (couponDiscount > 0) {
-    finalTotal = totalBeforeCoupon * (1 - couponDiscount / 100);
-  }
-
-  const finalPrice = Math.round(finalTotal * 100) / 100;
-
-  const trackCode = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-
-  const order = await Order.create({
-    user: req.user._id,
-    orderItems: orderItemsIds,
-    shippingAddress,
-    shippingMethod: shippingMethod || "standard",
-    trackCode,
-    status: "pending",
-    totalPrice: finalPrice,
-    coupon: appliedCoupon,
-  });
-
-  await User.findByIdAndUpdate(
-    req.user._id,
-    { $push: { purchaseHistory: order._id } },
-    { new: true }
-  );
-
-  const populatedOrder = await Order.findById(order._id)
-    .populate({
-      path: "orderItems",
-      populate: {
-        path: "product",
-      },
-    })
-    .populate("coupon", "code discount");
-
-  await Notification.create({
-    receivers: [req.user._id],
-    sender: "Misrify Store",
-    content: `Order with ${order.trackCode} has been created with a Price of ${order.totalPrice}`,
-    type: "order",
-    isRead: false,
-  });
-
-  res.status(201).json({
-    success: true,
-    order: populatedOrder,
-  });
 };
 
->>>>>>> clean-branch
 
 export const updateOrder = async (req, res, next) => {
     const orderId = req.params.id;
@@ -820,8 +717,6 @@ export const handlePaymentCallback = async (req, res, next) => {
         session.endSession();
     }
 };
-<<<<<<< HEAD
-=======
 
 // export const handlePaymentCallback = async (req, res, next) => {
 //     const { orderId, success, transaction_id } = req.body;
@@ -1140,4 +1035,3 @@ export const handlePaymentCallback = async (req, res, next) => {
 //         return res.redirect(`${CLIENT_FAILURE_URL}?error=callback_error`);
 //     }
 // };
->>>>>>> clean-branch
