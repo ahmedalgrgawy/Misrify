@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
-<<<<<<< HEAD
-=======
 import 'dart:convert';
 
->>>>>>> clean-branch
 import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
@@ -131,19 +128,12 @@ class EditProfile extends HookWidget {
                       CircleAvatar(
                         radius: 60,
                         backgroundImage: user.imgUrl != null
-<<<<<<< HEAD
-                            ? NetworkImage(user.imgUrl!)
-                            : const NetworkImage(
-                                "https://images.unsplash.com/photo-1563389234808-52344934935c?q=80",
-                              ),
-=======
                             ? (user.imgUrl!.startsWith('data:image')
                                 ? MemoryImage(
                                     base64Decode(user.imgUrl!.split(',').last))
                                 : NetworkImage(user.imgUrl!)) as ImageProvider
                             : const NetworkImage(
                                 "https://images.unsplash.com/photo-1563389234808-52344934935c?q=80"),
->>>>>>> clean-branch
                       ),
                       GestureDetector(
                         onTap: () async {

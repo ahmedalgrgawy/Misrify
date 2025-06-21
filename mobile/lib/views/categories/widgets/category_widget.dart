@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-// ignore_for_file: must_be_immutable
-
-=======
 import 'dart:convert';
->>>>>>> clean-branch
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -14,25 +9,15 @@ import 'package:graduation_project1/controllers/category_controller.dart';
 import 'package:graduation_project1/models/categories_model.dart';
 import 'package:graduation_project1/views/categories/all_category_product_screen.dart';
 
-<<<<<<< HEAD
-class CategoryWidget extends StatelessWidget {
-  CategoryWidget({
-    super.key,
-    required this.category,
-  });
-=======
 // ignore: must_be_immutable
 class CategoryWidget extends StatelessWidget {
   CategoryWidget({super.key, required this.category});
->>>>>>> clean-branch
 
   Category category;
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.put(CategoryController());
-<<<<<<< HEAD
-=======
 
     Widget _buildImage(String? imgUrl) {
       if (imgUrl != null && imgUrl.startsWith('data:image')) {
@@ -64,7 +49,6 @@ class CategoryWidget extends StatelessWidget {
       }
     }
 
->>>>>>> clean-branch
     return GestureDetector(
       onTap: () {
         if (controller.categoryValue == category.id) {
@@ -73,11 +57,6 @@ class CategoryWidget extends StatelessWidget {
         } else {
           controller.updateCategory = category.id;
           controller.updateTitle = category.name;
-<<<<<<< HEAD
-
-          // Navigate to category product screen
-=======
->>>>>>> clean-branch
           Get.to(() => const AllCategoryProductScreen());
         }
       },
@@ -86,27 +65,6 @@ class CategoryWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Container(
-<<<<<<< HEAD
-              margin: EdgeInsets.symmetric(
-                horizontal: 10.w,
-              ),
-              width: width * 0.19,
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10.r),
-                  border: Border.all(
-                      color: controller.categoryValue == category
-                          ? kNavy
-                          : Colors.white,
-                      width: .5.w)),
-              child: SizedBox(
-                height: 60.h,
-                child: Image.network(
-                  "https://static.vecteezy.com/system/resources/previews/035/438/654/non_2x/ai-generated-blue-hoodie-isolated-on-transparent-background-free-png.png",
-                  fit: BoxFit.contain,
-                ),
-              ),
-=======
               margin: EdgeInsets.symmetric(horizontal: 10.w),
               width: width * 0.19,
               height: 60.h,
@@ -124,7 +82,6 @@ class CategoryWidget extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10.r),
                 child: _buildImage(category.imgUrl),
               ),
->>>>>>> clean-branch
             ),
             Padding(
               padding: EdgeInsets.only(top: 5.h),

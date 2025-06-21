@@ -46,10 +46,7 @@ class User {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int v;
-<<<<<<< HEAD
-=======
   final String? imgUrl; // ✅ Add this line
->>>>>>> clean-branch
 
   User({
     required this.id,
@@ -68,10 +65,7 @@ class User {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
-<<<<<<< HEAD
-=======
     this.imgUrl, // ✅ Include in constructor
->>>>>>> clean-branch
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -93,10 +87,7 @@ class User {
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
-<<<<<<< HEAD
-=======
         imgUrl: json["imgUrl"], // ✅ Include from JSON
->>>>>>> clean-branch
       );
 
   Map<String, dynamic> toJson() => {
@@ -115,11 +106,8 @@ class User {
         "otp": otp,
         "otpExpiry": otpExpiry,
         "createdAt": createdAt.toIso8601String(),
-<<<<<<< HEAD
-=======
         "imgUrl": imgUrl, // ✅ Add to JSON
 
->>>>>>> clean-branch
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
       };

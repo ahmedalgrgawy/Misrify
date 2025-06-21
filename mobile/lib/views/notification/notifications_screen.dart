@@ -19,13 +19,6 @@ class NotificationsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-<<<<<<< HEAD
-        title: Center(
-            child: ReusableText(
-          text: "Notifications",
-          style: appStyle(20, KTextColor, FontWeight.w600),
-        )),
-=======
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: KTextColor),
@@ -37,7 +30,6 @@ class NotificationsScreen extends StatelessWidget {
           text: "Notifications",
           style: appStyle(18, KTextColor, FontWeight.w600),
         ),
->>>>>>> clean-branch
         backgroundColor: Kbackground,
         actions: [
           Obx(() => controller.notifications.isNotEmpty
@@ -112,13 +104,8 @@ class NotificationsScreen extends StatelessWidget {
         if (controller.notifications.isEmpty) {
           return Center(
             child: ReusableText(
-<<<<<<< HEAD
-              text: "No notifications available.",
-              style: appStyle(20, kGray, FontWeight.w500),
-=======
               text: "No notifications.",
               style: appStyle(16, kGray, FontWeight.w500),
->>>>>>> clean-branch
             ),
           );
         }

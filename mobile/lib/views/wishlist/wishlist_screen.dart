@@ -32,11 +32,7 @@ class WishlistScreen extends HookWidget {
       return null;
     }, [hookResult.data]);
 
-<<<<<<< HEAD
-    final controller = Get.put(LoginController());
-=======
     Get.put(LoginController());
->>>>>>> clean-branch
     final box = GetStorage();
     final token = box.read('token');
 
@@ -53,11 +49,7 @@ class WishlistScreen extends HookWidget {
                 child: ReusableText(
                   text: 'Favourites',
                   align: TextAlign.center,
-<<<<<<< HEAD
-                  style: appStyle(18, kDarkBlue, FontWeight.w600),
-=======
                   style: appStyle(18, KTextColor, FontWeight.w600),
->>>>>>> clean-branch
                 ),
               ),
             ),

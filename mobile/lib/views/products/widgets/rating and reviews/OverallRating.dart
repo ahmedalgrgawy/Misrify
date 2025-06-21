@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-import 'package:graduation_project1/constants/constants.dart';
-=======
->>>>>>> clean-branch
 
 import 'RatingProgress.dart';
 

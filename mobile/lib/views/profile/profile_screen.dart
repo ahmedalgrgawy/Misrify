@@ -2,16 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:get/get.dart';
-<<<<<<< HEAD
-import 'package:graduation_project1/common/app_style.dart';
-import 'package:graduation_project1/common/reusable_text.dart';
-import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
-import 'package:graduation_project1/controllers/profile_controller.dart';
-import 'package:graduation_project1/hooks/fetch_profile.dart';
-import 'package:graduation_project1/views/profile/contactus.dart';
-import 'package:graduation_project1/views/profile/edit_profile_Screen.dart';
-=======
 import 'dart:convert';
 
 import 'package:graduation_project1/common/app_style.dart';
@@ -25,44 +15,24 @@ import 'package:graduation_project1/views/orders/allOrders_screen.dart';
 import 'package:graduation_project1/views/profile/contactus.dart';
 import 'package:graduation_project1/views/profile/edit_profile_Screen.dart';
 import 'package:graduation_project1/views/profile/points_screen.dart';
->>>>>>> clean-branch
 import 'package:graduation_project1/views/profile/widgets/help%20and%20support/widget_help.dart';
 import 'package:graduation_project1/views/profile/widgets/profile_tile.dart';
 
 class ProfileScreen extends HookWidget {
-<<<<<<< HEAD
-  @override
-  Widget build(BuildContext context) {
-    final login = Get.put(LoginController());
-    final profileController = Get.put(ProfileController());
-=======
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final login = Get.put(LoginController());
->>>>>>> clean-branch
     final profileHook = useFetchProfile();
     final user = profileHook.data?.user;
 
     return Scaffold(
-<<<<<<< HEAD
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: kDarkBlue),
-          onPressed: () => Get.back(),
-        ),
-        title: const Text('My Profile', style: TextStyle(color: kDarkBlue)),
-        centerTitle: true,
-=======
       appBar: CustomAppbar(
         title: 'My Profile',
         onpress: () {
           Get.to(MainScreen());
         },
->>>>>>> clean-branch
       ),
       body: user == null
           ? const Center(child: CircularProgressIndicator())
@@ -80,12 +50,6 @@ class ProfileScreen extends HookWidget {
                           CircleAvatar(
                             radius: 43,
                             backgroundImage: user.imgUrl != null
-<<<<<<< HEAD
-                                ? NetworkImage(user.imgUrl!)
-                                : const AssetImage(
-                                        'assets/images/default_avatar.png')
-                                    as ImageProvider,
-=======
                                 ? (user.imgUrl!.startsWith('data:image')
                                         ? MemoryImage(base64Decode(
                                             user.imgUrl!.split(',').last))
@@ -93,7 +57,6 @@ class ProfileScreen extends HookWidget {
                                     as ImageProvider
                                 : const AssetImage(
                                     'assets/images/default_avatar.png'),
->>>>>>> clean-branch
                           ),
                         ],
                       ),
@@ -139,24 +102,16 @@ class ProfileScreen extends HookWidget {
                       ProfileTile(
                         icon: CupertinoIcons.cube_box,
                         title: 'Orders',
-<<<<<<< HEAD
-                        onTap: () {},
-=======
                         onTap: () {
                           Get.to(() => AllOrdersScreen());
                         },
->>>>>>> clean-branch
                       ),
                       ProfileTile(
                         icon: Icons.control_point_duplicate_sharp,
                         title: 'Your Points',
-<<<<<<< HEAD
-                        onTap: () {},
-=======
                         onTap: () {
                           Get.to(() => const PointsScreen());
                         },
->>>>>>> clean-branch
                       ),
                       ProfileTile(
                           icon: Icons.headset_mic_sharp,
@@ -168,11 +123,7 @@ class ProfileScreen extends HookWidget {
                         icon: Icons.help_outline,
                         title: 'Help & Support',
                         onTap: () {
-<<<<<<< HEAD
-                          Get.to(() => FAQPage());
-=======
                           Get.to(() => const FAQPage());
->>>>>>> clean-branch
                         },
                       ),
                       ProfileTile(

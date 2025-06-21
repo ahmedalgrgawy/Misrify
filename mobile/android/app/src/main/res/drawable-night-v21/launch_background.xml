@@ -3,10 +3,7 @@
     <item>
         <bitmap android:gravity="fill" android:src="@drawable/background"/>
     </item>
-<<<<<<< HEAD
-=======
     <item>
         <bitmap android:gravity="center" android:src="@drawable/splash"/>
     </item>
->>>>>>> clean-branch
 </layer-list>

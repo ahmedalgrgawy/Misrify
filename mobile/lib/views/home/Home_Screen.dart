@@ -4,15 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/controllers/category_controller.dart';
-<<<<<<< HEAD
-import 'package:graduation_project1/controllers/controllers.auth/login_controller.dart';
-import 'package:graduation_project1/controllers/notification_controller.dart';
-import 'package:graduation_project1/hooks/fetch_all_products.dart';
-=======
 import 'package:graduation_project1/controllers/notification_controller.dart';
 import 'package:graduation_project1/hooks/fetch_all_products.dart';
 import 'package:graduation_project1/main.dart';
->>>>>>> clean-branch
 import 'package:graduation_project1/views/categories/categories_Screen.dart';
 import 'package:graduation_project1/views/home/AllBest_seller.dart';
 import 'package:graduation_project1/views/home/AllNew_arrival.dart';
@@ -32,24 +26,14 @@ class HomeScreen extends StatefulHookWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-<<<<<<< HEAD
-class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
-  final cartController = Get.put(CartController());
-  final notificationsController = Get.put(NotificationController());
-=======
 class _HomeScreenState extends State<HomeScreen> with RouteAware {
   final cartController = Get.find<CartController>();
   final notificationsController = Get.find<NotificationController>();
->>>>>>> clean-branch
   final categoryController = Get.put(CategoryController());
 
   @override
   void initState() {
     super.initState();
-<<<<<<< HEAD
-    WidgetsBinding.instance.addObserver(this);
-    _refetch(); // Initial load
-=======
     _refetch(); // initial fetch
   }
 
@@ -57,23 +41,10 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   void didChangeDependencies() {
     super.didChangeDependencies();
     routeObserver.subscribe(this, ModalRoute.of(context)!);
->>>>>>> clean-branch
   }
 
   @override
   void dispose() {
-<<<<<<< HEAD
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed &&
-        ModalRoute.of(context)?.isCurrent == true) {
-      _refetch(); // When app resumes and we're still on HomeScreen
-    }
-=======
     routeObserver.unsubscribe(this);
     super.dispose();
   }
@@ -82,7 +53,6 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
   @override
   void didPopNext() {
     _refetch();
->>>>>>> clean-branch
   }
 
   void _refetch() {
@@ -112,15 +82,7 @@ class _HomeScreenState extends State<HomeScreen> with RouteAware {
             const BannerSlider(),
             SectionHeading(
               title: 'Categories',
-<<<<<<< HEAD
-              onPress: () {
-                Get.to(() => CategoriesScreen(),
-                    duration: const Duration(milliseconds: 900),
-                    transition: Transition.cupertino);
-              },
-=======
               onPress: () => Get.to(() => CategoriesScreen()),
->>>>>>> clean-branch
             ),
             const CategoryList(),
             Obx(() => categoryController.categoryValue == ''

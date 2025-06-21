@@ -1,9 +1,6 @@
 // ignore_for_file: must_be_immutable
 
-<<<<<<< HEAD
-=======
 import 'dart:convert';
->>>>>>> clean-branch
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -22,11 +19,6 @@ class CategoryTile extends StatelessWidget {
 
   Category category;
 
-<<<<<<< HEAD
-  @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(CategoryController());
-=======
   Widget _buildImage(String? imgUrl) {
     if (imgUrl != null && imgUrl.startsWith('data:image')) {
       try {
@@ -58,36 +50,17 @@ class CategoryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(CategoryController());
 
->>>>>>> clean-branch
     return ListTile(
       onTap: () {
         controller.updateCategory = category.id;
         controller.updateTitle = category.name;
-<<<<<<< HEAD
-        Get.to(() => AllCategoryProductScreen(),
-            transition: Transition.fadeIn,
-            duration: Duration(milliseconds: 900));
-=======
         Get.to(() => const AllCategoryProductScreen(),
             transition: Transition.fadeIn,
             duration: const Duration(milliseconds: 900));
->>>>>>> clean-branch
       },
       leading: CircleAvatar(
         radius: 22.r,
         backgroundColor: Kbackground,
-<<<<<<< HEAD
-        child: Image.network(
-          "https://static.vecteezy.com/system/resources/previews/035/438/654/non_2x/ai-generated-blue-hoodie-isolated-on-transparent-background-free-png.png",
-
-          // category.imageUrl,
-          fit: BoxFit.contain,
-        ),
-      ),
-      title: ReusableText(
-          text: category.name,
-          style: appStyle(14, KTextColor, FontWeight.normal)),
-=======
         child: ClipOval(
           child: _buildImage(category.imgUrl),
         ),
@@ -96,7 +69,6 @@ class CategoryTile extends StatelessWidget {
         text: category.name,
         style: appStyle(14, KTextColor, FontWeight.normal),
       ),
->>>>>>> clean-branch
       trailing: Icon(
         Icons.arrow_forward_ios_rounded,
         size: 15.r,

@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-=======
 import 'dart:convert';
 
->>>>>>> clean-branch
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -15,11 +12,6 @@ import 'package:graduation_project1/controllers/cart_controller.dart';
 import 'package:graduation_project1/controllers/wishlist_controller.dart';
 import 'package:graduation_project1/hooks/fetch_all_brands.dart';
 import 'package:graduation_project1/models/wishlist_response.dart';
-<<<<<<< HEAD
-import 'package:graduation_project1/models/brands_model.dart' as brand_model;
-import 'package:graduation_project1/views/products/Product_page.dart';
-=======
->>>>>>> clean-branch
 
 class WishlistTile extends HookWidget {
   WishlistTile({Key? key, required this.wishlist, this.refetch, this.ontap})
@@ -31,11 +23,6 @@ class WishlistTile extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-<<<<<<< HEAD
-    print('wishlist.brand = ${wishlist.brand}');
-
-=======
->>>>>>> clean-branch
     final wishlistController = Get.find<WishlistController>();
     final cartController = Get.put(CartController());
     final brandsHook = useFetchBrands();
@@ -67,14 +54,6 @@ class WishlistTile extends HookWidget {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12.r),
-<<<<<<< HEAD
-              child: Image.network(
-                wishlist.imgUrl ??
-                    "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                width: 80.w,
-                height: 80.h,
-                fit: BoxFit.cover,
-=======
               child: SizedBox(
                 width: 80.w,
                 height: 80.h,
@@ -110,7 +89,6 @@ class WishlistTile extends HookWidget {
                     }
                   },
                 ),
->>>>>>> clean-branch
               ),
             ),
             SizedBox(width: 12.w),
@@ -127,11 +105,7 @@ class WishlistTile extends HookWidget {
                         ReusableText(
                           text: wishlist.name,
                           style: appStyle(14, Kfoundation, FontWeight.w600),
-<<<<<<< HEAD
-                          maxlines: 1,
-=======
                           maxlines: 2,
->>>>>>> clean-branch
                         ),
                         SizedBox(height: 4.h),
                         ReusableText(
@@ -144,22 +118,14 @@ class WishlistTile extends HookWidget {
                                 children: [
                                   ReusableText(
                                     text:
-<<<<<<< HEAD
-                                        "\$${discountedPrice.toStringAsFixed(2)}",
-=======
                                         "EGP ${discountedPrice.toStringAsFixed(2)}",
->>>>>>> clean-branch
                                     style: appStyle(
                                         13, kDarkBlue, FontWeight.bold),
                                   ),
                                   SizedBox(width: 6.w),
                                   ReusableText(
                                     text:
-<<<<<<< HEAD
-                                        "\$${wishlist.price.toStringAsFixed(2)}",
-=======
                                         "EGP ${wishlist.price.toStringAsFixed(2)}",
->>>>>>> clean-branch
                                     style: appStyle(12, kGray, FontWeight.w400)
                                         .copyWith(
                                       decoration: TextDecoration.lineThrough,
@@ -168,15 +134,9 @@ class WishlistTile extends HookWidget {
                                 ],
                               )
                             : ReusableText(
-<<<<<<< HEAD
-                                text: "\$${wishlist.price.toStringAsFixed(2)}",
-                                style:
-                                    appStyle(14, Kfoundation, FontWeight.w400),
-=======
                                 text:
                                     "EGP ${wishlist.price.toStringAsFixed(2)}",
                                 style: appStyle(13, kDarkBlue, FontWeight.bold),
->>>>>>> clean-branch
                               ),
                       ],
                     ),

@@ -37,14 +37,8 @@ class ProductList extends HookWidget {
               itemBuilder: (context, i) {
                 final product = products[i];
                 return ProductWidget(
-<<<<<<< HEAD
-                  onTap: () {
-                    Get.to(() => ProductDetailScreen(product: product));
-                  },
-=======
                   onTap: () =>
                       Get.to(() => ProductDetailScreen(product: product)),
->>>>>>> clean-branch
                   brand: product.brand.name,
                   price: product.price.toStringAsFixed(2),
                   title: product.name,
