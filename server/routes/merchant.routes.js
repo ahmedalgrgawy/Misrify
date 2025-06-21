@@ -25,7 +25,6 @@ router.post("/create-comment", catchAsync(protectedRoute), catchAsync(merchantRo
 router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getStockLevel))
 router.get("/products-with-ratings", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getProductsWithAvgRatings))
 router.get("/merchant-orders-stats", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getMerchantOrdersStats));
-router.get("/sales-growth", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getSalesGrowth));
 router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute), getStockLevel);
 router.get("/products-with-ratings", catchAsync(protectedRoute), catchAsync(merchantRoute), getProductsWithAvgRatings);
 router.get("/merchant-orders-stats", catchAsync(protectedRoute), catchAsync(merchantRoute), getMerchantOrdersStats);
