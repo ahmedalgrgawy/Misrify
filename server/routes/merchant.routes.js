@@ -5,7 +5,7 @@ import { createProduct, deleteProduct, editProduct, getMerchantProducts } from '
 import { validate } from '../services/validate.service.js';
 import { createProductSchema, editProductSchema } from '../validators/productValidator.js';
 import { createComment } from '../controllers/comment.controllers.js';
-import { getStockLevel, getProductsWithAvgRatings, getMerchantOrdersStats, getSalesGrowth, getMerchantOrderTrends, getMerchantSalesTrends } from '../controllers/merchantAnalytics.controllers.js';
+import { getStockLevel, getProductsWithAvgRatings, getMerchantOrdersStats, getSalesGrowth, getMerchantOrderTrends, getMerchantSalesTrends, getMerchantOrders } from '../controllers/merchantAnalytics.controllers.js';
 
 const router = express.Router()
 
@@ -20,6 +20,9 @@ router.delete("/delete-product/:id", catchAsync(protectedRoute), catchAsync(merc
 
 // Handling Comments & Reviews
 router.post("/create-comment", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(createComment))
+
+// Handling Merchant Orders
+router.get("/orders", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getMerchantOrders))
 
 // Handling Merchant Analytics 
 router.get("/stock-level", catchAsync(protectedRoute), catchAsync(merchantRoute), catchAsync(getStockLevel))

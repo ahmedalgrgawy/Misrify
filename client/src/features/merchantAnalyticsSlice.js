@@ -74,7 +74,18 @@ export const getMerchantOrderTrends = createAsyncThunk(
   }
 );
 
-// Reuse getYearlyIncome and getTotalViewers from adminAnalyticsSlice
+export const getMerchantOrders = createAsyncThunk(
+  "merchantOrders/getMerchantOrders",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await axiosInstance.get("/merchant/orders");
+      return res.data.orders;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 
 const merchantAnalyticsSlice = createSlice({
   name: "merchantAnalytics",
@@ -87,6 +98,7 @@ const merchantAnalyticsSlice = createSlice({
     orderTrends: [],
     yearlyIncome: {},
     totalViewers: {},
+    orders: [],
     loading: false,
     error: null,
   },
@@ -181,6 +193,17 @@ const merchantAnalyticsSlice = createSlice({
         state.yearlyIncome = action.payload.data;
       })
       .addCase(getYearlyIncome.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      }).addCase(getMerchantOrders.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getMerchantOrders.fulfilled, (state, action) => {
+        state.loading = false;
+        state.orders = action.payload;
+      })
+      .addCase(getMerchantOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
