@@ -52,21 +52,21 @@ const Sidebar = () => {
                         <span className="text-sm font-medium">Products</span>
                     </NavLink>
 
+                    <NavLink
+                        to="requested-products"
+                        className={({ isActive }) =>
+                            `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition ${isActive
+                                ? "bg-title-blue text-white"
+                                : "text-title-blue hover:bg-bg-second"
+                            }`
+                        }
+                    >
+                        <FaBox className="text-xl" />
+                        <span className="text-sm font-medium">Requested Products</span>
+                    </NavLink>
+
                     {userRole === "admin" && (
                         <>
-                            <NavLink
-                                to="requested-products"
-                                className={({ isActive }) =>
-                                    `flex items-center gap-4 px-4 py-2 rounded-lg cursor-pointer transition ${isActive
-                                        ? "bg-title-blue text-white"
-                                        : "text-title-blue hover:bg-bg-second"
-                                    }`
-                                }
-                            >
-                                <FaBox className="text-xl" />
-                                <span className="text-sm font-medium">Requested Products</span>
-                            </NavLink>
-
                             <NavLink
                                 to="categories"
                                 className={({ isActive }) =>

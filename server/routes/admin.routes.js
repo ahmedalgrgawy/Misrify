@@ -1,6 +1,6 @@
 import express from 'express'
 import catchAsync from '../errors/catchAsync.js'
-import { adminRoute, protectedRoute } from '../middlewares/auth.middlewares.js'
+import { adminAndMerchantRoute, adminRoute, protectedRoute } from '../middlewares/auth.middlewares.js'
 import { createUser, deleteUser, editUser, getAllMerchants, getAllUsers } from '../controllers/user.controllers.js'
 import { validate } from '../services/validate.service.js'
 import { createUserSchema, editUserSchema } from '../validators/userValidator.js'
@@ -49,7 +49,7 @@ router.put("/edit-brand/:id", catchAsync(protectedRoute), catchAsync(adminRoute)
 router.delete("/delete-brand/:id", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(deleteBrand))
 
 // Handling Products
-router.get("/requested-products", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getRequestedProducts))
+router.get("/requested-products", catchAsync(protectedRoute), catchAsync(adminAndMerchantRoute), catchAsync(getRequestedProducts))
 
 router.get("/products", catchAsync(protectedRoute), catchAsync(adminRoute), catchAsync(getProducts))
 

@@ -646,7 +646,9 @@ const Products = () => {
   return (
     <div className="p-6 bg-bg-second">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
-        <h3 className="text-3xl font-bold text-title-blue">Products</h3>
+        <h3 className="text-3xl font-bold text-title-blue">
+          {userRole === "merchant" ? "Approved Products" : "Products"}
+        </h3>
         <button
           onClick={handleCreateClick}
           className="btn text-lg hover:bg-main-blue bg-title-blue text-white p-3 rounded-3xl flex items-center gap-2"
