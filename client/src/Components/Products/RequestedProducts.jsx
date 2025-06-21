@@ -20,6 +20,8 @@ const RequestedProducts = () => {
     const brandsLoading = useSelector((state) => state.Brands?.loading ?? false);
     const categoriesLoading = useSelector((state) => state.Categories?.loading ?? false);
 
+    const userRole = useSelector((state) => state.auth.user?.role);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -62,7 +64,9 @@ const RequestedProducts = () => {
     return (
         <div className="p-6 bg-bg-second">
             <div className="flex justify-between items-center mb-6">
-                <h3 className="text-3xl font-bold text-title-blue">Requested Products</h3>
+                <h3 className="text-3xl font-bold text-title-blue">
+                    {userRole === "admin" ? "Requested Products" : "Your Requested Products"}
+                </h3>
             </div>
             {error && (
                 <div className="mb-4 p-4 bg-red-50 text-red-600 rounded-lg border border-red-200">
@@ -87,7 +91,9 @@ const RequestedProducts = () => {
                                 <th className="py-4 px-6 text-center">Product Name</th>
                                 <th className="py-4 px-6 text-center">Category</th>
                                 <th className="py-4 px-6 text-center">Brand</th>
-                                <th className="py-4 px-6 text-center">Action</th>
+                                {userRole === "admin" && (
+                                    <th className="py-4 px-6 text-center">Actions</th>
+                                )}
                             </tr>
                         </thead>
                         <tbody>
@@ -113,40 +119,42 @@ const RequestedProducts = () => {
                                         <td className="py-4 px-6 text-main-blue text-center">
                                             {product.brand?.name || "N/A"}
                                         </td>
-                                        <td>
-                                            <div className="py-4 px-6 text-center space-x-4 flex justify-center items-center">
-                                                <button
-                                                    onClick={() => handleToggleApproval(product._id, true)}
-                                                    className="text-green-500 hover:text-green-600 transition duration-300 transform hover:scale-110"
-                                                    data-tooltip-id="Approve"
-                                                    data-tooltip-content="Approve"
-                                                    data-tooltip-place="bottom"
-                                                    aria-label="Approve product"
-                                                    disabled={isSubmitting === product._id}
-                                                >
-                                                    {isSubmitting === product._id && !product.isApproved ? (
-                                                        <TailSpin color="#22C55E" height={20} width={20} />
-                                                    ) : (
-                                                        <FaCheck />
-                                                    )}
-                                                </button>
-                                                <button
-                                                    onClick={() => handleToggleApproval(product._id, false)}
-                                                    className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110"
-                                                    data-tooltip-id="Reject"
-                                                    data-tooltip-content="Reject"
-                                                    data-tooltip-place="bottom"
-                                                    aria-label="Reject product"
-                                                    disabled={isSubmitting === product._id}
-                                                >
-                                                    {isSubmitting === product._id && product.isApproved ? (
-                                                        <TailSpin color="#EF4444" height={20} width={20} />
-                                                    ) : (
-                                                        <FaTimes />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </td>
+                                        {userRole === "admin" && (
+                                            <td>
+                                                <div className="py-4 px-6 text-center space-x-4 flex justify-center items-center">
+                                                    <button
+                                                        onClick={() => handleToggleApproval(product._id, true)}
+                                                        className="text-green-500 hover:text-green-600 transition duration-300 transform hover:scale-110"
+                                                        data-tooltip-id="Approve"
+                                                        data-tooltip-content="Approve"
+                                                        data-tooltip-place="bottom"
+                                                        aria-label="Approve product"
+                                                        disabled={isSubmitting === product._id}
+                                                    >
+                                                        {isSubmitting === product._id && !product.isApproved ? (
+                                                            <TailSpin color="#22C55E" height={20} width={20} />
+                                                        ) : (
+                                                            <FaCheck />
+                                                        )}
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleToggleApproval(product._id, false)}
+                                                        className="text-red-500 hover:text-red-600 transition duration-300 transform hover:scale-110"
+                                                        data-tooltip-id="Reject"
+                                                        data-tooltip-content="Reject"
+                                                        data-tooltip-place="bottom"
+                                                        aria-label="Reject product"
+                                                        disabled={isSubmitting === product._id}
+                                                    >
+                                                        {isSubmitting === product._id && product.isApproved ? (
+                                                            <TailSpin color="#EF4444" height={20} width={20} />
+                                                        ) : (
+                                                            <FaTimes />
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                     </tr>
                                 ))
                             ) : (
@@ -160,8 +168,12 @@ const RequestedProducts = () => {
                     </table>
                 </div>
             )}
-            <Tooltip id="Approve" className="!py-1 !px-2 !bg-green-600 !rounded-md" />
-            <Tooltip id="Reject" className="!py-1 !px-2 !bg-red-600 !rounded-md" />
+            {userRole === "admin" && (
+                <>
+                    <Tooltip id="Approve" className="!py-1 !px-2 !bg-green-600 !rounded-md" />
+                    <Tooltip id="Reject" className="!py-1 !px-2 !bg-red-600 !rounded-md" />
+                </>
+            )}
         </div>
     );
 };

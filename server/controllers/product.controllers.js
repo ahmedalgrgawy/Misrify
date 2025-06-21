@@ -10,10 +10,31 @@ import User from "../models/user.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res, next) => {
-    const requestedProducts = await Product.find({ isApproved: false })
-        .populate("category")
-        .populate("brand")
-        .exec();
+
+    const user = req.user;
+
+    let requestedProducts = [];
+
+    if (user.role === 'merchant') {
+
+        const brand = await Brand.findOne({ owner: user._id });
+
+        if (!brand) {
+            return next(new AppError("You Are Not Authorized To View This Page", 401));
+        }
+
+        requestedProducts = await Product.find({ isApproved: false, brand: brand._id })
+            .populate("category")
+            .populate("brand")
+            .exec();
+    } else {
+        requestedProducts = await Product.find({ isApproved: false })
+            .populate("category")
+            .populate("brand")
+            .exec();
+    }
+
+
 
     if (!requestedProducts || requestedProducts.length === 0) {
         return next(new AppError("No Requested Products Found", 404))
@@ -260,13 +281,13 @@ export const deleteProduct = async (req, res, next) => {
 // <<<<<<<<<<<<<<<<< Merchant Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getMerchantProducts = async (req, res, next) => {
     const merchantId = req.user._id;
-    const merchantBrand = await Brand.findOne({ owner: merchantId });
+    const merchantBrand = await Brand.findOne({ owner: merchantId, });
 
     if (!merchantBrand) {
         return next(new AppError("Merchant Does Not Have Any Products", 404))
     }
 
-    const products = await Product.find({ brand: merchantBrand._id }).populate("category")
+    const products = await Product.find({ brand: merchantBrand._id, isApproved: true }).populate("category")
         .populate("brand")
         .exec();
 
