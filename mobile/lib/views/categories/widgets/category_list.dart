@@ -28,7 +28,7 @@ class CategoryList extends HookWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: List.generate(
-          categories.length,
+          categories.take(8).length,
           (i) {
             return CategoryWidget(category: categories[i]);
           },

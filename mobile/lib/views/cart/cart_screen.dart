@@ -232,7 +232,7 @@ class CartScreen extends HookWidget {
                   showButton: true,
                   padd: EdgeInsets.zero,
                   onPress: () {
-                    Get.to(PointsScreen());
+                    Get.to(const PointsScreen());
                   },
                 ),
                 TextField(

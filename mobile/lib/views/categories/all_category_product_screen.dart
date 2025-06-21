@@ -47,10 +47,11 @@ class AllCategoryProductScreen extends HookWidget {
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            centerTitle: true,
             backgroundColor: Kbackground,
             title: ReusableText(
               text: categoryName,
-              style: appStyle(16, kDarkBlue, FontWeight.w500),
+              style: appStyle(18, KTextColor, FontWeight.w600),
             ),
             actions: [
               IconButton(
