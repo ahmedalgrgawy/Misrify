@@ -2,10 +2,15 @@ import Product from "../models/product.model.js";
 import Review from "../models/review.model.js";
 import Order from "../models/order.model.js";
 import moment from "moment";
-
+import MerchantAnalytics from "../models/merchantAnalytics.model.js";
+import mongoose from "mongoose";
+import Brand from "../models/brand.model.js";
 
 export const getStockLevel = async (req, res, next) => {
-  const products = await Product.find().select("name quantityInStock");
+
+  const brand = await Brand.find({ owner: req.user._id });
+
+  const products = await Product.find({ brand: brand[0]._id }).select("name quantityInStock");
 
   res.status(200).json({
     success: true,
@@ -15,20 +20,28 @@ export const getStockLevel = async (req, res, next) => {
 };
 
 export const getProductsWithAvgRatings = async (req, res, next) => {
+
+  const brand = await Brand.find({ owner: req.user._id });
+
   const products = await Product.aggregate([
+    {
+      $match: {
+        brand: new mongoose.Types.ObjectId(brand[0]._id),
+      },
+    },
     {
       $lookup: {
         from: "reviews",
         localField: "reviews",
         foreignField: "_id",
         as: "reviewArray",
-      }
+      },
     },
     {
       $unwind: {
         path: "$reviewArray",
-        preserveNullAndEmptyArrays: true
-      }
+        preserveNullAndEmptyArrays: true,
+      },
     },
     {
       $group: {
@@ -36,7 +49,7 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
         name: { $first: "$name" },
         totalReviews: { $sum: 1 },
         averageRating: { $avg: "$reviewArray.rating" },
-      }
+      },
     },
     {
       $project: {
@@ -45,12 +58,12 @@ export const getProductsWithAvgRatings = async (req, res, next) => {
         averageRating: {
           $cond: {
             if: { $gt: ["$totalReviews", 0] },
-            then: "$averageRating",
-            else: 0
-          }
-        }
-      }
-    }
+            then: { $round: ["$averageRating", 2] }, // Round to 2 decimal places
+            else: 0,
+          },
+        },
+      },
+    },
   ]);
 
   res.status(200).json({
@@ -118,39 +131,104 @@ export const getSalesGrowth = async (req, res, next) => {
   try {
     const merchantId = req.user._id;
 
+    // Define date ranges
     const startOfCurrentMonth = moment().startOf("month").toDate();
     const endOfCurrentMonth = moment().endOf("month").toDate();
     const startOfLastMonth = moment().subtract(1, "month").startOf("month").toDate();
     const endOfLastMonth = moment().subtract(1, "month").endOf("month").toDate();
 
+    // Find merchant's brand(s)
+    const brands = await Brand.find({ owner: merchantId }).select("_id");
+    if (!brands || brands.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No brands found for this merchant",
+        data: {
+          currentMonthTotal: 0,
+          lastMonthTotal: 0,
+          salesGrowthRate: "0.00",
+        },
+      });
+    }
+    const brandIds = brands.map((brand) => brand._id);
+
+    // Aggregation pipeline for sales
     const salesAggregation = (start, end) => Order.aggregate([
-      { $match: { merchant: new mongoose.Types.ObjectId(merchantId), createdAt: { $gte: start, $lte: end } } },
-      { $unwind: "$products" },
+      // Match orders with successful payments
+      {
+        $lookup: {
+          from: "payments",
+          localField: "_id",
+          foreignField: "order",
+          as: "payment",
+        },
+      },
+      {
+        $match: {
+          "payment.status": "success",
+          createdAt: { $gte: start, $lte: end },
+        },
+      },
+      // Unwind orderItems
+      { $unwind: "$orderItems" },
+      // Lookup OrderItem details
+      {
+        $lookup: {
+          from: "orderitems",
+          localField: "orderItems",
+          foreignField: "_id",
+          as: "orderItemDetails",
+        },
+      },
+      { $unwind: "$orderItemDetails" },
+      // Lookup Product details
       {
         $lookup: {
           from: "products",
-          localField: "products.product",
+          localField: "orderItemDetails.product",
           foreignField: "_id",
           as: "productDetails",
         },
       },
       { $unwind: "$productDetails" },
+      // Filter for merchant's brand
+      {
+        $match: {
+          "productDetails.brand": { $in: brandIds },
+        },
+      },
+      // Calculate total sales
       {
         $group: {
           _id: null,
-          totalSales: { $sum: { $multiply: ["$products.quantity", "$productDetails.price"] } },
+          totalSales: {
+            $sum: {
+              $multiply: ["$orderItemDetails.quantity", "$orderItemDetails.price"],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          totalSales: { $ifNull: ["$totalSales", 0] },
         },
       },
     ]);
 
+    // Run aggregations concurrently
     const [currentMonthSales, lastMonthSales] = await Promise.all([
       salesAggregation(startOfCurrentMonth, endOfCurrentMonth),
       salesAggregation(startOfLastMonth, endOfLastMonth),
     ]);
 
+    // Extract totals
     const currentMonthTotal = currentMonthSales.length > 0 ? currentMonthSales[0].totalSales : 0;
     const lastMonthTotal = lastMonthSales.length > 0 ? lastMonthSales[0].totalSales : 0;
-    const salesGrowthRate = lastMonthTotal > 0 ? (((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100).toFixed(2) : 0;
+    // Calculate growth rate
+    const salesGrowthRate = lastMonthTotal > 0
+      ? (((currentMonthTotal - lastMonthTotal) / lastMonthTotal) * 100).toFixed(2)
+      : currentMonthTotal > 0 ? "100.00" : "0.00";
 
     res.status(200).json({
       success: true,
@@ -162,9 +240,11 @@ export const getSalesGrowth = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error("Error in getSalesGrowth:", error.message);
     next(error);
   }
 };
+
 
 export const getMerchantSalesTrends = async (req, res, next) => {
   try {
@@ -374,34 +454,83 @@ export const getMerchantOrderTrends = async (req, res, next) => {
     const merchantId = req.user._id;
     const year = new Date().getFullYear();
 
+    // Find the merchant's brand(s)
+    const brands = await Brand.find({ owner: merchantId }).select("_id");
+    if (!brands || brands.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No brands found for this merchant",
+        data: Array(12).fill().map((_, i) => ({
+          month: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][i],
+          totalOrders: 0,
+          totalRevenue: 0,
+        })),
+      });
+    }
+    const brandIds = brands.map((brand) => brand._id);
+
     const orderTrends = await Order.aggregate([
+      // Match orders with successful payments
+      {
+        $lookup: {
+          from: "payments",
+          localField: "_id",
+          foreignField: "order",
+          as: "payment",
+        },
+      },
       {
         $match: {
-          merchant: new mongoose.Types.ObjectId(merchantId),
+          "payment.status": "success",
           createdAt: {
             $gte: new Date(year, 0, 1),
             $lte: new Date(year, 11, 31, 23, 59, 59),
           },
         },
       },
-      { $unwind: "$products" },
+      // Unwind orderItems to process each OrderItem
+      { $unwind: "$orderItems" },
+      // Lookup OrderItem details
+      {
+        $lookup: {
+          from: "orderitems",
+          localField: "orderItems",
+          foreignField: "_id",
+          as: "orderItemDetails",
+        },
+      },
+      { $unwind: "$orderItemDetails" },
+      // Lookup Product details to check brand
       {
         $lookup: {
           from: "products",
-          localField: "products.product",
+          localField: "orderItemDetails.product",
           foreignField: "_id",
           as: "productDetails",
         },
       },
       { $unwind: "$productDetails" },
+      // Filter for merchant's brand
+      {
+        $match: {
+          "productDetails.brand": { $in: brandIds },
+        },
+      },
+      // Group by month
       {
         $group: {
           _id: { month: { $month: "$createdAt" } },
-          totalOrders: { $sum: 1 },
-          totalRevenue: { $sum: { $multiply: ["$products.quantity", "$productDetails.price"] } },
+          totalOrders: { $addToSet: "$_id" }, // Count unique orders
+          totalRevenue: {
+            $sum: {
+              $multiply: ["$orderItemDetails.quantity", "$orderItemDetails.price"],
+            },
+          },
         },
       },
+      // Sort by month
       { $sort: { "_id.month": 1 } },
+      // Project final fields
       {
         $project: {
           _id: 0,
@@ -411,8 +540,8 @@ export const getMerchantOrderTrends = async (req, res, next) => {
               { $subtract: ["$_id.month", 1] },
             ],
           },
-          totalOrders: 1,
-          totalRevenue: 1,
+          totalOrders: { $size: "$totalOrders" }, // Count unique orders
+          totalRevenue: { $round: ["$totalRevenue", 2] },
         },
       },
     ]);
@@ -431,14 +560,13 @@ export const getMerchantOrderTrends = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: "Order trends fetched successfully",
-      data: filledTrends, // [{ month: "Jan", totalOrders: 50, totalRevenue: 5000 }, ...]
+      data: filledTrends,
     });
   } catch (error) {
+    console.error("Error in getMerchantOrderTrends:", error.message);
     next(error);
   }
 };
-
-import MerchantAnalytics from "../models/merchantAnalytics.model.js";
 
 export const updateMerchantAnalytics = async (merchantId) => {
   try {
