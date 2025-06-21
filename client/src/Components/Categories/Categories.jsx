@@ -513,8 +513,7 @@ const Categories = () => {
                         }, 0);
                       })
                       .catch((err) => {
-                        showToast("there is something wrong 👎", "error");
-                        console.error("Error creating brand:", err);
+                        showToast(err, "error");
                       });
                   }}
                   className="bg-main-blue text-white py-2 px-4 rounded-lg hover:bg-title-blue transition duration-500 shadow-lg"
