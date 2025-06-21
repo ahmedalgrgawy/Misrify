@@ -106,7 +106,7 @@ const Notifications = () => {
           notifications.map(({ _id, sender, content, isRead, createdAt }) => (
             <div
               key={_id}
-              className="p-6 bg-white rounded-lg shadow-md transition ease-in hover:shadow-lg duration-400 border border-gray-100"
+              className={`p-6 bg-white rounded-lg shadow-md transition ease-in hover:shadow-lg duration-400 border border-gray-100 ${isRead ? "opacity-70" : "opacity-100"}`}
             >
               <div className="flex gap-4 items-center mb-4">
                 <h4 className="font-semibold text-xl text-main-blue">
