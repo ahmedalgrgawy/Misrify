@@ -24,6 +24,7 @@ import Notifications from '../Components/Notifications/Notifications';
 import StartupGuide from '../Pages/Students/StartupGuide';
 import RequestedProducts from '../Components/Products/RequestedProducts';
 import { MerchantOrders } from '../Components/MerchantOrders/MerchantOrders';
+import MerchantReviews from '../Components/MerchantReviews/MerchantReviews';
 
 const router = createBrowserRouter([
   {
@@ -58,6 +59,7 @@ const router = createBrowserRouter([
       { path: 'messages', element: <Messages /> },
       { path: 'requested-products', element: <RequestedProducts /> },
       { path: "orders", element: <MerchantOrders /> },
+      { path: "reviews", element: <MerchantReviews /> }
     ]
   },
   {
