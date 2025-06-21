@@ -8,9 +8,8 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LuPackageOpen } from "react-icons/lu";
-import { FaArrowUpLong, FaTags } from "react-icons/fa6";
+import { FaTags } from "react-icons/fa6";
 import { IoIosPeople } from "react-icons/io";
-import { BsCurrencyDollar } from "react-icons/bs";
 import { RxGrid } from "react-icons/rx";
 import { Link } from "react-router-dom";
 import {
@@ -28,6 +27,7 @@ import {
   getMiniChartData,
   getYearlyIncome,
 } from "../../features/adminAnalyticsSlice";
+import moment from "moment";
 
 const Analytics = () => {
   const dispatch = useDispatch();
@@ -45,24 +45,21 @@ const Analytics = () => {
     totalUsers = {},
     miniChartData = {},
     yearlyIncome: adminYearlyIncome = {},
-    totalViewers: adminTotalViewers = {},
     loading: adminLoading,
   } = userRole === "admin" ? adminAnalytics || {} : {};
 
   const {
     stockLevels = [],
     productRatings = [],
-    orderStats = { totalOrders: 0, totalMoneyEarned: 0 },
     salesGrowth = { currentMonthTotal: 0, lastMonthTotal: 0, salesGrowthRate: "0.00" },
-    salesTrends = [],
     orderTrends = [],
     yearlyIncome: merchantYearlyIncome = {},
-    totalViewers: merchantTotalViewers = {},
     loading: merchantLoading,
   } = userRole === "merchant" ? merchantAnalytics || {} : {};
 
+  console.log(salesGrowth);
+
   const yearlyIncome = userRole === "admin" ? adminYearlyIncome : merchantYearlyIncome;
-  const totalViewers = userRole === "admin" ? adminTotalViewers : merchantTotalViewers;
   const loading = userRole === "admin" ? adminLoading : merchantLoading;
 
   // Derived data
@@ -76,10 +73,16 @@ const Analytics = () => {
   const totalOrders = orderTrends.map((o) => o.totalOrders || 0);
   const totalRevenue = orderTrends.map((o) => o.totalRevenue || 0);
 
-  const salesXData = salesTrends.map((s) => s.month || "");
-  const salesData = salesTrends.map((s) => s.totalSales || 0);
-  const totalSales = salesData.reduce((sum, val) => sum + val, 0);
+  const totalSales = salesGrowth.currentMonthTotal || 0;
   const growthRate = salesGrowth.salesGrowthRate || "0.00";
+  const chartLabels = [
+    moment().subtract(1, "month").format("MMM YYYY"), // Last month, e.g., "May 2025"
+    moment().format("MMM YYYY"), // Current month, e.g., "Jun 2025"
+  ];
+  const chartData = [
+    salesGrowth.lastMonthTotal || 0,
+    salesGrowth.currentMonthTotal || 0,
+  ];
 
   const handleTooltipChange = (event) => {
     setShowTooltip(event.target.checked);
@@ -131,27 +134,6 @@ const Analytics = () => {
   };
 
   const doughnutOptions = {
-    plugins: { legend: { display: false }, tooltip: { enabled: false } },
-    responsive: true,
-    maintainAspectRatio: false,
-  };
-
-  const viewersData = {
-    labels: totalViewers.labels || ["Active", "Inactive", "Offline"],
-    datasets: [
-      {
-        data: totalViewers.values || [0, 0, 0],
-        backgroundColor: ["#2B3D5B", "#D1D5DB", "#A5D8FF"],
-        borderWidth: 0,
-        cutout: "65%",
-        circumference: 210,
-        rotation: 255,
-        borderRadius: 3,
-      },
-    ],
-  };
-
-  const viewersOptions = {
     plugins: { legend: { display: false }, tooltip: { enabled: false } },
     responsive: true,
     maintainAspectRatio: false,
@@ -451,12 +433,55 @@ const Analytics = () => {
               </LineChart>
             )}
           </div>
+          <div className="grid gap-8 gap-x-14 font-inter">
+            {/* Yearly Income */}
+            <div className="rounded-2xl bg-white p-8">
+              <div className="pb-2.5 border-b-2 border-[#E5E5EF]">
+                <p className="text-[#9291A5] text-lg">Statistics</p>
+                <p className="text-title-blue text-xl font-bold">Yearly Income</p>
+              </div>
+              <div className="mt-5">
+                {loading ? (
+                  <Typography>Loading...</Typography>
+                ) : (
+                  <>
+                    <Box position="relative" width={240} height={200} mx="auto">
+                      <Doughnut data={doughnutData} options={doughnutOptions} />
+                      <Box position="absolute" top="50%" left="50%" sx={{ transform: "translate(-50%, -25%)", textAlign: "center" }}>
+                        <Typography variant="body2" color="textSecondary" className="!font-inter !font-normal !text-base">
+                          Total Income
+                        </Typography>
+                        <Typography variant="h6" fontWeight="semibold" className="!text-main-blue !font-inter !font-bold !text-xl">
+                          {yearlyIncome.totalIncome ? `${parseInt(yearlyIncome.totalIncome).toLocaleString()} EGP` : "0 EGP"}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    <Box className="flex flex-wrap w-full justify-around mt-5 text-sm">
+                      {(doughnutData.labels || []).map((label, index) => (
+                        <div className="flex items-center" key={label}>
+                          <span className={`w-3 h-3 rounded-full me-0.5`} style={{ backgroundColor: doughnutData.datasets[0].backgroundColor[index] }}></span>
+                          <span className="text-second-grey text-base font-normal">
+                            {label}
+                            <span className="text-main-blue font-medium ms-1">
+                              {yearlyIncome.values && yearlyIncome.values.reduce((sum, val) => sum + val, 0)
+                                ? `${((yearlyIncome.values[index] / yearlyIncome.values.reduce((sum, val) => sum + val, 0)) * 100).toFixed(0)}%`
+                                : "0%"}
+                            </span>
+                          </span>
+                        </div>
+                      ))}
+                    </Box>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
         </>
       )}
 
       {userRole === "merchant" && (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 font-inter">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 font-inter">
             {/* Stock Levels */}
             <div className="px-4 py-3.5 rounded-2xl bg-white">
               <div className="flex justify-between">
@@ -478,7 +503,7 @@ const Analytics = () => {
                   <BarChart
                     xAxis={[{ scaleType: "band", data: stockLevels.map((p) => p.name || "Unknown") }]}
                     series={[{ data: stockLevels.map((p) => p.quantityInStock || 0), label: "Stock Quantity", color: "#b8f2bc" }]}
-                    width={350}
+                    width={500}
                     height={200}
                   />
                 )}
@@ -508,23 +533,27 @@ const Analytics = () => {
                       { data: avgRatings, label: "Average Rating", color: "#ffd096" },
                       { data: totalReviews, label: "Total Reviews", color: "#e27d09" },
                     ]}
-                    width={350}
+                    width={500}
                     height={200}
                   />
                 )}
               </div>
             </div>
             {/* Order Stats */}
-            <div className="px-4 py-3.5 rounded-2xl bg-white">
+            <div className="px-4 py-3.5 rounded-2xl bg-white xl:col-span-2 w-full">
               <div className="flex justify-between">
                 <div className="flex flex-col">
                   <div className="p-3 text-[#DB2777] bg-[#FCE7F3] rounded-full w-fit">
                     <FaTags className="text-3xl" />
                   </div>
-                  <p className="my-4 text-[#6E7786] text-sm font-semibold">Orders Stats</p>
+                  <p className="my-4 text-[#6E7786] text-sm font-semibold">Paid Orders Stats</p>
                   <h3 className="text-sm font-normal text-[#6E7786]">
-                    <span className="text-2xl font-bold text-title-blue mr-2">{orderStats.totalOrders || 0}</span>
-                    orders
+                    <span className="text-2xl font-bold text-title-blue mr-2">
+                      {totalOrders.reduce((a, b) => a + b, 0) || 0} <span className="font-normal text-xl">Orders</span>
+                      <br />
+                      {totalRevenue.reduce((a, b) => a + b, 0) || 0} <span className="font-normal text-xl">Revenue</span>
+                    </span>
+
                   </h3>
                 </div>
               </div>
@@ -538,7 +567,7 @@ const Analytics = () => {
                       { data: totalOrders, label: "Orders", color: "#f4c6e0" },
                       { data: totalRevenue, label: "Revenue (EGP)", color: "#e1478c" },
                     ]}
-                    width={350}
+                    width={700}
                     height={200}
                   />
                 )}
@@ -549,135 +578,112 @@ const Analytics = () => {
           <div className="rounded-2xl bg-white my-5 p-8 font-inter">
             <div className="flex justify-between mb-6">
               <div>
-                <p className="text-[#6E7786] text-lg">Sales {new Date().getFullYear()}</p>
+                <p className="text-[#6E7786] text-lg">
+                  Sales for {moment().format("MMMM YYYY")}
+                </p>
                 <h3 className="flex items-center gap-2 text-[#6E7786]">
                   <span className="font-bold text-3xl text-[#1E1B39]">
                     EGP {(totalSales || 0).toLocaleString()}
                   </span>
-                  <span className={`flex items-center gap-1 text-sm ${growthRate >= 0 ? "text-[#04CE00]" : "text-[#DC2626]"}`}>
-                    <div className={`w-2.5 h-2.5 rounded-full ${growthRate >= 0 ? "bg-[#04CE00]" : "bg-[#DC2626]"}`}></div>
+                  <span
+                    className={`flex items-center gap-1 text-sm ${parseFloat(growthRate || 0) >= 0 ? "text-[#04CE00]" : "text-[#DC2626]"
+                      }`}
+                  >
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full ${parseFloat(growthRate || 0) >= 0 ? "bg-[#04CE00]" : "bg-[#DC2626]"
+                        }`}
+                    ></div>
                     {growthRate}%
                   </span>
                   VS LAST MONTH
                 </h3>
               </div>
               <div className="flex bg-[#F8F9FF] rounded-lg overflow-hidden items-center">
-                <button className="px-4 py-2.5 text-sm">Daily</button>
-                <button className="px-4 py-2.5 text-sm">Weekly</button>
-                <button className="px-4 py-2.5 text-sm bg-title-blue rounded-lg font-medium text-white">Annually</button>
+                <button className="px-4 py-2.5 text-sm bg-title-blue rounded-lg font-medium text-white">
+                  Monthly
+                </button>
               </div>
             </div>
             {loading ? (
               <Typography>Loading...</Typography>
             ) : (
-              <LineChart
-                xAxis={[{ scaleType: "band", data: salesXData, valueFormatter: (val) => val, disableTicks: true, disableLine: true, offset: 25, labelOffset: 1 }]}
-                yAxis={[{ offset: 30, disableTicks: true, disableLine: true, position: "right", valueFormatter: (value) => `${(value / 1000).toFixed(0)}K` }]}
-                grid={{ horizontal: true }}
-                series={[{ curve: "natural", data: salesData, area: true, showMark: false, color: "url(#Gradient7)" }]}
-                sx={{ [`& .${lineElementClasses.root}`]: { stroke: "rgba(21, 37, 63)", strokeWidth: 3 } }}
+              <BarChart
+                xAxis={[
+                  {
+                    scaleType: "band",
+                    data: chartLabels,
+                    tickLabelStyle: { fontSize: 12, fill: "#6E7786" },
+                  },
+                ]}
+                yAxis={[
+                  {
+                    tickLabelStyle: { fontSize: 12, fill: "#6E7786" },
+                    valueFormatter: (value) => `${Math.round(value)}`, // Display raw EGP
+                    min: 0,
+                    max: Math.max(
+                      ...chartData,
+                      50 // Ensure at least 50 EGP range
+                    ) * 1.2, // 20% headroom
+                    tickValues: (() => {
+                      const maxData = Math.max(...chartData, 50);
+                      const baseTicks = [50, 100, 200, 500, 1000]; // Initial ranges
+                      if (maxData > 1000) {
+                        // Extend ticks dynamically
+                        let nextTick = 2000; // Start at 2000 EGP
+                        const extendedTicks = [...baseTicks];
+                        while (nextTick <= maxData * 1.2) {
+                          extendedTicks.push(nextTick);
+                          nextTick = nextTick < 5000 ? nextTick * 2.5 : nextTick * 2; // e.g., 2000, 5000, 10000
+                        }
+                        return extendedTicks;
+                      }
+                      return baseTicks.filter((tick) => tick <= maxData * 1.2);
+                    })(),
+                    position: "right",
+                  },
+                ]}
+                series={[
+                  {
+                    data: chartData,
+                    label: "Sales (EGP)",
+                    color: "url(#Gradient7)",
+                    valueFormatter: (value) => `EGP ${value.toLocaleString()}`,
+                  },
+                ]}
                 height={300}
+                margin={{ top: 20, bottom: 30, left: 10, right: 50 }} // Increased right margin
+                grid={{ horizontal: true }}
+                sx={{
+                  "& .MuiBarElement-root": {
+                    fill: "url(#Gradient7)",
+                  },
+                  "& .MuiChartsGrid-root": {
+                    stroke: "rgba(0, 0, 0, 0.1)",
+                    strokeDasharray: "2 2",
+                  },
+                  "& .MuiChartsAxis-right .MuiChartsAxis-tickLabel": {
+                    transform: "translateX(10px)", // Adjust label position
+                  },
+                }}
               >
-                <Stack direction="row">
-                  <FormControlLabel
-                    value="end"
-                    control={<Switch className="bg-title-blue" checked={showTooltip} onChange={handleTooltipChange} />}
-                    label="showTooltip"
-                    labelPlacement="end"
-                  />
-                </Stack>
-                <linearGradient id="Gradient7" x1="0%" y1="100%" x2="0%" y2="0%">
-                  <stop offset="0" stopColor="rgba(21, 37, 63, 0)" />
-                  <stop offset="1" stopColor="rgba(21, 37, 63, 0.6)" />
-                </linearGradient>
-                <AreaPlot />
-                <LinePlot />
-              </LineChart>
+                <defs>
+                  <linearGradient id="Gradient7" x1="0%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stopColor="rgba(21, 37, 63, 0)" />
+                    <stop offset="100%" stopColor="rgba(21, 37, 63, 0.6)" />
+                  </linearGradient>
+                </defs>
+                {chartData.every((v) => v === 0) && (
+                  <text x="50%" y="50%" textAnchor="middle" fill="rgba(0, 0, 0, 0.5)" fontSize="14">
+                    No Sales Data
+                  </text>
+                )}
+              </BarChart>
             )}
           </div>
         </>
       )}
 
-      <div className="grid gap-8 gap-x-14 font-inter">
-        {/* Yearly Income */}
-        <div className="rounded-2xl bg-white p-8">
-          <div className="pb-2.5 border-b-2 border-[#E5E5EF]">
-            <p className="text-[#9291A5] text-lg">Statistics</p>
-            <p className="text-title-blue text-xl font-bold">Yearly Income</p>
-          </div>
-          <div className="mt-5">
-            {loading ? (
-              <Typography>Loading...</Typography>
-            ) : (
-              <>
-                <Box position="relative" width={240} height={200} mx="auto">
-                  <Doughnut data={doughnutData} options={doughnutOptions} />
-                  <Box position="absolute" top="50%" left="50%" sx={{ transform: "translate(-50%, -25%)", textAlign: "center" }}>
-                    <Typography variant="body2" color="textSecondary" className="!font-inter !font-normal !text-base">
-                      Total Income
-                    </Typography>
-                    <Typography variant="h6" fontWeight="semibold" className="!text-main-blue !font-inter !font-bold !text-xl">
-                      {yearlyIncome.totalIncome ? `${parseInt(yearlyIncome.totalIncome).toLocaleString()} EGP` : "0 EGP"}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box className="flex flex-wrap w-full justify-around mt-5 text-sm">
-                  {(doughnutData.labels || []).map((label, index) => (
-                    <div className="flex items-center" key={label}>
-                      <span className={`w-3 h-3 rounded-full me-0.5`} style={{ backgroundColor: doughnutData.datasets[0].backgroundColor[index] }}></span>
-                      <span className="text-second-grey text-base font-normal">
-                        {label}
-                        <span className="text-main-blue font-medium ms-1">
-                          {yearlyIncome.values && yearlyIncome.values.reduce((sum, val) => sum + val, 0)
-                            ? `${((yearlyIncome.values[index] / yearlyIncome.values.reduce((sum, val) => sum + val, 0)) * 100).toFixed(0)}%`
-                            : "0%"}
-                        </span>
-                      </span>
-                    </div>
-                  ))}
-                </Box>
-              </>
-            )}
-          </div>
-        </div>
-        {/* Total Viewers */}
-        {/* <div className="rounded-2xl bg-white p-8">
-          <div className="pb-2.5 border-b-2 border-[#E5E5EF]">
-            <p className="text-[#9291A5] text-lg">Statistics</p>
-            <p className="text-title-blue text-xl font-bold">Total Viewers</p>
-          </div>
-          <div className="mt-5">
-            {loading ? (
-              <Typography>Loading...</Typography>
-            ) : (
-              <>
-                <Box position="relative" width={250} height={200} mx="auto">
-                  <Doughnut data={viewersData} options={viewersOptions} />
-                  <Box position="absolute" top="50%" left="50%" sx={{ transform: "translate(-50%, 0%)", textAlign: "center" }}>
-                    <Typography variant="body2" color="textSecondary" className="!text-[#615E83] !text-lg">
-                      Total Count
-                    </Typography>
-                    <Typography variant="h6" className="!text-main-blue !font-inter !font-bold !text-4xl">
-                      {totalViewers.totalCount ? totalViewers.totalCount.toLocaleString() : 0}
-                    </Typography>
-                  </Box>
-                </Box>
-                <Box className="flex justify-around w-full flex-wrap text-sm border-t-2 pt-5 border-[#E5E5EF]">
-                  {(viewersData.labels || []).map((label, index) => (
-                    <div className="flex items-center" key={label}>
-                      <span className={`w-3 h-3 rounded-full me-0.5`} style={{ backgroundColor: viewersData.datasets[0].backgroundColor[index] }}></span>
-                      <span className="text-second-grey text-base font-normal">
-                        {label}
-                        <span className="text-main-blue font-medium ms-1">{totalViewers.values ? totalViewers.values[index] : 0}</span>
-                      </span>
-                    </div>
-                  ))}
-                </Box>
-              </>
-            )}
-          </div>
-        </div> */}
-      </div>
+
     </div>
   );
 };

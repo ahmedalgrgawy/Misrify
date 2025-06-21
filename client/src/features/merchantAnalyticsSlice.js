@@ -180,7 +180,7 @@ const merchantAnalyticsSlice = createSlice({
         state.loading = false;
         state.yearlyIncome = action.payload.data;
       })
-      .addCase(getYearlyIncome.rejected, (state) => {
+      .addCase(getYearlyIncome.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
