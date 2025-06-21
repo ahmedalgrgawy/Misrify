@@ -9,6 +9,10 @@ import errorHandler from './middlewares/error.middlewares.js';
 import helmet from 'helmet'
 import compression from 'compression'
 import rateLimit from 'express-rate-limit'
+import cron from "node-cron";
+import User from './models/user.model.js';
+import { updateAdminAnalytics } from './controllers/adminAnalytics.controllers.js';
+import { updateMerchantAnalytics } from './controllers/merchantAnalytics.controllers.js';
 
 dotenv.config()
 
@@ -18,12 +22,12 @@ const port = process.env.PORT || 5000;
 // Security middleware
 app.use(helmet())
 
-//Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
-})
-app.use(limiter)
+// Rate limiting
+// const limiter = rateLimit({
+//     windowMs: 15 * 60 * 1000, // 15 minutes
+//     max: 100 // limit each IP to 100 requests per windowMs
+// })
+// app.use(limiter)
 
 // Compression
 app.use(compression())
@@ -39,12 +43,6 @@ app.use(cookieParser())
 wrapRoutes(app)
 
 app.use(errorHandler);
-
-import cron from "node-cron";
-import User from './models/user.model.js';
-import { updateAdminAnalytics } from './controllers/adminAnalytics.controllers.js';
-import { updateMerchantAnalytics } from './controllers/merchantAnalytics.controllers.js';
-;
 
 // Daily at midnight
 cron.schedule("0 0 * * *", async () => {
