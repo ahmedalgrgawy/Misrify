@@ -539,9 +539,6 @@ export const getTotalViewers = async (req, res, next) => {
       match = { "viewedProducts.merchant": new mongoose.Types.ObjectId(userId) }; // Adjust Product model if needed
     }
 
-    console.log("pass 1");
-
-
     const viewers = await User.aggregate([
       { $match: match },
       {
@@ -569,9 +566,6 @@ export const getTotalViewers = async (req, res, next) => {
         },
       },
     ]);
-
-    console.log("pass 2");
-
 
     const result = { Active: 0, Inactive: 0, Offline: 0 };
     viewers.forEach(({ _id, count }) => (result[_id] = count));

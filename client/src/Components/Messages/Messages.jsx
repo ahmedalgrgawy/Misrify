@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllContactMessages } from "../../features/messageSlice";
 import { TailSpin } from "react-loader-spinner";
@@ -48,7 +48,7 @@ const Messages = () => {
                         const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 
                         return (
-                            <div key={_id} className="bg-white p-6 rounded-lg shadow-md border border-gray-200 rounded-lg transition ease-in hover:shadow-lg duarition-400">
+                            <div key={_id} className="bg-white p-6 rounded-lg shadow-md border border-gray-200  transition ease-in hover:shadow-lg duarition-400">
                                 <div className="flex items-center">
                                     <div className="w-8 h-8 flex items-center justify-center bg-red-600 rounded-full text-white">
                                         {initials}

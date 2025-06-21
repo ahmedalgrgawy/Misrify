@@ -25,6 +25,7 @@ import StartupGuide from '../Pages/Students/StartupGuide';
 import RequestedProducts from '../Components/Products/RequestedProducts';
 import { MerchantOrders } from '../Components/MerchantOrders/MerchantOrders';
 import MerchantReviews from '../Components/MerchantReviews/MerchantReviews';
+import ProtectedRoute from './ProtectedRoutes';
 
 const router = createBrowserRouter([
   {
@@ -41,26 +42,39 @@ const router = createBrowserRouter([
       { path: '/reset-password', element: <ResetPassword /> },
       { path: '/password-success', element: <PasswordSuccess /> },
       { path: '/contact', element: <Contact /> },
-      { path: '/profile', element: <Profile /> },
-      { path: '/notifications', element: <Notifications /> },
-      { path: "/students", element: <StartupGuide /> }
+      { path: '/students', element: <StartupGuide /> },
+      {
+        path: '/profile',
+        element: <ProtectedRoute />,
+        children: [{ index: true, element: <Profile /> }],
+      },
+      {
+        path: '/notifications',
+        element: <ProtectedRoute />,
+        children: [{ index: true, element: <Notifications /> }],
+      },
     ],
   },
   {
     path: '/analytics',
-    element: <DashboardLayout />,
+    element: <ProtectedRoute />,
     children: [
-      { index: true, element: <Analytics /> },
-      { path: 'users', element: <Users /> },
-      { path: 'merchants', element: <Merchants /> },
-      { path: 'products', element: <Products /> },
-      { path: 'categories', element: <Categories /> },
-      { path: 'support', element: <Support /> },
-      { path: 'messages', element: <Messages /> },
-      { path: 'requested-products', element: <RequestedProducts /> },
-      { path: "orders", element: <MerchantOrders /> },
-      { path: "reviews", element: <MerchantReviews /> }
-    ]
+      {
+        element: <DashboardLayout />,
+        children: [
+          { index: true, element: <Analytics /> },
+          { path: 'users', element: <Users /> },
+          { path: 'merchants', element: <Merchants /> },
+          { path: 'products', element: <Products /> },
+          { path: 'categories', element: <Categories /> },
+          { path: 'support', element: <Support /> },
+          { path: 'messages', element: <Messages /> },
+          { path: 'requested-products', element: <RequestedProducts /> },
+          { path: 'orders', element: <MerchantOrders /> },
+          { path: 'reviews', element: <MerchantReviews /> },
+        ],
+      },
+    ],
   },
   {
     path: '*',

@@ -24,159 +24,154 @@ export const getPlatformStats = async (req, res, next) => {
 };
 
 export const getOrdersAndSales = async (req, res, next) => {
-    try {
-        const { period = "monthly" } = req.query;
-        const currentYear = moment().year();
-        const currentMonth = moment().month();
-        const startOfWeek = moment().startOf("week");
 
-        let matchStage, groupBy, sortBy, projectLabel, fillPeriods;
+    const { period = "monthly" } = req.query;
+    const currentYear = moment().year();
+    const currentMonth = moment().month();
+    const startOfWeek = moment().startOf("week");
 
-        switch (period) {
-            case "weekly":
-                matchStage = {
-                    "payment.status": "success",
-                    createdAt: {
-                        $gte: startOfWeek.toDate(),
-                        $lte: moment().endOf("week").toDate(),
-                    },
-                };
-                groupBy = { day: { $dayOfWeek: "$createdAt" } };
-                sortBy = { "_id.day": 1 };
-                projectLabel = {
-                    label: {
-                        $arrayElemAt: [
-                            ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-                            { $subtract: ["$_id.day", 1] },
-                        ],
-                    },
-                };
-                fillPeriods = () =>
-                    ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => ({
-                        label,
+    let matchStage, groupBy, sortBy, projectLabel, fillPeriods;
+
+    switch (period) {
+        case "weekly":
+            matchStage = {
+                "payment.status": "success",
+                createdAt: {
+                    $gte: startOfWeek.toDate(),
+                    $lte: moment().endOf("week").toDate(),
+                },
+            };
+            groupBy = { day: { $dayOfWeek: "$createdAt" } };
+            sortBy = { "_id.day": 1 };
+            projectLabel = {
+                label: {
+                    $arrayElemAt: [
+                        ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+                        { $subtract: ["$_id.day", 1] },
+                    ],
+                },
+            };
+            fillPeriods = () =>
+                ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => ({
+                    label,
+                    totalOrders: 0,
+                    totalMoneyPaid: 0,
+                }));
+            break;
+        case "monthly":
+            // 4 weeks of the current month
+            matchStage = {
+                "payment.status": "success",
+                createdAt: {
+                    $gte: moment().startOf("month").toDate(),
+                    $lte: moment().endOf("month").toDate(),
+                },
+            };
+            groupBy = {
+                week: {
+                    $subtract: [
+                        { $week: "$createdAt" },
+                        { $week: moment().startOf("month").toDate() },
+                    ],
+                },
+            };
+            sortBy = { "_id.week": 1 };
+            projectLabel = {
+                label: {
+                    $concat: ["Week ", { $toString: { $add: ["$_id.week", 1] } }],
+                },
+            };
+            fillPeriods = () =>
+                Array(4)
+                    .fill()
+                    .map((_, i) => ({
+                        label: `Week ${i + 1}`,
                         totalOrders: 0,
                         totalMoneyPaid: 0,
                     }));
-                break;
-            case "monthly":
-                // 4 weeks of the current month
-                matchStage = {
-                    "payment.status": "success",
-                    createdAt: {
-                        $gte: moment().startOf("month").toDate(),
-                        $lte: moment().endOf("month").toDate(),
-                    },
-                };
-                groupBy = {
-                    week: {
-                        $subtract: [
-                            { $week: "$createdAt" },
-                            { $week: moment().startOf("month").toDate() },
-                        ],
-                    },
-                };
-                sortBy = { "_id.week": 1 };
-                projectLabel = {
-                    label: {
-                        $concat: ["Week ", { $toString: { $add: ["$_id.week", 1] } }],
-                    },
-                };
-                fillPeriods = () =>
-                    Array(4)
-                        .fill()
-                        .map((_, i) => ({
-                            label: `Week ${i + 1}`,
-                            totalOrders: 0,
-                            totalMoneyPaid: 0,
-                        }));
-                break;
-            case "annually":
-                matchStage = {
-                    "payment.status": "success",
-                    createdAt: {
-                        $gte: moment().startOf("year").toDate(),
-                        $lte: moment().endOf("year").toDate(),
-                    },
-                };
-                groupBy = { month: { $month: "$createdAt" } };
-                sortBy = { "_id.month": 1 };
-                projectLabel = {
-                    label: {
-                        $arrayElemAt: [
-                            ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                            { $subtract: ["$_id.month", 1] },
-                        ],
-                    },
-                };
-                fillPeriods = () =>
-                    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
-                        (label) => ({
-                            label,
-                            totalOrders: 0,
-                            totalMoneyPaid: 0,
-                        })
-                    );
-                break;
-            default:
-                throw new Error("Invalid period");
-        }
-
-        const orders = await Order.aggregate([
-            { $lookup: { from: "payments", localField: "_id", foreignField: "order", as: "payment" } },
-            { $match: matchStage },
-            { $unwind: "$payment" },
-            {
-                $group: {
-                    _id: groupBy,
-                    totalOrders: { $sum: 1 },
-                    totalMoneyPaid: { $sum: "$payment.paymentDetails.amount" },
+            break;
+        case "annually":
+            matchStage = {
+                "payment.status": "success",
+                createdAt: {
+                    $gte: moment().startOf("year").toDate(),
+                    $lte: moment().endOf("year").toDate(),
                 },
-            },
-            { $sort: sortBy },
-            {
-                $project: {
-                    _id: 0,
-                    ...projectLabel,
-                    totalOrders: 1,
-                    totalMoneyPaid: { $round: ["$totalMoneyPaid", 2] },
+            };
+            groupBy = { month: { $month: "$createdAt" } };
+            sortBy = { "_id.month": 1 };
+            projectLabel = {
+                label: {
+                    $arrayElemAt: [
+                        ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+                        { $subtract: ["$_id.month", 1] },
+                    ],
                 },
-            },
-        ]);
-
-        console.log(`Aggregated orders for ${period}:`, orders); // Debug log
-
-        // Fill missing periods
-        const filledOrders = fillPeriods();
-        orders.forEach((order) => {
-            const index =
-                period === "weekly"
-                    ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(order.label)
-                    : period === "monthly"
-                        ? parseInt(order.label.replace("Week ", "")) - 1
-                        : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(
-                            order.label
-                        );
-            if (index >= 0) {
-                filledOrders[index] = order;
-            }
-        });
-
-        const totalOrders = filledOrders.reduce((sum, item) => sum + item.totalOrders, 0);
-        const totalMoneyPaid = filledOrders.reduce((sum, item) => sum + item.totalMoneyPaid, 0);
-
-        res.status(200).json({
-            success: true,
-            message: "Orders and total sales analytics fetched successfully",
-            data: {
-                totalOrders,
-                totalMoneyPaid,
-                timeSeries: filledOrders,
-            },
-        });
-    } catch (error) {
-        console.error("Error in getOrdersAndSales:", error.message);
-        next(error);
+            };
+            fillPeriods = () =>
+                ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].map(
+                    (label) => ({
+                        label,
+                        totalOrders: 0,
+                        totalMoneyPaid: 0,
+                    })
+                );
+            break;
+        default:
+            throw new Error("Invalid period");
     }
+
+    const orders = await Order.aggregate([
+        { $lookup: { from: "payments", localField: "_id", foreignField: "order", as: "payment" } },
+        { $match: matchStage },
+        { $unwind: "$payment" },
+        {
+            $group: {
+                _id: groupBy,
+                totalOrders: { $sum: 1 },
+                totalMoneyPaid: { $sum: "$payment.paymentDetails.amount" },
+            },
+        },
+        { $sort: sortBy },
+        {
+            $project: {
+                _id: 0,
+                ...projectLabel,
+                totalOrders: 1,
+                totalMoneyPaid: { $round: ["$totalMoneyPaid", 2] },
+            },
+        },
+    ]);
+
+    // Fill missing periods
+    const filledOrders = fillPeriods();
+    orders.forEach((order) => {
+        const index =
+            period === "weekly"
+                ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(order.label)
+                : period === "monthly"
+                    ? parseInt(order.label.replace("Week ", "")) - 1
+                    : ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"].indexOf(
+                        order.label
+                    );
+        if (index >= 0) {
+            filledOrders[index] = order;
+        }
+    });
+
+    const totalOrders = filledOrders.reduce((sum, item) => sum + item.totalOrders, 0);
+    const totalMoneyPaid = filledOrders.reduce((sum, item) => sum + item.totalMoneyPaid, 0);
+
+    res.status(200).json({
+        success: true,
+        message: "Orders and total sales analytics fetched successfully",
+        data: {
+            totalOrders,
+            totalMoneyPaid,
+            timeSeries: filledOrders,
+        },
+    });
+
 };
 
 export const getTotalUsers = async (req, res, next) => {
@@ -224,115 +219,109 @@ export const getLoginStats = async (req, res, next) => {
 };
 
 export const getMiniChartData = async (req, res, next) => {
-    try {
-        const sevenDaysAgo = new Date();
-        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        const [orders, brands, products, users, categories] = await Promise.all([
-            Order.aggregate([
-                { $match: { createdAt: { $gte: sevenDaysAgo } } },
-                {
-                    $group: {
-                        _id: { $dayOfWeek: "$createdAt" },
-                        count: { $sum: 1 },
-                    },
-                },
-                { $sort: { "_id": 1 } },
-            ]),
-            Brand.aggregate([
-                { $match: { createdAt: { $gte: sevenDaysAgo } } },
-                {
-                    $group: {
-                        _id: { $dayOfWeek: "$createdAt" },
-                        count: { $sum: 1 },
-                    },
-                },
-                { $sort: { "_id": 1 } },
-            ]),
-            Product.aggregate([
-                { $match: { createdAt: { $gte: sevenDaysAgo } } },
-                {
-                    $group: {
-                        _id: { $dayOfWeek: "$createdAt" },
-                        count: { $sum: 1 },
-                    },
-                },
-                { $sort: { "_id": 1 } },
-            ]),
-            User.aggregate([
-                { $match: { createdAt: { $gte: sevenDaysAgo } } },
-                {
-                    $group: {
-                        _id: { $dayOfWeek: "$createdAt" },
-                        count: { $sum: 1 },
-                    },
-                },
-                { $sort: { "_id": 1 } },
-            ]),
-            Category.aggregate([
-                { $match: { createdAt: { $gte: sevenDaysAgo } } },
-                {
-                    $group: {
-                        _id: { $dayOfWeek: "$createdAt" },
-                        count: { $sum: 1 },
-                    },
-                },
-                { $sort: { "_id": 1 } },
-            ]),
-        ]);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-        const fillDays = (data) =>
-            Array(7)
-                .fill(0)
-                .map((_, i) => {
-                    const found = data.find((item) => item._id === i + 1);
-                    return found ? found.count : 0;
-                });
-
-        res.status(200).json({
-            success: true,
-            message: "Mini chart data fetched successfully",
-            data: {
-                orders: fillDays(orders),
-                brands: fillDays(brands),
-                products: fillDays(products),
-                users: fillDays(users),
-                categories: fillDays(categories),
-                labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    const [orders, brands, products, users, categories] = await Promise.all([
+        Order.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dayOfWeek: "$createdAt" },
+                    count: { $sum: 1 },
+                },
             },
-        });
-    } catch (error) {
-        next(error);
-    }
+            { $sort: { "_id": 1 } },
+        ]),
+        Brand.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dayOfWeek: "$createdAt" },
+                    count: { $sum: 1 },
+                },
+            },
+            { $sort: { "_id": 1 } },
+        ]),
+        Product.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dayOfWeek: "$createdAt" },
+                    count: { $sum: 1 },
+                },
+            },
+            { $sort: { "_id": 1 } },
+        ]),
+        User.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dayOfWeek: "$createdAt" },
+                    count: { $sum: 1 },
+                },
+            },
+            { $sort: { "_id": 1 } },
+        ]),
+        Category.aggregate([
+            { $match: { createdAt: { $gte: sevenDaysAgo } } },
+            {
+                $group: {
+                    _id: { $dayOfWeek: "$createdAt" },
+                    count: { $sum: 1 },
+                },
+            },
+            { $sort: { "_id": 1 } },
+        ]),
+    ]);
+
+    const fillDays = (data) =>
+        Array(7)
+            .fill(0)
+            .map((_, i) => {
+                const found = data.find((item) => item._id === i + 1);
+                return found ? found.count : 0;
+            });
+
+    res.status(200).json({
+        success: true,
+        message: "Mini chart data fetched successfully",
+        data: {
+            orders: fillDays(orders),
+            brands: fillDays(brands),
+            products: fillDays(products),
+            users: fillDays(users),
+            categories: fillDays(categories),
+            labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+        },
+    });
+
 };
 
 
 export const updateAdminAnalytics = async () => {
-    try {
-        const [totalCategories, totalBrands, totalProducts, totalUsers, orders] = await Promise.all([
-            Category.countDocuments(),
-            Brand.countDocuments(),
-            Product.countDocuments(),
-            User.countDocuments(),
-            Order.find().select("totalPrice"),
-        ]);
+    const [totalCategories, totalBrands, totalProducts, totalUsers, orders] = await Promise.all([
+        Category.countDocuments(),
+        Brand.countDocuments(),
+        Product.countDocuments(),
+        User.countDocuments(),
+        Order.find().select("totalPrice"),
+    ]);
 
-        const totalOrders = orders.length;
-        const totalSales = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+    const totalOrders = orders.length;
+    const totalSales = orders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
 
-        await AdminAnalytics.findOneAndUpdate(
-            { user: null }, // Admin analytics may not be tied to a specific user
-            {
-                totalCategories,
-                totalBrands,
-                totalProducts,
-                totalUsers,
-                totalOrders,
-                totalSales,
-            },
-            { upsert: true }
-        );
-    } catch (error) {
-        console.error("Failed to update admin analytics:", error);
-    }
+    await AdminAnalytics.findOneAndUpdate(
+        { user: null }, // Admin analytics may not be tied to a specific user
+        {
+            totalCategories,
+            totalBrands,
+            totalProducts,
+            totalUsers,
+            totalOrders,
+            totalSales,
+        },
+        { upsert: true }
+    );
 };
