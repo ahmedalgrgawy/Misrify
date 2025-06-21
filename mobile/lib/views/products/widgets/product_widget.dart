@@ -48,9 +48,9 @@ class ProductWidget extends StatelessWidget {
           height: 260.h,
           padding: EdgeInsets.symmetric(vertical: 2.w),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.r),
-            color: Colors.white,
-          ),
+              borderRadius: BorderRadius.circular(8.r),
+              color: Colors.white,
+              border: Border.all(color: kLightWhite, width: 0.7)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
