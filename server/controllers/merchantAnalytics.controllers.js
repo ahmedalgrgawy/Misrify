@@ -314,74 +314,56 @@ export const getMerchantSalesTrends = async (req, res, next) => {
 export const getYearlyIncome = async (req, res, next) => {
   try {
     const { role, _id: userId } = req.user;
-    const year = new Date().getFullYear();
+    const year = moment().year();
 
     let salesRevenue = 0;
-    let otherIncome = 0; // Placeholder; extend Order/Product model if needed
+
+    const matchStage = {
+      "payment.status": "success",
+      createdAt: {
+        $gte: moment().startOf("year").toDate(),
+        $lte: moment().endOf("year").toDate(),
+      },
+    };
 
     if (role === "merchant") {
-      const sales = await Order.aggregate([
-        {
-          $match: {
-            merchant: new mongoose.Types.ObjectId(userId),
-            createdAt: {
-              $gte: new Date(year, 0, 1),
-              $lte: new Date(year, 11, 31, 23, 59, 59),
-            },
-          },
-        },
-        { $unwind: "$products" },
-        {
-          $lookup: {
-            from: "products",
-            localField: "products.product",
-            foreignField: "_id",
-            as: "productDetails",
-          },
-        },
-        { $unwind: "$productDetails" },
-        {
-          $group: {
-            _id: null,
-            totalSales: { $sum: { $multiply: ["$products.quantity", "$productDetails.price"] } },
-          },
-        },
-      ]);
-      salesRevenue = sales.length > 0 ? sales[0].totalSales : 0;
-    } else if (role === "admin") {
-      const sales = await Order.aggregate([
-        {
-          $match: {
-            createdAt: {
-              $gte: new Date(year, 0, 1),
-              $lte: new Date(year, 11, 31, 23, 59, 59),
-            },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            totalSales: { $sum: "$totalPrice" },
-          },
-        },
-      ]);
-      salesRevenue = sales.length > 0 ? sales[0].totalSales : 0;
+      matchStage.merchant = new mongoose.Types.ObjectId(userId);
     }
 
-    // Assume otherIncome is 35% of total for simplicity; adjust based on actual data
-    const totalIncome = salesRevenue / 0.65; // Reverse-engineer total assuming 65% is sales
-    otherIncome = totalIncome - salesRevenue;
+    const sales = await Order.aggregate([
+      // Join with payments
+      {
+        $lookup: {
+          from: "payments",
+          localField: "_id",
+          foreignField: "order",
+          as: "payment",
+        },
+      },
+      // Filter for paid orders
+      { $match: matchStage },
+      // Unwind payment
+      { $unwind: "$payment" },
+      // Group to sum paid amounts
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$payment.paymentDetails.amount" },
+        },
+      },
+    ]);
+
+    salesRevenue = sales.length > 0 ? sales[0].totalSales : 0;
 
     res.status(200).json({
       success: true,
       message: "Yearly income fetched successfully",
       data: {
-        labels: ["Salary", "Investments"],
-        values: [salesRevenue, otherIncome],
-        totalIncome: totalIncome.toFixed(0),
+        totalIncome: salesRevenue.toFixed(2),
       },
     });
   } catch (error) {
+    console.error("Error in getYearlyIncome:", error.message);
     next(error);
   }
 };
