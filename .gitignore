@@ -35,3 +35,4 @@ dist-ssr
 
 .history
 coverage/
+tools/
