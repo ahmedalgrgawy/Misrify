@@ -227,6 +227,8 @@ class Brand {
   final String id;
   final String name;
   final String? owner;
+  final String? imgUrl; // 👈 Add this field
+
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -238,6 +240,8 @@ class Brand {
     this.owner,
     this.description,
     required this.createdAt,
+    this.imgUrl, // 👈 Add to constructor
+
     required this.updatedAt,
     required this.v,
   });
@@ -246,6 +250,8 @@ class Brand {
         id: json["_id"] ?? '',
         name: json["name"] ?? '',
         owner: json["owner"],
+        imgUrl: json["imgUrl"], // 👈 Add here
+
         description: json["description"],
         createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
         updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
@@ -256,6 +262,8 @@ class Brand {
         id: '',
         name: '',
         owner: '',
+        imgUrl: '', // 👈 Here too
+
         description: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -265,6 +273,8 @@ class Brand {
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
+        "imgUrl": imgUrl, // 👈 And here
+
         "owner": owner,
         "description": description,
         "createdAt": createdAt.toIso8601String(),
