@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "SET NODE_ENV=development & nodemon server/server.js",
     "start": "SET NODE_ENV=production & nodemon server/server.js",
-    "build": "npm install && npm install --prefix client"
+    "build": "npm install && npm install --prefix client",
+    "test": "jest --coverage"
   },
   "keywords": [],
   "author": "Ahmed Algrgawy | Reem Ghareeb",
@@ -31,6 +32,7 @@
     "moment": "^2.30.1",
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.3",
+    "node-cron": "^4.1.0",
     "nodemailer": "^6.9.16",
     "react-easy-crop": "^5.4.1",
     "react-image-file-resizer": "^0.4.8",
@@ -38,6 +40,33 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.6"
+    "@babel/core": "^7.27.4",
+    "@babel/preset-env": "^7.27.2",
+    "babel-jest": "^30.0.0",
+    "jest": "^30.0.0",
+    "nodemon": "^3.1.6",
+    "supertest": "^7.1.1"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__tests__/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage",
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "setupFilesAfterEnv": [
+      "./server/__tests__/setup.js"
+    ],
+    "clearMocks": true,
+    "resetMocks": true,
+    "restoreMocks": true,
+    "coveragePathIgnorePatterns": [
+      "/coverage/"
+    ]
   }
 }

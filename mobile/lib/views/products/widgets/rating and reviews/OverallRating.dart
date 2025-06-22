@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:graduation_project1/constants/constants.dart';
 
 import 'RatingProgress.dart';
 

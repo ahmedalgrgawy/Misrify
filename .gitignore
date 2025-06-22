@@ -2,6 +2,11 @@
 .node_module
 .idea
 .vscode
+# Flutter build and cache artifacts
+**/build/
+**/.dart_tool/
+*.apk
+*.dill
 
 # Logs
 logs
@@ -17,7 +22,6 @@ dist
 dist-ssr
 *.local
 
-
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -28,3 +32,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.history
+coverage/

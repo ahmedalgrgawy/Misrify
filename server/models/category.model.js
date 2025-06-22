@@ -9,6 +9,9 @@ const categorySchema = new mongoose.Schema({
     description: {
         type: String,
         required: [true, "Description is required"],
+    },
+    imgUrl: {
+        type: String,
     }
 }, { timestamps: true })
 

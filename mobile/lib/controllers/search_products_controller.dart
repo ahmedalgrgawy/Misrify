@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:http/http.dart' as http;
 

@@ -33,14 +33,19 @@ export const updateProfile = async (req, res, next) => {
         user.password = newPassword;
     }
 
-    if (imgUrl) {
-        if (user.imgUrl) {
-            await cloudinary.uploader.destroy(user.imgUrl.split("/").pop().split(".")[0]);
-        }
+    // if (imgUrl) {
+    //     console.log("pass");
 
-        const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
-        imgUrl = uploadedResponse.secure_url;
-    }
+    //     if (user.imgUrl) {
+    //         await cloudinary.uploader.destroy(user.imgUrl.split("/").pop().split(".")[0]);
+    //         console.log("pass");
+    //     }
+
+    //     const uploadedResponse = await cloudinary.uploader.upload(imgUrl);
+    //     console.log("pass");
+    //     imgUrl = uploadedResponse.secure_url;
+    //     console.log("pass");
+    // }
 
     user.name = name || user.name;
     user.email = email || user.email;
@@ -57,7 +62,7 @@ export const updateProfile = async (req, res, next) => {
         receivers: [userId], // Changed to receivers array
         sender: "Misrify Store", // Updated to Misrify Store
         content: `Your profile has been updated`, // Changed to content
-        type: "profile", // Now valid with updated schema
+        type: "general", // Now valid with updated schema
         isRead: false,
     })
 

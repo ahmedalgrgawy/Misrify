@@ -1,5 +1,7 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -43,14 +45,14 @@ class ProductWidget extends StatelessWidget {
       child: Padding(
         padding: EdgeInsets.only(left: 10.w, right: 5.w),
         child: Container(
+          height: 260.h,
           padding: EdgeInsets.symmetric(vertical: 2.w),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8.r),
-            color: Colors.white,
-          ),
+              borderRadius: BorderRadius.circular(8.r),
+              color: Colors.white,
+              border: Border.all(color: kLightWhite, width: 0.7)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
             children: [
               // Product Image
               Padding(
@@ -58,21 +60,45 @@ class ProductWidget extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(10.r),
                   child: SizedBox(
-                    height: 127.h,
-                    width: 170.w,
-                    child: Image.network(
-                      image ??
+                    height: 115.h,
+                    width: 140.w,
+                    child: () {
+                      if (image != null && image!.startsWith('data:image')) {
+                        try {
+                          final base64Str = image!.split(',').last;
+                          return Image.memory(
+                            base64Decode(base64Str),
+                            fit: BoxFit.fitWidth,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Icon(Icons.broken_image, size: 50);
+                            },
+                          );
+                        } catch (_) {
+                          return const Icon(Icons.broken_image, size: 50);
+                        }
+                      } else if (image != null && image!.startsWith('http')) {
+                        return Image.network(
+                          image!,
+                          fit: BoxFit.fitWidth,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.broken_image, size: 50);
+                          },
+                        );
+                      } else {
+                        return Image.network(
                           "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                      fit: BoxFit.fitWidth,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Icon(Icons.broken_image, size: 50);
-                      },
-                    ),
+                          fit: BoxFit.fitWidth,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(Icons.broken_image, size: 50);
+                          },
+                        );
+                      }
+                    }(),
                   ),
                 ),
               ),
 
-              // Title + Wishlist icon in same row
+              // Title + Wishlist icon
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 2.h),
                 child: Row(
@@ -108,8 +134,6 @@ class ProductWidget extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 6.h),
-
               // Brand
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12.w),
@@ -119,21 +143,21 @@ class ProductWidget extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 6.h),
+              const Spacer(),
 
-              // Price or discounted price
+              // Price
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 12.w),
                 child: isDiscounted && discountAmount > 0
-                    ? Row(
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ReusableText(
-                            text: "\$${discountedPrice.toStringAsFixed(2)}",
+                            text: "EGP ${discountedPrice.toStringAsFixed(2)}",
                             style: appStyle(14, kDarkBlue, FontWeight.bold),
                           ),
-                          SizedBox(width: 8.w),
                           ReusableText(
-                            text: "\$$price",
+                            text: "EGP $price",
                             style:
                                 appStyle(12, kGray, FontWeight.w400).copyWith(
                               decoration: TextDecoration.lineThrough,
@@ -142,10 +166,11 @@ class ProductWidget extends StatelessWidget {
                         ],
                       )
                     : ReusableText(
-                        text: "\$$price",
-                        style: appStyle(14, KTextColor, FontWeight.w700),
+                        text: "EGP $price",
+                        style: appStyle(13, KTextColor, FontWeight.w700),
                       ),
               ),
+              SizedBox(height: 6.h),
             ],
           ),
         ),

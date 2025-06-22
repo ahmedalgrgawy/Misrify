@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:graduation_project1/constants/constants.dart';
 import 'package:graduation_project1/models/api_error_model.dart';
 import 'package:graduation_project1/models/hook_result.dart';
@@ -31,17 +30,10 @@ FetchHook useFetchNewArrivals() {
     onFetch: () async {
       final url = Uri.parse('$appBaseUrl/user/products');
       final response = await http.get(url);
-      debugPrint('fetch new arrivals: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final now = DateTime.now();
         final products = productsModelFromJson(response.body).products;
-
-        // Optional debug logging
-        for (var p in products) {
-          debugPrint(
-              '📦 ${p.name} | createdAt: ${p.createdAt} | discounted: ${p.isDiscounted} | amount: ${p.discountAmount}');
-        }
 
         return products
             .where((p) =>

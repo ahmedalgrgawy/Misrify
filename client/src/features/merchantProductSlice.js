@@ -7,9 +7,9 @@ export const getMerchantProducts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.get("/merchant/products");
-      return res.data.Products;
+      return res.data.merchantProducts;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+      return rejectWithValue(err.response?.data?.message || "Failed to fetch products");
     }
   }
 );
@@ -22,7 +22,7 @@ export const deleteMerchantProduct = createAsyncThunk(
       await axiosInstance.delete(`/merchant/delete-product/${productId}`);
       return productId;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+      return rejectWithValue(err.response?.data?.message || "Failed to delete product");
     }
   }
 );
@@ -36,9 +36,9 @@ export const editMerchantProduct = createAsyncThunk(
         `/merchant/edit-product/${productId}`,
         updatedData
       );
-      return response.data.Product;
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message);
+      return rejectWithValue(error.response?.data?.message || "Failed to edit product");
     }
   }
 );
@@ -49,9 +49,9 @@ export const createMerchantProduct = createAsyncThunk(
   async (productData, { rejectWithValue }) => {
     try {
       const res = await axiosInstance.post(`/merchant/create-product`, productData);
-      return res.data.Product;
+      return res.data.merchantProducts;
     } catch (err) {
-      return rejectWithValue(err.response?.data?.message);
+      return rejectWithValue(err.response?.data?.message || "Failed to create product");
     }
   }
 );
@@ -87,7 +87,10 @@ const merchantProductsSlice = createSlice({
       })
       .addCase(createMerchantProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.products.push(action.payload);
+        // state.products.push(action.payload);
+        if (action.payload) {
+          state.products.push(action.payload);
+        }
       })
       .addCase(createMerchantProduct.rejected, (state, action) => {
         state.loading = false;
@@ -116,9 +119,15 @@ const merchantProductsSlice = createSlice({
       .addCase(editMerchantProduct.fulfilled, (state, action) => {
         state.loading = false;
         const updatedProduct = action.payload;
-        state.products = state.products.map(product =>
-          product._id === updatedProduct._id ? updatedProduct : product
-        );
+        // state.products = state.products.map(product =>
+        //   product._id === updatedProduct._id ? updatedProduct : product
+        // );
+        if (updatedProduct && updatedProduct._id) {
+          const index = state.products.findIndex(product => product._id === updatedProduct._id);
+          if (index !== -1) {
+              state.products[index] = updatedProduct;
+          }
+      }
       })
       .addCase(editMerchantProduct.rejected, (state, action) => {
         state.loading = false;

@@ -49,7 +49,7 @@ export const createComment = async (req, res, next) => {
 
     await Notification.create({
         receivers: [review.user], // Changed to receivers array
-        sender: "Misrify Store", // Updated to Misrify Store
+        sender: userId, // Updated to Misrify Store
         content: `New comment on your review`, // Already using content
         type: "product",
         isRead: false,

@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:graduation_project1/common/app_style.dart';
-import 'package:graduation_project1/common/reusable_text.dart';
-import 'package:graduation_project1/constants/constants.dart';
-import 'package:graduation_project1/data/product_sort.dart';
+import 'package:graduation_project1/common/custom_appbar.dart';
 import 'package:graduation_project1/hooks/fetch_all_products.dart';
 import 'package:graduation_project1/models/products_model.dart';
 import 'package:graduation_project1/views/products/Product_page.dart';
@@ -32,12 +29,11 @@ class AllspecialOffers extends HookWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Kbackground,
-        title: ReusableText(
-          text: "Special Offers",
-          style: appStyle(16, kDarkBlue, FontWeight.w500),
-        ),
+      appBar: CustomAppbar(
+        title: "Special Offers",
+        onpress: () {
+          Get.back();
+        },
       ),
       body: hookResult.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -52,7 +48,6 @@ class AllspecialOffers extends HookWidget {
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisExtent: 260.h,
-                      crossAxisSpacing: 10,
                       mainAxisSpacing: 10,
                     ),
                     itemBuilder: (context, index) {
@@ -67,8 +62,7 @@ class AllspecialOffers extends HookWidget {
                         price: product.price.toStringAsFixed(2),
                         isDiscounted: product.isDiscounted,
                         discountAmount: product.discountAmount,
-                        image:
-                            "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
+                        image: product.imgUrl,
                       );
                     },
                   ),

@@ -20,11 +20,81 @@ class CartController extends GetxController {
     itemCount.value = count;
   }
 
+  Future<void> clearCart({bool isRetrying = false}) async {
+    setLoading = true;
+    final accessToken = box.read('token');
+
+    if (accessToken == null) {
+      Get.offAll(() => const LoginScreen());
+      return;
+    }
+
+    final url = Uri.parse('$appBaseUrl/user/clear');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Cookie': 'accessToken=$accessToken',
+    };
+
+    try {
+      final response = await http.delete(url, headers: headers);
+      if (response.statusCode == 200) {
+        final resData = jsonDecode(response.body);
+        Get.snackbar(
+          'Cart Cleared',
+          resData['message'] ?? 'Your cart is now empty.',
+          colorText: KTextColor,
+          backgroundColor: Kbackground,
+          icon: const Icon(Icons.delete_outline, color: kLightWhite),
+        );
+        await refreshCartCount();
+      } else if (response.statusCode == 401 && !isRetrying) {
+        await refreshTokenAndRetryClear();
+      } else {
+        final error = apiErrorFromJson(response.body);
+        Get.snackbar('Error', error.message);
+      }
+    } catch (e) {
+      debugPrint('🚨 Clear cart error: $e');
+    } finally {
+      setLoading = false;
+    }
+  }
+
+  Future<void> refreshTokenAndRetryClear() async {
+    final refreshToken = box.read('refreshToken');
+    if (refreshToken == null) {
+      Get.offAll(() => const LoginScreen());
+      return;
+    }
+
+    final refreshUrl = Uri.parse('$appBaseUrl/auth/refresh-token');
+    final refreshResponse = await http.post(
+      refreshUrl,
+      headers: {
+        'Cookie': refreshToken,
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (refreshResponse.statusCode == 200) {
+      final newCookie = refreshResponse.headers['set-cookie'];
+      final match = RegExp(r'accessToken=([^;]+)').firstMatch(newCookie ?? '');
+      if (match != null) {
+        final newToken = match.group(1);
+        box.write('token', newToken);
+        await clearCart(isRetrying: true);
+        return;
+      }
+    }
+
+    Get.offAll(() => const LoginScreen());
+  }
+
   Future<void> refreshCartCount() async {
     final accessToken = box.read('token');
     if (accessToken == null) return;
 
-    final url = Uri.parse('$appBaseUrl/user/getCart');
+    final url = Uri.parse('$appBaseUrl/user/cart');
     final headers = {
       'Content-Type': 'application/json',
       'Cookie': 'accessToken=$accessToken',
@@ -34,12 +104,19 @@ class CartController extends GetxController {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        final List<dynamic> items = data['cart']['cartItems'];
-        final totalQuantity = items.fold<int>(
-          0,
-          (sum, item) => sum + (item['quantity'] as int? ?? 1),
-        );
-        itemCount.value = totalQuantity;
+
+        if (data['cart'] != null && data['cart']['cartItems'] != null) {
+          final List<dynamic> items = data['cart']['cartItems'];
+          final totalQuantity = items.fold<int>(
+            0,
+            (sum, item) => sum + (item['quantity'] as int? ?? 1),
+          );
+          itemCount.value = totalQuantity;
+        } else {
+          itemCount.value = 0; // fallback for empty or invalid cart
+        }
+      } else {
+        itemCount.value = 0; // fallback for API error
       }
     } catch (e) {
       debugPrint('❌ Failed to refresh cart count: $e');
@@ -122,14 +199,15 @@ class CartController extends GetxController {
 
       if (response.statusCode == 200) {
         final resData = jsonDecode(response.body);
+        await refreshCartCount();
+
         Get.snackbar(
           'Added to cart',
           resData['message'] ?? 'Updated successfully',
-          colorText: kLightWhite,
-          backgroundColor: kLightBlue,
-          icon: const Icon(Icons.check_circle_outline, color: kLightWhite),
+          colorText: KTextColor,
+          backgroundColor: Kbackground,
+          icon: const Icon(Icons.check_circle_outline, color: KTextColor),
         );
-        await refreshCartCount();
       } else if (response.statusCode == 401 && !isRetrying) {
         await refreshTokenAndRetry(
           productId: productId,

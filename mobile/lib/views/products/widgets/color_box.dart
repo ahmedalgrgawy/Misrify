@@ -18,29 +18,41 @@ class ColorBox extends StatelessWidget {
     switch (name.toLowerCase()) {
       case 'red':
         return Colors.red;
+      case 'pink':
+        return const Color.fromARGB(255, 237, 182, 182);
+      case 'baby blue':
+        return Color.fromARGB(255, 136, 204, 238);
       case 'blue':
         return Colors.blue;
+      case 'olive':
+        return const Color.fromARGB(255, 47, 103, 49);
       case 'green':
         return Colors.green;
       case 'black':
         return Colors.black;
       case 'white':
         return Colors.white;
+      case 'off white':
+        return Color.fromARGB(255, 224, 225, 211);
+      case 'beige':
+        return Color.fromARGB(255, 230, 228, 207);
+      case 'burgandy':
+        return const Color.fromARGB(255, 84, 31, 31);
+      case 'brown':
+        return Color.fromARGB(255, 67, 50, 6);
       case 'orange':
         return Colors.orange;
       case 'purple':
-        return Colors.purple;
-      case 'pink':
-        return Colors.pink;
+        return Color.fromARGB(255, 211, 158, 222);
       case 'yellow':
-        return Colors.yellow;
+        return Color.fromARGB(255, 247, 236, 142);
       case 'teal':
         return Colors.teal;
       case 'grey':
       case 'gray':
         return Colors.grey;
       case 'navy':
-        return const Color(0xFF000080);
+        return Color.fromARGB(255, 7, 7, 63);
       default:
         return kDarkBlue;
     }

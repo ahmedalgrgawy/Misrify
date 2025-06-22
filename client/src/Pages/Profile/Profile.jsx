@@ -12,10 +12,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { getProfile, editProfile } from "../../features/profileSlice";
 import Cropper from "react-easy-crop";
 import Resizer from "react-image-file-resizer";
+import { TailSpin } from "react-loader-spinner";
+import { Flip, toast, ToastContainer } from "react-toastify";
+import { Tooltip } from "react-tooltip";
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { profile } = useSelector((state) => state.Profile);
+  const { profile, Loading } = useSelector((state) => state.Profile);
   const [isDisabled, setIsDisabled] = useState({
     name: true,
     email: true,
@@ -24,7 +27,6 @@ const Profile = () => {
     CPassword: true,
     NPassword: true,
   });
-  const [picLink, setPicLink] = useState(true);
 
   // Crop state
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -65,34 +67,61 @@ const Profile = () => {
   });
 
   function postNewData(data) {
-    if (data.currentPassword == "" && data.newPassword == "") {
-      if (data.imgUrl == "") {
+    const handleDispatch = (payload) => {
+      dispatch(editProfile(payload))
+        .then(() => {
+          setTimeout(() => {
+            showToast("the profile has been updated 👍", "success");
+          }, 0);
+          dispatch(getProfile());
+        })
+        .catch((err) => {
+          setTimeout(() => {
+            showToast("there is something wrong 👎", "error");
+          }, 0);
+
+          console.error("Error editing profile:", err);
+        });
+    };
+
+    if (data.currentPassword === "" && data.newPassword === "") {
+      if (data.imgUrl === "") {
         const { currentPassword, imgUrl, newPassword, ...updatedData } = data;
-        dispatch(editProfile(updatedData));
+        console.log(updatedData);
+
+        handleDispatch(updatedData);
       } else {
         const { currentPassword, newPassword, ...updatedData } = data;
-        dispatch(editProfile(updatedData));
+        handleDispatch(updatedData);
       }
     } else {
-      if (data.imgUrl == "") {
+      if (data.imgUrl === "") {
         const { imgUrl, ...updatedData } = data;
-        dispatch(editProfile(updatedData));
+        handleDispatch(updatedData);
       } else {
-        dispatch(editProfile(data));
+        handleDispatch(data);
       }
     }
+    setIsDisabled({
+      name: true,
+      email: true,
+      phone: true,
+      address: true,
+      CPassword: true,
+      NPassword: true,
+    });
   }
 
   const updateData = useFormik({
     initialValues: {
-      name: profile.name || "",
-      email: profile.email || "",
-      phoneNumber: profile.phoneNumber || "",
-      address: profile.address || "",
+      name: profile?.name || "",
+      email: profile?.email || "",
+      phoneNumber: profile?.phoneNumber || "",
+      address: profile?.address || "",
       currentPassword: "",
       newPassword: "",
-      gender: profile.gender || "",
-      imgUrl: profile.imgUrl || "",
+      gender: profile?.gender || "",
+      imgUrl: profile?.imgUrl || "",
     },
     validationSchema,
     onSubmit: postNewData,
@@ -171,7 +200,6 @@ const Profile = () => {
         (uri) => {
           updateData.setFieldValue("imgUrl", uri);
           setShowCropModal(false);
-          setPicLink(true);
         },
         "base64" // outputType
       );
@@ -180,6 +208,26 @@ const Profile = () => {
     }
   };
 
+  if (Loading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-white z-50">
+        <TailSpin color="#2B3D5B" height={100} width={100} />
+      </div>
+    );
+  }
+  const showToast = (message, type = "success") => {
+    toast[type](message, {
+      position: "bottom-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: false,
+      pauseOnHover: true,
+      draggable: false,
+      progress: undefined,
+      theme: "dark",
+      transition: Flip,
+    });
+  };
   return (
     <>
       <div
@@ -192,7 +240,13 @@ const Profile = () => {
               backgroundImage: `url(${updateData.values.imgUrl || pic})`,
             }}
           >
-            <div className="absolute bottom-0 right-0 w-11 h-11">
+            <div
+              data-tooltip-place="right"
+              data-tooltip-id="Upload"
+              data-tooltip-content="Upload"
+              data-tooltip-offset="5"
+              className="absolute bottom-0 right-0 w-11 h-11"
+            >
               <label htmlFor="upload-input">
                 <IoCameraOutline
                   style={{ backgroundClip: "" }}
@@ -210,9 +264,9 @@ const Profile = () => {
           </div>
 
           <h2 className="font-inter mb-2 text-bg-second font-semibold text-2xl">
-            {profile.name}
+            {profile?.name}
           </h2>
-          <p className="font-inter text-[#A2A2A2]">{profile.email}</p>
+          <p className="font-inter text-[#A2A2A2]">{profile?.email}</p>
         </div>
 
         <img
@@ -311,11 +365,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.name
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.name
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="text"
                     name="name"
                     id="name"
@@ -328,6 +381,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, name: false });
                     }}
@@ -352,11 +408,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.email
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.email
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="email"
                     name="email"
                     id="email"
@@ -369,6 +424,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, email: false });
                     }}
@@ -393,11 +451,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.phone
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.phone
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="tel"
                     name="phoneNumber"
                     id="phoneNumber"
@@ -410,6 +467,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, phone: false });
                     }}
@@ -418,7 +478,7 @@ const Profile = () => {
                   </button>
                 </div>
                 {updateData.errors.phoneNumber &&
-                updateData.touched.phoneNumber ? (
+                  updateData.touched.phoneNumber ? (
                   <p className="text-red-600 ps-5 mt-1">
                     {updateData.errors.phoneNumber}
                   </p>
@@ -435,11 +495,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.address
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.address
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="text"
                     name="address"
                     id="address"
@@ -452,6 +511,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, address: false });
                     }}
@@ -476,11 +538,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.CPassword
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.CPassword
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="Password"
                     name="currentPassword"
                     id="currentPassword"
@@ -493,6 +554,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, CPassword: false });
                     }}
@@ -501,7 +565,7 @@ const Profile = () => {
                   </button>
                 </div>
                 {updateData.errors.currentPassword &&
-                updateData.touched.currentPassword ? (
+                  updateData.touched.currentPassword ? (
                   <p className="text-red-600 ps-5 mt-1">
                     {updateData.errors.currentPassword}
                   </p>
@@ -518,11 +582,10 @@ const Profile = () => {
                 <br />
                 <div className="relative">
                   <input
-                    className={`${
-                      isDisabled.NPassword
-                        ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
-                        : null
-                    } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
+                    className={`${isDisabled.NPassword
+                      ? "bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed pointer-events-none"
+                      : null
+                      } select-text relative shadow-inner w-full bg-[#F2F4F8] py-3 px-4 placeholder:text-gray-400 text-black rounded-sm focus:outline-none`}
                     type="Password"
                     name="newPassword"
                     id="newPassword"
@@ -535,6 +598,9 @@ const Profile = () => {
                   <button
                     className="absolute right-4 top-4"
                     type="button"
+                    data-tooltip-id="Edit"
+                    data-tooltip-content="Edit"
+                    data-tooltip-place="bottom"
                     onClick={() => {
                       setIsDisabled({ ...isDisabled, NPassword: false });
                     }}
@@ -543,7 +609,7 @@ const Profile = () => {
                   </button>
                 </div>
                 {updateData.errors.newPassword &&
-                updateData.touched.newPassword ? (
+                  updateData.touched.newPassword ? (
                   <p className="text-red-600 ps-5 mt-1">
                     {updateData.errors.newPassword}
                   </p>
@@ -559,11 +625,10 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={() => updateData.setFieldValue("gender", "male")}
-                    className={`flex-1 text-center py-1 rounded-full ${
-                      updateData.values.gender === "male"
-                        ? "bg-title-blue text-white"
-                        : "text-dark-grey"
-                    }`}
+                    className={`flex-1 text-center py-1 rounded-full ${updateData.values.gender === "male"
+                      ? "bg-title-blue text-white"
+                      : "text-dark-grey"
+                      }`}
                   >
                     Male
                   </button>
@@ -571,11 +636,10 @@ const Profile = () => {
                   <button
                     type="button"
                     onClick={() => updateData.setFieldValue("gender", "female")}
-                    className={`flex-1 text-center py-1 rounded-full ${
-                      updateData.values.gender === "female"
-                        ? "bg-title-blue text-white"
-                        : "text-dark-grey"
-                    }`}
+                    className={`flex-1 text-center py-1 rounded-full ${updateData.values.gender === "female"
+                      ? "bg-title-blue text-white"
+                      : "text-dark-grey"
+                      }`}
                   >
                     Female
                   </button>
@@ -598,6 +662,28 @@ const Profile = () => {
           </form>
         </div>
       </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={2000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick={false}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable={false}
+        pauseOnHover
+        theme="dark"
+        transition={Flip}
+        style={{ zIndex: 9999 }}
+      />
+      <Tooltip
+        id="Edit"
+        className="!z-50 !py-1 !px-2 !bg-title-blue !rounded-md"
+      />
+      <Tooltip
+        id="Upload"
+        className="!z-50 !py-1 !px-2 !bg-dark-grey !rounded-md"
+      />
     </>
   );
 };

@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:graduation_project1/common/app_style.dart';
 import 'package:graduation_project1/common/back_ground_container.dart';
+import 'package:graduation_project1/common/custom_appbar.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/common/shimmers/foodlist_shimmer.dart';
 import 'package:graduation_project1/constants/constants.dart';
@@ -22,12 +24,11 @@ class CategoriesScreen extends HookWidget {
     final isLoading = hookResult.isLoading;
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Kbackground,
-        title: ReusableText(
-          text: 'Categories',
-          style: appStyle(16, kDarkBlue, FontWeight.w500),
-        ),
+      appBar: CustomAppbar(
+        title: 'Categories',
+        onpress: () {
+          Get.back();
+        },
       ),
       body: BackGroundContainer(
         color: Colors.white,

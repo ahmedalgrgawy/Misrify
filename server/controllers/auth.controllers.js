@@ -87,7 +87,7 @@ export const login = async (req, res, next) => {
     }
 
     await LoginAttempt.create({ user: user._id });
-    
+
     if (!user.isVerified) {
         return next(new AppError("User Not Verified", 401))
     }
@@ -105,6 +105,8 @@ export const login = async (req, res, next) => {
     storeTokenInCookies(res, accessToken, refreshToken);
 
     user.password = undefined
+
+    await User.updateOne({ _id: user.id }, { $set: { lastActive: new Date() } });
 
     res.status(200).json({ success: true, message: "User Logged In Successfully", user })
 }
@@ -127,7 +129,7 @@ export const forgotPassword = async (req, res, next) => {
 
     sendResetOtp(email, user.name, resetPasswordOtp);
 
-    res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully", otp:resetPasswordOtp })
+    res.status(200).json({ success: true, message: "Reset Password OTP Sent Successfully", otp: resetPasswordOtp })
 }
 
 export const resetPassword = async (req, res, next) => {

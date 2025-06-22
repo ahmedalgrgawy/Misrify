@@ -1,5 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:graduation_project1/common/app_style.dart';
@@ -18,11 +19,11 @@ class CustomNavBar extends StatelessWidget {
   });
 
   final List<_NavItemData> items = const [
-    _NavItemData("assets/icons/home-2.png", "Home"),
-    _NavItemData("assets/icons/search.png", "Search"),
-    _NavItemData("assets/icons/Heart.png", "Wishlist"),
-    _NavItemData("assets/icons/Frame.png", "Shop"),
-    _NavItemData("assets/icons/Frame.png", "Cart"),
+    _NavItemData(CupertinoIcons.home, "Home"),
+    _NavItemData(CupertinoIcons.search, "Search"),
+    _NavItemData(CupertinoIcons.heart, "Wishlist"),
+    _NavItemData(Icons.storefront_outlined, "Shop"),
+    _NavItemData(Icons.shopping_cart_outlined, "Cart"),
   ];
 
   @override
@@ -44,33 +45,33 @@ class CustomNavBar extends StatelessWidget {
                 final iconIndex = index == 2
                     ? currentIndex
                     : (index == currentIndex ? 2 : index);
-                final isCenter = index == 2;
 
-                return GestureDetector(
-                  onTap: () => onTap(iconIndex),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      if (!isCenter)
-                        Image.asset(
+                // Add Spacer around center index to ensure equal spacing
+                if (index == 2) {
+                  return Expanded(
+                    child: const SizedBox(), // reserve space for center button
+                  );
+                }
+
+                return Expanded(
+                  child: GestureDetector(
+                    onTap: () => onTap(iconIndex),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
                           items[iconIndex].icon,
-                          height: 24.h,
-                        )
-                      else
-                        const SizedBox(height: 24),
-                      const SizedBox(height: 4),
-                      if (!isCenter)
+                          size: 24.h,
+                          color: kNavy,
+                        ),
+                        const SizedBox(height: 4),
                         ReusableText(
                           text: items[iconIndex].label,
                           style: appStyle(12, Knavbarlabels, FontWeight.w400),
                         ),
-                      if (isCenter)
-                        ReusableText(
-                          text: items[iconIndex].label,
-                          style: appStyle(12, kNavy, FontWeight.w400),
-                        ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               }),
@@ -80,7 +81,7 @@ class CustomNavBar extends StatelessWidget {
 
         // Elevated center button
         Positioned(
-          bottom: 27,
+          bottom: 20,
           child: GestureDetector(
             onTap: () => onTap(currentIndex),
             child: Container(
@@ -109,10 +110,11 @@ class CustomNavBar extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Image.asset(
+                  child: Icon(
                     items[currentIndex].icon,
                     key: ValueKey<int>(currentIndex),
-                    color: currentIndex != 0 ? Colors.white : null,
+                    size: 28.h,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -125,7 +127,7 @@ class CustomNavBar extends StatelessWidget {
 }
 
 class _NavItemData {
-  final String icon;
+  final IconData icon;
   final String label;
   const _NavItemData(this.icon, this.label);
 }

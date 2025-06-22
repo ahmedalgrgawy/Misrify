@@ -31,7 +31,7 @@ class CustomTextContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final RegistrationController registrationController =
-        Get.find<RegistrationController>();
+        Get.put(RegistrationController());
 
     return Obx(() {
       // ✅ Get the error message for the specific field

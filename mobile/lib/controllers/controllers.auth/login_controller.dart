@@ -36,30 +36,31 @@ class LoginController extends GetxController {
 
         LoginResponse data = loginResponseFromJson(response.body);
 
-        // ✅ Extract and store accessToken & refreshToken
+        // ✅ Store tokens
         String? rawCookie = response.headers['set-cookie'];
         if (rawCookie != null) {
           final parts = rawCookie.split(',');
           for (var part in parts) {
             if (part.contains('accessToken=')) {
-              final access = part.trim().split(';')[0]; // accessToken=...
-              box.write('token', access.split('=')[1]); // Store only the token
-              print('🔐 accessToken: ${box.read('token')}');
+              final access = part.trim().split(';')[0];
+              box.write('token', access.split('=')[1]);
             }
-
             if (part.contains('refreshToken=')) {
               final refresh = part.trim().split(';')[0];
-              box.write('refreshToken', refresh); // Save full: refreshToken=...
-              print('🔁 refreshToken: ${box.read('refreshToken')}');
+              box.write('refreshToken', refresh);
             }
           }
         }
 
+        // ✅ Store user info
         String userId = data.user.id;
         String userData = jsonEncode(data);
         box.write(userId, userData);
-        box.write('userId', data.user.id);
+        box.write('userId', userId);
         box.write('verification', data.user.isVerified);
+
+        // ✅ Store user profile image for AppBar
+        box.write('userImg', data.user.imgUrl);
 
         setLoading = false;
 
@@ -74,8 +75,7 @@ class LoginController extends GetxController {
           Get.to(() => const VerificationScreen(),
               transition: Transition.fade,
               duration: const Duration(milliseconds: 900));
-        }
-        if (data.user.isVerified == true) {
+        } else {
           AuthenticationRepository.instance.screenRedirect();
         }
       } else {

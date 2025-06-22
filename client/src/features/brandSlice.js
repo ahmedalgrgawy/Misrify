@@ -20,7 +20,7 @@ export const createBrand = createAsyncThunk(
   async (newBrand, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(`admin/create-brand`, newBrand);
-      return response.data; 
+      return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
     }
@@ -45,7 +45,7 @@ export const editBrand = createAsyncThunk(
   "brands/editBrand",
   async ({ brandId, updatedData }, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.put(`/admin/edit-brand/${brandId}`,updatedData);
+      const response = await axiosInstance.put(`/admin/edit-brand/${brandId}`, updatedData);
       return response.data.brand;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message);
@@ -114,7 +114,7 @@ const BrandSlice = createSlice({
         // Update the brand in the state
         const updatedBrand = action.payload;
         state.brands = state.brands.map((brand) =>
-        brand._id === updatedBrand._id ? updatedBrand : brand
+          brand._id === updatedBrand._id ? updatedBrand : brand
         );
       })
       .addCase(editBrand.rejected, (state, action) => {

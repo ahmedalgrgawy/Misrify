@@ -46,6 +46,7 @@ class User {
   final DateTime createdAt;
   final DateTime updatedAt;
   final int v;
+  final String? imgUrl; // ✅ Add this line
 
   User({
     required this.id,
@@ -64,6 +65,7 @@ class User {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
+    this.imgUrl, // ✅ Include in constructor
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
@@ -85,6 +87,7 @@ class User {
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
+        imgUrl: json["imgUrl"], // ✅ Include from JSON
       );
 
   Map<String, dynamic> toJson() => {
@@ -103,6 +106,8 @@ class User {
         "otp": otp,
         "otpExpiry": otpExpiry,
         "createdAt": createdAt.toIso8601String(),
+        "imgUrl": imgUrl, // ✅ Add to JSON
+
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,
       };

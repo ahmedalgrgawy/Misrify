@@ -45,6 +45,7 @@ class Product {
   final List<Review> reviews;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final String? imgUrl;
   final int v;
 
   Product({
@@ -62,12 +63,14 @@ class Product {
     required this.isApproved,
     required this.reviews,
     required this.createdAt,
+    this.imgUrl,
     required this.updatedAt,
     required this.v,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json["_id"] ?? '',
+        imgUrl: json["imgUrl"],
         name: json["name"] ?? '',
         category: json["category"] != null
             ? Brand.fromJson(json["category"])
@@ -115,6 +118,7 @@ class Product {
 
   Map<String, dynamic> toJson() => {
         "_id": id,
+        "imgUrl": imgUrl,
         "name": name,
         "category": category.toJson(),
         "brand": brand.toJson(),
@@ -167,12 +171,64 @@ class Product {
         updatedAt: item.updatedAt,
         v: item.v,
       );
+
+  Product copyWith({
+    String? id,
+    String? name,
+    Brand? category,
+    Brand? brand,
+    String? description,
+    int? quantityInStock,
+    double? price,
+    List<String>? colors,
+    List<String>? sizes,
+    bool? isDiscounted,
+    int? discountAmount,
+    bool? isApproved,
+    List<Review>? reviews,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    String? imgUrl,
+    int? v,
+  }) {
+    return Product(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      category: category ?? this.category,
+      brand: brand ?? this.brand,
+      description: description ?? this.description,
+      quantityInStock: quantityInStock ?? this.quantityInStock,
+      price: price ?? this.price,
+      colors: colors ?? this.colors,
+      sizes: sizes ?? this.sizes,
+      isDiscounted: isDiscounted ?? this.isDiscounted,
+      discountAmount: discountAmount ?? this.discountAmount,
+      isApproved: isApproved ?? this.isApproved,
+      reviews: reviews ?? this.reviews,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      imgUrl: imgUrl ?? this.imgUrl,
+      v: v ?? this.v,
+    );
+  }
+}
+
+extension SafeProduct on Product {
+  Product ensureValid() {
+    return copyWith(
+      brand: brand.name.isNotEmpty ? brand : Brand.empty(),
+      category: category.name.isNotEmpty ? category : Brand.empty(),
+      reviews: reviews,
+    );
+  }
 }
 
 class Brand {
   final String id;
   final String name;
   final String? owner;
+  final String? imgUrl; // 👈 Add this field
+
   final String? description;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -184,6 +240,8 @@ class Brand {
     this.owner,
     this.description,
     required this.createdAt,
+    this.imgUrl, // 👈 Add to constructor
+
     required this.updatedAt,
     required this.v,
   });
@@ -192,6 +250,8 @@ class Brand {
         id: json["_id"] ?? '',
         name: json["name"] ?? '',
         owner: json["owner"],
+        imgUrl: json["imgUrl"], // 👈 Add here
+
         description: json["description"],
         createdAt: DateTime.tryParse(json["createdAt"] ?? '') ?? DateTime.now(),
         updatedAt: DateTime.tryParse(json["updatedAt"] ?? '') ?? DateTime.now(),
@@ -202,6 +262,8 @@ class Brand {
         id: '',
         name: '',
         owner: '',
+        imgUrl: '', // 👈 Here too
+
         description: '',
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -211,6 +273,8 @@ class Brand {
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
+        "imgUrl": imgUrl, // 👈 And here
+
         "owner": owner,
         "description": description,
         "createdAt": createdAt.toIso8601String(),

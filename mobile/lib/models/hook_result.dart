@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:graduation_project1/models/api_error_model.dart';
 
 class FetchHook {
   final dynamic data;
@@ -11,5 +11,6 @@ class FetchHook {
     required this.isLoading,
     required this.error,
     required this.refetch,
+    ApiError? apiError,
   });
 }

@@ -7,6 +7,7 @@ import 'package:graduation_project1/views/products/widgets/rating and reviews/ra
 import 'package:graduation_project1/views/products/widgets/rating and reviews/user_reviews.dart';
 import 'package:graduation_project1/views/products/widgets/rating and reviews/review_container.dart';
 
+// ignore: must_be_immutable
 class ReviewsSection extends StatefulWidget {
   final List<Review> reviews;
   final String currentUserId;

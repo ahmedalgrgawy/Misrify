@@ -10,10 +10,31 @@ import User from "../models/user.model.js";
 
 // <<<<<<<<<<<<<<<<< Admin Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getRequestedProducts = async (req, res, next) => {
-    const requestedProducts = await Product.find({ isApproved: false })
-        .populate("category")
-        .populate("brand")
-        .exec();
+
+    const user = req.user;
+
+    let requestedProducts = [];
+
+    if (user.role === 'merchant') {
+
+        const brand = await Brand.findOne({ owner: user._id });
+
+        if (!brand) {
+            return next(new AppError("You Are Not Authorized To View This Page", 401));
+        }
+
+        requestedProducts = await Product.find({ isApproved: false, brand: brand._id })
+            .populate("category")
+            .populate("brand")
+            .exec();
+    } else {
+        requestedProducts = await Product.find({ isApproved: false })
+            .populate("category")
+            .populate("brand")
+            .exec();
+    }
+
+
 
     if (!requestedProducts || requestedProducts.length === 0) {
         return next(new AppError("No Requested Products Found", 404))
@@ -92,18 +113,10 @@ export const approveOrRejectProduct = async (req, res, next) => {
 }
 
 export const createProduct = async (req, res, next) => {
-    const { name, categoryId, description, quantityInStock, price, colors, sizes, isDiscounted, discountAmount } = req.body
-    let { imgUrl, brandId } = req.body;
+    const { name, categoryId, description, quantityInStock, price, colors, imgUrl, sizes, isDiscounted, discountAmount } = req.body
+    let { brandId } = req.body;
 
     const user = req.user;
-
-    if (imgUrl) {
-        const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
-            folder: "Products"
-        });
-
-        imgUrl = uploadedResponse.secure_url;
-    }
 
     if (user.role === 'merchant') {
         const merchantBrand = await Brand.findOne({ owner: user._id });
@@ -181,13 +194,13 @@ export const editProduct = async (req, res, next) => {
         }
     }
 
-    if (imgUrl) {
-        await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
-        const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
-            folder: "Products"
-        });
-        imgUrl = uploadedResponse.secure_url;
-    }
+    // if (imgUrl) {
+    //     await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
+    //     const uploadedResponse = await cloudinary.uploader.upload(imgUrl, {
+    //         folder: "Products"
+    //     });
+    //     imgUrl = uploadedResponse.secure_url;
+    // }
 
     product.name = name || product.name;
     product.category = categoryId || product.category.id;
@@ -222,56 +235,59 @@ export const deleteProduct = async (req, res, next) => {
     const { id } = req.params;
     const user = req.user;
 
-    if (!isValidObjectId(id)) return next(new AppError("Invalid product ID", 400))
-
     const product = await Product.findById(id).populate("category").populate("brand");
 
     if (!product) {
-        return next(new AppError("Product Not Found", 404))
+        return next(new AppError("Product Not Found", 404));
     }
 
     if (user.role === 'merchant') {
         if (product.brand.owner.toString() !== user._id.toString()) {
-            return next(new AppError("You Are Not Authorized To Delete This Product", 401))
+            return next(new AppError("You Are Not Authorized To Delete This Product", 401));
         }
     }
 
-    await cloudinary.uploader.destroy(product.imgUrl.split("/").pop().split(".")[0]);
+    // Delete all comments for each review and then delete the reviews
+    if (product.reviews.length > 0) {
+        for (const reviewId of product.reviews) {
+            const review = await Review.findById(reviewId);
+            if (review && Array.isArray(review.comments)) {
+                await Comment.deleteMany({ _id: { $in: review.comments } });
+            }
+            await Review.deleteOne({ _id: reviewId });
+        }
+    }
 
-    product.reviews.map(async (singleReview) => {
+    // Delete the product
+    await Product.deleteOne({ _id: id });
 
-        await Review.findById(singleReview).comments.map(async (singleComment) => {
-            await Comment.deleteOne({ _id: singleComment });
-        })
+    // Fetch brand merchant for notification
+    if (product.brand) {
+        const brandMerchant = await Brand.findById(product.brand).populate("owner");
 
-        await Review.deleteOne({ _id: singleReview });
-    })
+        // Create notification
+        await Notification.create({
+            receivers: [brandMerchant.owner._id],
+            sender: "Misrify Store",
+            content: `Product ${product.name} has been deleted by ${user.name}`,
+            type: "product",
+            isRead: false,
+        });
+    }
 
-    await product.deleteOne();
-
-    const brandMerchant = await Brand.findById(product.brand).populate("owner");
-
-    await Notification.create({
-        receivers: [brandMerchant.owner._id], // Changed to receivers array
-        sender: "Misrify Store", // Updated to Misrify Store
-        content: `Product ${product.name} has been deleted by ${user.name}`, // Changed to content
-        type: "product",
-        isRead: false,
-    })
-
-    res.status(200).json({ success: true, message: "Product Deleted Successfully" })
-}
+    res.status(200).json({ success: true, message: "Product Deleted Successfully" });
+};
 
 // <<<<<<<<<<<<<<<<< Merchant Functions >>>>>>>>>>>>>>>>>>>>>>>>>>
 export const getMerchantProducts = async (req, res, next) => {
     const merchantId = req.user._id;
-    const merchantBrand = await Brand.findOne({ owner: merchantId });
+    const merchantBrand = await Brand.findOne({ owner: merchantId, });
 
     if (!merchantBrand) {
         return next(new AppError("Merchant Does Not Have Any Products", 404))
     }
 
-    const products = await Product.find({ brand: merchantBrand._id }).populate("category")
+    const products = await Product.find({ brand: merchantBrand._id, isApproved: true }).populate("category")
         .populate("brand")
         .exec();
 
@@ -400,4 +416,3 @@ export const filterProducts = async (req, res, next) => {
 
     res.status(200).json({ success: true, products });
 };
-

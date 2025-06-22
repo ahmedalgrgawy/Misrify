@@ -19,8 +19,9 @@ class AllCategoryProductScreen extends HookWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<CategoryController>();
     final categoryName = controller.titleValue;
+    final categoryId = controller.categoryIdValue; // ✅ Use ID
     final sortType = useState<String>('Most Popular');
-    final hookResult = useFetchProductsByCategory(categoryName);
+    final hookResult = useFetchProductsByCategory(categoryId); // ✅ Correct ID
     final originalProducts = useState<List<Product>>([]);
     final displayedProducts = useState<List<Product>>([]);
 
@@ -39,17 +40,18 @@ class AllCategoryProductScreen extends HookWidget {
     return WillPopScope(
       onWillPop: () async {
         // ✅ Reset category state before navigating back
-        controller.updateCategory = '';
+        controller.updateCategoryId = '';
         controller.updateTitle = '';
-        return true; // Allow pop
+        return true;
       },
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
+            centerTitle: true,
             backgroundColor: Kbackground,
             title: ReusableText(
               text: categoryName,
-              style: appStyle(16, kDarkBlue, FontWeight.w500),
+              style: appStyle(18, KTextColor, FontWeight.w600),
             ),
             actions: [
               IconButton(
@@ -119,8 +121,7 @@ class AllCategoryProductScreen extends HookWidget {
                             price: product.price.toStringAsFixed(2),
                             isDiscounted: product.isDiscounted,
                             discountAmount: product.discountAmount,
-                            image:
-                                "https://plus.unsplash.com/premium_photo-1664472724753-0a4700e4137b?q=80&w=1780&auto=format&fit=crop",
+                            image: product.imgUrl,
                           );
                         },
                       ),

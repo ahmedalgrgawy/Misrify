@@ -71,6 +71,7 @@ const userSchema = new mongoose.Schema({
     resetPasswordOtpExpiry: {
         type: Date,
     },
+    lastActive: { type: Date, default: Date.now }
 }, { timestamps: true })
 
 userSchema.pre("save", async function (next) {

@@ -67,8 +67,6 @@ FetchHook useFetchcart() {
       );
 
       final decoded = jsonDecode(response.body);
-      debugPrint('Cart response: $decoded');
-      print(response.statusCode);
 
       if (response.statusCode == 200 &&
           decoded is Map<String, dynamic> &&

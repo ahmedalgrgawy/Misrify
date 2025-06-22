@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:graduation_project1/common/app_style.dart';
+import 'package:graduation_project1/common/custom_appbar.dart';
 import 'package:graduation_project1/common/custom_button.dart';
 import 'package:graduation_project1/common/reusable_text.dart';
 import 'package:graduation_project1/constants/constants.dart';
@@ -33,7 +36,8 @@ class ProductDetailScreen extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cartController = Get.put(CartController());
+    final cartController = Get.find<CartController>();
+
     final reviewController = Get.put(ReviewController());
     final selectedColor = useState('');
     final selectedSize = useState('');
@@ -43,10 +47,18 @@ class ProductDetailScreen extends HookWidget {
     final discountedPrice =
         (originalPrice - discountAmount).clamp(0, originalPrice);
 
-    final mainImage = useState(
-      //  product.image
+    final mainImage = useState<String>(
       'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=2069&auto=format&fit=crop',
-    ); // Replace with actual main image
+    );
+
+    useEffect(() {
+      if (product.imgUrl != null && product.imgUrl!.startsWith('http')) {
+        mainImage.value = product.imgUrl!;
+      }
+      return null;
+    }, []);
+
+// Replace with actual main image
     final reviewsKey = GlobalKey<ReviewsSectionState>();
     final hookResult = useFetchProductsByCategory(product.category.id);
     final selectedQuantity = useState<int>(1);
@@ -57,17 +69,11 @@ class ProductDetailScreen extends HookWidget {
     final userIdFromTokenOrStorage = box.read('userId') ?? "You";
 
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Get.back(),
-        ),
-        title: Center(
-          child: ReusableText(
-            text: 'Product Details',
-            style: appStyle(14, KTextColor, FontWeight.bold),
-          ),
-        ),
+      appBar: CustomAppbar(
+        title: 'Product Details',
+        onpress: () {
+          Get.back();
+        },
       ),
       bottomNavigationBar: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
@@ -103,6 +109,7 @@ class ProductDetailScreen extends HookWidget {
               color: product.colors.isEmpty ? null : selectedColor.value,
               size: product.sizes.isEmpty ? null : selectedSize.value,
             );
+            await cartController.refreshCartCount();
           },
           btnColor: kLightBlue,
           text: 'Add To Cart',
@@ -117,8 +124,45 @@ class ProductDetailScreen extends HookWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.network(mainImage.value,
-                  height: 300, width: double.infinity, fit: BoxFit.cover),
+              //image
+              SizedBox(
+                height: 360,
+                width: double.infinity,
+                child: () {
+                  final imgUrl = product.imgUrl;
+                  if (imgUrl != null && imgUrl.startsWith('data:image')) {
+                    try {
+                      final base64Str = imgUrl.split(',').last;
+                      return Image.memory(
+                        base64Decode(base64Str),
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.broken_image, size: 50);
+                        },
+                      );
+                    } catch (_) {
+                      return const Icon(Icons.broken_image, size: 50);
+                    }
+                  } else if (imgUrl != null && imgUrl.startsWith('http')) {
+                    return Image.network(
+                      imgUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.broken_image, size: 50);
+                      },
+                    );
+                  } else {
+                    return Image.network(
+                      'https://images.unsplash.com/photo-1529374255404-311a2a4f1fd9?q=80&w=2069&auto=format&fit=crop',
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(Icons.broken_image, size: 50);
+                      },
+                    );
+                  }
+                }(),
+              ),
+
               const SizedBox(height: 20),
               ReusableText(
                   text: product.brand.name,
@@ -177,12 +221,12 @@ class ProductDetailScreen extends HookWidget {
                       children: [
                         ReusableText(
                           text:
-                              "\$${(product.price - product.discountAmount).clamp(0, product.price).toStringAsFixed(2)}",
+                              "EGP ${(product.price - product.discountAmount).clamp(0, product.price).toStringAsFixed(2)}",
                           style: appStyle(22, kDarkBlue, FontWeight.w600),
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          "\$${product.price.toStringAsFixed(2)}",
+                          "EGP ${product.price.toStringAsFixed(2)}",
                           style: appStyle(16, kGray, FontWeight.w400).copyWith(
                             decoration: TextDecoration.lineThrough,
                           ),
@@ -203,7 +247,7 @@ class ProductDetailScreen extends HookWidget {
                       ],
                     )
                   : ReusableText(
-                      text: "\$${product.price.toStringAsFixed(2)}",
+                      text: "EGP ${product.price.toStringAsFixed(2)}",
                       style: appStyle(20, KTextColor, FontWeight.w700),
                     ),
 

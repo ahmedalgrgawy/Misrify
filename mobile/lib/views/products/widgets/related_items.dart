@@ -14,24 +14,28 @@ class RelatedItems extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 4),
       child: GrideLayout(
-        mainAxisspacing: 16,
-        mainAxis: 275,
+        mainAxisspacing: 10,
+        mainAxis: 260,
         crossAxiscount: 2,
         scrooldirection: Axis.vertical,
         shrinkwrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: products.length < 2 ? products.length : 2,
+        physics: const BouncingScrollPhysics(),
+        itemCount: products.length < 4 ? products.length : 4,
         itemBuilder: (context, i) {
           final product = products[i];
 
           return ProductWidget(
-            onTap: () => Get.to(() => ProductDetailScreen(product: product)),
+            onTap: () {
+              Get.to(() => ProductDetailScreen(product: product.copyWith()),
+                  preventDuplicates: false);
+            },
             brand: product.brand.name,
             price: product.price.toStringAsFixed(2),
             title: product.name,
+            id: product.id,
+            image: product.imgUrl,
             isDiscounted: product.isDiscounted,
             discountAmount: product.discountAmount,
-            id: product.id,
           );
         },
       ),

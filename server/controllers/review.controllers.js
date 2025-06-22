@@ -92,3 +92,107 @@ export const deleteReview = async (req, res, next) => {
 
     res.status(200).json({ success: true, message: "Review deleted successfully" });
 };
+
+export const getMerchantReviews = async (req, res, next) => {
+    try {
+        const merchantId = req.user._id;
+
+        const reviews = await Product.aggregate([
+            // Step 1: Lookup merchant's brands
+            {
+                $lookup: {
+                    from: "brands",
+                    let: { merchantId: merchantId },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$owner", "$$merchantId"] } } },
+                        { $project: { _id: 1 } },
+                    ],
+                    as: "merchantBrands",
+                },
+            },
+            // Step 2: Match products for those brands
+            {
+                $match: {
+                    $expr: { $in: ["$brand", "$merchantBrands._id"] },
+                },
+            },
+            // Step 3: Unwind reviews array
+            { $unwind: "$reviews" },
+            // Step 4: Lookup review details
+            {
+                $lookup: {
+                    from: "reviews",
+                    let: { reviewId: "$reviews" },
+                    pipeline: [
+                        { $match: { $expr: { $eq: ["$_id", "$$reviewId"] } } },
+                        {
+                            $lookup: {
+                                from: "users",
+                                localField: "user",
+                                foreignField: "_id",
+                                as: "user",
+                            },
+                        },
+                        { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+                        {
+                            $lookup: {
+                                from: "comments",
+                                localField: "comments",
+                                foreignField: "_id",
+                                as: "comments",
+                                pipeline: [
+                                    {
+                                        $lookup: {
+                                            from: "users",
+                                            localField: "user",
+                                            foreignField: "_id",
+                                            as: "user",
+                                        },
+                                    },
+                                    { $unwind: { path: "$user", preserveNullAndEmptyArrays: true } },
+                                    {
+                                        $project: {
+                                            _id: 1,
+                                            text: 1,
+                                            createdAt: 1,
+                                            user: { _id: 1, name: 1, email: 1 },
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                        {
+                            $project: {
+                                _id: 1,
+                                rating: 1,
+                                reviewText: 1,
+                                createdAt: 1,
+                                user: { _id: 1, name: 1, email: 1 },
+                                comments: 1,
+                            },
+                        },
+                    ],
+                    as: "review",
+                },
+            },
+            { $unwind: "$review" },
+            // Step 5: Project final output
+            {
+                $project: {
+                    _id: "$review._id",
+                    rating: "$review.rating",
+                    reviewText: "$review.reviewText",
+                    createdAt: "$review.createdAt",
+                    user: "$review.user",
+                    comments: "$review.comments",
+                    product: { _id: "$_id", name: "$name", imgUrl: "$imgUrl" },
+                },
+            },
+        ]);
+
+        res.status(200).json({ success: true, reviews });
+    } catch (error) {
+        console.error("Aggregation error:", error);
+        res.status(500).json({ success: false, message: "Failed to fetch reviews" });
+    }
+};
