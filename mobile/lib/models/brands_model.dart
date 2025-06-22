@@ -29,11 +29,12 @@ class Brand {
   final String id;
   final String name;
   final Owner owner;
+  final String? imgUrl;
+
   final String description;
   final DateTime createdAt;
   final DateTime updatedAt;
   final int v;
-
   Brand({
     required this.id,
     required this.name,
@@ -42,6 +43,7 @@ class Brand {
     required this.createdAt,
     required this.updatedAt,
     required this.v,
+    this.imgUrl,
   });
 
   factory Brand.fromJson(Map<String, dynamic> json) => Brand(
@@ -49,13 +51,13 @@ class Brand {
         name: json["name"],
         owner: Owner.fromJson(json["owner"]),
         description: json["description"],
+        imgUrl: json["imgUrl"], // 👈 add this line
         createdAt: DateTime.parse(json["createdAt"]),
         updatedAt: DateTime.parse(json["updatedAt"]),
         v: json["__v"],
       );
 
   factory Brand.empty() => Brand(
-        // ✅ Add this method
         id: '',
         name: '',
         owner: Owner(
@@ -66,6 +68,7 @@ class Brand {
           address: '',
         ),
         description: '',
+        imgUrl: '', // 👈 also here
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         v: 0,
@@ -76,6 +79,7 @@ class Brand {
         "name": name,
         "owner": owner.toJson(),
         "description": description,
+        "imgUrl": imgUrl, // 👈 and here
         "createdAt": createdAt.toIso8601String(),
         "updatedAt": updatedAt.toIso8601String(),
         "__v": v,

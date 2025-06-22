@@ -169,6 +169,7 @@ class WishlistItem {
         name: brand.name,
         owner: brand.owner,
         description: brand.description,
+        imgUrl: brand.imgUrl, // 👈 add this
         createdAt: brand.createdAt,
         updatedAt: brand.updatedAt,
         v: brand.v,
