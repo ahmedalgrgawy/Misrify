@@ -74,6 +74,8 @@ dependencies:
 
 
 
+  flutter_otp_text_field: any
+  intl: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

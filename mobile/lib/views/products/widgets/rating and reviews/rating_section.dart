@@ -30,7 +30,7 @@ class RatingSection extends StatelessWidget {
             child: Column(
               children: [
                 ReusableText(
-                  text: '${rate.toStringAsFixed(1)}',
+                  text: rate.toStringAsFixed(1),
                   style: appStyle(40, KTextColor, FontWeight.w600),
                 ),
                 Row(
@@ -48,7 +48,7 @@ class RatingSection extends StatelessWidget {
                   }),
                 ),
                 ReusableText(
-                  text: '${reviewsNum} Reviews',
+                  text: '$reviewsNum Reviews',
                   style: appStyle(13, KTextColor, FontWeight.w400),
                 ),
               ],

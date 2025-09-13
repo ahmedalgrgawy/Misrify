@@ -7,7 +7,7 @@ import 'package:graduation_project1/models/products_model.dart';
 class ProductsController extends GetxController {
   RxInt currentPage = 0.obs;
   RxInt count = 1.obs;
-  RxDouble _totalPrice = 0.0.obs;
+  final RxDouble _totalPrice = 0.0.obs;
 
   double get additivePrice => _totalPrice.value;
 

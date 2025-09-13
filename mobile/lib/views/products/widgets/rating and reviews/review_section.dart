@@ -125,7 +125,7 @@ class ReviewsSectionState extends State<ReviewsSection> {
               },
               onReviewSubmitted: (_) {}, // not used in update mode
             ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           if (_reviews.length > 2)

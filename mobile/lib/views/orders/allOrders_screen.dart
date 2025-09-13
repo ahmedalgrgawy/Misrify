@@ -23,7 +23,7 @@ class AllOrdersScreen extends HookWidget {
       appBar: CustomAppbar(
         title: 'My Orders',
         onpress: () {
-          Get.to(ProfileScreen());
+          Get.to(const ProfileScreen());
         },
       ),
       body: isLoading

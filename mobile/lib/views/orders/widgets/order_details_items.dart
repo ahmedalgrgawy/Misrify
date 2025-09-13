@@ -77,11 +77,9 @@ class OrderDetailsItems extends StatelessWidget {
                   SizedBox(height: 6.h),
                   Row(
                     children: [
-                      if (item.color != null &&
-                          item.color!.toLowerCase() != 'default')
+                      if (item.color.toLowerCase() != 'default')
                         _buildTag("Color: ${item.color}"),
-                      if (item.size != null &&
-                          item.size!.toLowerCase() != 'default') ...[
+                      if (item.size.toLowerCase() != 'default') ...[
                         SizedBox(width: 6.w),
                         _buildTag("Size: ${item.size}"),
                       ],

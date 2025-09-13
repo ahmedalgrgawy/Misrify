@@ -22,6 +22,6 @@ const Kfoundation = Color(0xff121111);
 double height = 825.h;
 double width = 375.w;
 
-const String appBaseUrl = "http://10.0.2.2:5000/api";
+const String appBaseUrl = "http://192.168.1.4:5000/api";
 // local ip  IPv4 Address. . . . . . . . . . . : 172.24.128.1
 

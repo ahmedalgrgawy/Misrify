@@ -9,7 +9,7 @@ import 'package:http/http.dart' as http;
 
 class WishlistController extends GetxController {
   final box = GetStorage();
-  RxBool _isLoading = false.obs;
+  final RxBool _isLoading = false.obs;
   RxSet<String> wishlistIds = <String>{}.obs;
 
   bool get isLoading => _isLoading.value;

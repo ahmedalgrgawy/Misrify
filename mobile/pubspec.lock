@@ -388,7 +388,7 @@ packages:
     source: hosted
     version: "2.4.1"
   flutter_otp_text_field:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_otp_text_field
       sha256: "7a33285d22cafc38ea13a75ff61eff2c9b3c4860b59ba10838ad9b20ee72196d"
@@ -766,7 +766,7 @@ packages:
     source: hosted
     version: "0.2.1+1"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
       sha256: d6f56758b7d3014a48af9701c085700aac781a92a87a62b1333b46d8879661cf

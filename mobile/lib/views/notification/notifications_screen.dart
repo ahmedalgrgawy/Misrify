@@ -43,7 +43,7 @@ class NotificationsScreen extends StatelessWidget {
                     Get.bottomSheet(
                       Container(
                         padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: Colors.white,
                           borderRadius:
                               BorderRadius.vertical(top: Radius.circular(16)),

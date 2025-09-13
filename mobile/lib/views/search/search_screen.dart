@@ -71,9 +71,9 @@ class _SearchScreenState extends State<SearchScreen> {
           return const Center(child: Text("No products found."));
         }
 
-        return Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: const SearchResults(),
+        return const Padding(
+          padding: EdgeInsets.only(top: 20.0),
+          child: SearchResults(),
         );
       }),
     );

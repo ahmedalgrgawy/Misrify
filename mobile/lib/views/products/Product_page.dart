@@ -26,7 +26,7 @@ import 'package:graduation_project1/views/products/widgets/size_box.dart';
 class ProductDetailScreen extends HookWidget {
   final Product product;
 
-  ProductDetailScreen({Key? key, required this.product}) : super(key: key);
+  const ProductDetailScreen({Key? key, required this.product}) : super(key: key);
 
   double get averageRating {
     if (product.reviews.isEmpty) return 0.0;
@@ -342,7 +342,7 @@ class ProductDetailScreen extends HookWidget {
                   style: appStyle(14, kGray, FontWeight.w400),
                   maxlines: 3),
               const SizedBox(height: 24),
-              DeliverySection(),
+              const DeliverySection(),
               const SizedBox(height: 15),
               ReviewInputContainer(
                 productId: product.id,

@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
@@ -106,11 +105,11 @@ class PasswordTextfield extends StatelessWidget {
                 borderRadius: BorderRadius.all(Radius.circular(15.r)),
               ),
               errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: kRed, width: .5),
+                borderSide: const BorderSide(color: kRed, width: .5),
                 borderRadius: BorderRadius.all(Radius.circular(15.r)),
               ),
               focusedErrorBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: kRed, width: .5),
+                borderSide: const BorderSide(color: kRed, width: .5),
                 borderRadius: BorderRadius.all(Radius.circular(15.r)),
               ),
             ),

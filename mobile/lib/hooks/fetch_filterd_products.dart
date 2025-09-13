@@ -97,7 +97,6 @@ FetchHook useFetchProductsByCategory(String categoryId) {
       } else {
         products.value = [];
       }
-    } catch (e) {
     } finally {
       isLoading.value = false;
     }

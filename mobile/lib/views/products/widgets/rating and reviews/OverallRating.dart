@@ -7,7 +7,7 @@ class OverallRating extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
         RatingProgress(text: '5', value: 1),
         RatingProgress(text: '4', value: .8),

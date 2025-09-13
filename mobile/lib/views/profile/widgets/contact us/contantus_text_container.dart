@@ -79,10 +79,10 @@ class ContantusTextContainer extends StatelessWidget {
                 borderSide: BorderSide(
                     color: errorMessage != null ? kRed : kLightGray, width: .5),
               ),
-              errorBorder: OutlineInputBorder(
+              errorBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: kRed, width: .5),
               ),
-              focusedErrorBorder: OutlineInputBorder(
+              focusedErrorBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: kRed, width: .5),
               ),
             ),

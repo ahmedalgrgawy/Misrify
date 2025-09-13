@@ -44,10 +44,10 @@ class EditprofileTextContainer extends StatelessWidget {
               errorText: errorText,
               filled: true,
               fillColor: kLightWhite.withOpacity(0.45),
-              border: OutlineInputBorder(
+              border: const OutlineInputBorder(
                 borderSide: BorderSide(color: Kbackground, width: .5),
               ),
-              enabledBorder: OutlineInputBorder(
+              enabledBorder: const OutlineInputBorder(
                 borderSide: BorderSide(color: Kbackground, width: .5),
               ),
               focusedBorder: OutlineInputBorder(

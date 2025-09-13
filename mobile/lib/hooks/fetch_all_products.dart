@@ -37,7 +37,6 @@ FetchHook useFetchNewArrivals() {
 
         return products
             .where((p) =>
-                p.createdAt != null &&
                 now.difference(p.createdAt).inDays <= 365)
             .toList()
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));

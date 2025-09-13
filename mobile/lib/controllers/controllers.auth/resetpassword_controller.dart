@@ -9,7 +9,7 @@ import 'package:graduation_project1/views/auth/success_screen.dart';
 import 'package:http/http.dart' as http;
 
 class ResetpasswordController extends GetxController {
-  RxBool _isLoading = false.obs;
+  final RxBool _isLoading = false.obs;
   final box = GetStorage();
 
   String _password = '';
@@ -61,7 +61,7 @@ class ResetpasswordController extends GetxController {
 
         setLoading = false;
 
-        Get.offAll(() => SuccessScreen());
+        Get.offAll(() => const SuccessScreen());
       } else {
         var error = apiErrorFromJson(response.body);
         Get.snackbar('Failed to verify', error.message,

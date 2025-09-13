@@ -37,7 +37,7 @@ class ConfirmOrderScreen extends HookWidget {
 
     final productsHook = useFetchAllProducts();
     final cartController = Get.find<CartController>();
-    late final TextEditingController _addressController =
+    late final TextEditingController addressController =
         TextEditingController();
     final CouponController couponController = Get.find<CouponController>();
     final orderController = Get.put(OrderController());
@@ -151,9 +151,9 @@ class ConfirmOrderScreen extends HookWidget {
                     ),
                     const SectionHeading(title: 'Address', showButton: false),
                     Padding(
-                      padding: EdgeInsets.only(right: 30.0, left: 30, top: 10),
+                      padding: const EdgeInsets.only(right: 30.0, left: 30, top: 10),
                       child: TextFormField(
-                        controller: _addressController,
+                        controller: addressController,
                         maxLines: 2,
                         style: appStyle(14, kBlue, FontWeight.w400),
                         decoration: InputDecoration(
@@ -187,7 +187,7 @@ class ConfirmOrderScreen extends HookWidget {
                     const SectionHeading(
                         title: 'Payment Method', showButton: false),
                     Padding(
-                      padding: EdgeInsets.only(right: 30.0, left: 30, top: 10),
+                      padding: const EdgeInsets.only(right: 30.0, left: 30, top: 10),
                       child: Obx(() => Container(
                             decoration: BoxDecoration(
                                 color: Colors.white,
@@ -255,7 +255,7 @@ class ConfirmOrderScreen extends HookWidget {
                                 final couponCode =
                                     couponController.appliedCoupon.value?.code;
                                 final shippingAddress =
-                                    _addressController.text.trim();
+                                    addressController.text.trim();
                                 final paymentMethod =
                                     selectedPaymentMethod.value;
 

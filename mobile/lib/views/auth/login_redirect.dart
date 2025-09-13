@@ -23,7 +23,7 @@ class LoginRedirect extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Container(
+          SizedBox(
             width: width,
             child: LottieBuilder.asset("assets/anime/delivery.json",
                 width: width, height: height / 2),
@@ -32,7 +32,7 @@ class LoginRedirect extends StatelessWidget {
             onTap: () {
               Get.to(() => const LoginScreen(),
                   transition: Transition.cupertino,
-                  duration: Duration(milliseconds: 900));
+                  duration: const Duration(milliseconds: 900));
             },
             text: 'L O G I N ',
             btnColor: kGray,

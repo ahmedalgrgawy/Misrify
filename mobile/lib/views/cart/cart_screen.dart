@@ -283,7 +283,7 @@ class CartScreen extends HookWidget {
                 const SizedBox(height: 12),
                 CustomButton(
                   onTap: () {
-                    Get.to(ConfirmOrderScreen());
+                    Get.to(const ConfirmOrderScreen());
                   },
                   btnColor: kNavy,
                   text: 'Checkout',

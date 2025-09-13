@@ -48,8 +48,8 @@ class CustomNavBar extends StatelessWidget {
 
                 // Add Spacer around center index to ensure equal spacing
                 if (index == 2) {
-                  return Expanded(
-                    child: const SizedBox(), // reserve space for center button
+                  return const Expanded(
+                    child: SizedBox(), // reserve space for center button
                   );
                 }
 

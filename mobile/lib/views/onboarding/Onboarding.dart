@@ -40,7 +40,7 @@ class OnboardingScreen extends StatelessWidget {
                 )
               ],
             ),
-            if (controller.currentPageIndex != 2) SkipButton(),
+            if (controller.currentPageIndex != 2) const SkipButton(),
             const DotNavigation(),
             const NextButton()
           ],

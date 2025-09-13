@@ -23,7 +23,7 @@ class Appbar extends StatelessWidget implements PreferredSizeWidget {
   final double? height;
   final EdgeInsetsGeometry? padding;
 
-  Appbar({
+  const Appbar({
     super.key,
     required this.title,
     this.child,

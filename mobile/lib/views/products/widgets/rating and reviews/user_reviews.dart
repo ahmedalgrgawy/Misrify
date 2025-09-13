@@ -78,7 +78,7 @@ class _UserReviewsState extends State<UserReviews> {
     } else {
       final created =
           await commentsController.createComment(text, widget.review.id);
-      if (created != null && created is Map<String, dynamic>) {
+      if (created != null) {
         setState(() {
           fetchedComments.add(created);
           controller.clear();

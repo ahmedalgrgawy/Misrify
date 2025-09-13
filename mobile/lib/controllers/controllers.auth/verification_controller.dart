@@ -11,7 +11,7 @@ import 'package:graduation_project1/views/home/Home_Screen.dart';
 import 'package:http/http.dart' as http;
 
 class VerificationController extends GetxController {
-  RxBool _isLoading = false.obs;
+  final RxBool _isLoading = false.obs;
   final box = GetStorage();
 
   dynamic _code;
@@ -64,7 +64,7 @@ class VerificationController extends GetxController {
 
         setLoading = false;
 
-        Get.offAll(() => HomeScreen());
+        Get.offAll(() => const HomeScreen());
       } else {
         var error = apiErrorFromJson(response.body);
         Get.snackbar('Failed to verify', error.message,
@@ -93,6 +93,6 @@ class VerificationController extends GetxController {
     Get.snackbar('OTP Entered correctly', 'Please, Enter your new password',
         colorText: Colors.white, backgroundColor: Colors.green);
 
-    Get.offAll(() => NewpasswordScreen());
+    Get.offAll(() => const NewpasswordScreen());
   }
 }

@@ -19,8 +19,8 @@ class RatingProgress extends StatelessWidget {
             child: Row(
               children: [
                 Text(text, style: appStyle(14, KTextColor, FontWeight.w400)),
-                SizedBox(width: 3),
-                Icon(Icons.star, size: 16, color: Colors.amber),
+                const SizedBox(width: 3),
+                const Icon(Icons.star, size: 16, color: Colors.amber),
               ],
             ),
           ),

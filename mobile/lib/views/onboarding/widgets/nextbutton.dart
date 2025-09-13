@@ -30,7 +30,7 @@ class NextButton extends StatelessWidget {
                         style: appStyle(15, kDarkBlue, FontWeight.w400),
                       )
                     : ReusableText(
-                        text: "Let\'s Start",
+                        text: "Let's Start",
                         style: appStyle(15, kDarkBlue, FontWeight.w400),
                       ),
                 SizedBox(width: 5.w),

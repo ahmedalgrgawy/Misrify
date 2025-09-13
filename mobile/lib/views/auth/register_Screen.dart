@@ -233,13 +233,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: kRed, width: .5),
+                                        const BorderSide(color: kRed, width: .5),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15.r)),
                                   ),
                                   focusedErrorBorder: OutlineInputBorder(
                                     borderSide:
-                                        BorderSide(color: kRed, width: .5),
+                                        const BorderSide(color: kRed, width: .5),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(15.r)),
                                   ),

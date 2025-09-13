@@ -19,7 +19,7 @@ class CategoryWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.put(CategoryController());
 
-    Widget _buildImage(String? imgUrl) {
+    Widget buildImage(String? imgUrl) {
       if (imgUrl != null && imgUrl.startsWith('data:image')) {
         try {
           final base64Str = imgUrl.split(',').last;
@@ -80,7 +80,7 @@ class CategoryWidget extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10.r),
-                child: _buildImage(category.imgUrl),
+                child: buildImage(category.imgUrl),
               ),
             ),
             Padding(

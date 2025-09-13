@@ -103,7 +103,7 @@ class ProfileScreen extends HookWidget {
                         icon: CupertinoIcons.cube_box,
                         title: 'Orders',
                         onTap: () {
-                          Get.to(() => AllOrdersScreen());
+                          Get.to(() => const AllOrdersScreen());
                         },
                       ),
                       ProfileTile(

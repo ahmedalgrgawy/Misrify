@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:graduation_project1/views/shop/widgets/filter_custom_container.dart';
 
 class FilterSizeWidget extends StatelessWidget {
-  FilterSizeWidget({super.key, required this.size});
+  const FilterSizeWidget({super.key, required this.size});
   final String size;
 
   @override
